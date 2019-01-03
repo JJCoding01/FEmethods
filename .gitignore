@@ -2,3 +2,8 @@
 env/*
 
 scrap/*
+
+# ignore build related folders
+build/*
+dist/*
+femethods.egg-info/*
