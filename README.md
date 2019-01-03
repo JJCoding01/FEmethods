@@ -8,6 +8,10 @@ Using Finite elements has the advantage over using exact solutions because it ca
 
 ## Installation
 
+__FEMethods__ is hosted on PyPi, so installation is simple.
+
+`pip install femethods`
+
 
 ## General Layout
 
