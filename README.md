@@ -1,7 +1,7 @@
 # FEMethods
 
 ## Introduction
-_FEMethods_ is a module that uses __F__inite __E__lement __Methods__ to determine the reactions, and plot the shear, moment, and deflection along the length of a beam.
+_FEMethods_ is a module that uses Finite Element Methods to determine the reactions, and plot the shear, moment, and deflection along the length of a beam.
 
 Using Finite elements has the advantage over using exact solutions because it can be used as a general analysis, and can analyze beams that are statically indeterminate. The downside of this numerical approach is it will be less accurate than the exact approach.
 
