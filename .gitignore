@@ -1,0 +1,4 @@
+# ignore python environment
+env/*
+
+scrap/*
