@@ -7,8 +7,10 @@ https://www.awc.org/pdf/codes-standards/publications/design-aids/AWC-DA6-BeamFor
 import numpy as np
 import matplotlib.pyplot as plt
 
-from fem import Base
-from reactions import PointLoad, MomentLoad, PinnedReaction, FixedReaction
+from .elements import Base
+
+from .reactions import PinnedReaction, FixedReaction
+from .loads import PointLoad, MomentLoad
 
 
 class ExactBase(Base):
