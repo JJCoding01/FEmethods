@@ -56,6 +56,9 @@ class PinnedReaction(Reaction):
                 f'  Location: {self.location}\n'
                 f'     Force: {self.force}\n')
 
+    def __repr__(self):
+        return f'PinnedReaction(location={self.location}, label={self.label})'
+
 
 class FixedReaction(Reaction):
 

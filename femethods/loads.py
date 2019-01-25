@@ -18,6 +18,9 @@ class PointLoad(Forces):
     def __str__(self):
         return f'PointLoad(location={self.location}, value={self.value})'
 
+    def __repr__(self):
+        return f'PointLoad(location={self.location}, value={self.value})'
+
 
 class MomentLoad(Forces):
     """
