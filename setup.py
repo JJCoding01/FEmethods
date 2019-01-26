@@ -5,7 +5,7 @@ with open('README.md', 'r') as f:
 
 setup(
     name='femethods',
-    version='0.01dev',
+    version='0.1.3dev',
     author='Joseph Contreras',
     author_email='26684136+JosephJContreras@users.noreply.github.com',
     description='Implementation of Finite Element Analysis',
