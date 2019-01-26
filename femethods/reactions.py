@@ -10,7 +10,7 @@ class Reaction(Forces):
 
     name = None
 
-    def __init__(self, location, label=None):
+    def __init__(self, location):
         super().__init__(value=None, location=location)
         self._force = None
         self._moment = None
@@ -36,44 +36,38 @@ class Reaction(Forces):
         return (self.force, self.moment)
 
     def invalidate(self):
-        """Invalidate the reaction values. To be used whenever the parameters cha Ie, for when inputs change and the
-        reaction values are no longer valid
+        """Invalidate the reaction values
+
+        To be used whenever the parameters change and the reaction values are
+        no longer valid
         """
         self.force, self.moment = (None, None)
+
+    def __str__(self):
+        return (f'{self.__class__.__name__}\n'
+                f'  Location: {self.location}\n'
+                f'     Force: {self.force}\n'
+                f'    Moment: {self.moment}\n')
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}(location={self.location})'
 
 
 class PinnedReaction(Reaction):
 
     name = 'pinned'
 
-    def __init__(self, location, label=None):
-        super().__init__(location, label)
+    def __init__(self, location):
+        super().__init__(location)
         # limit the vertical displacemnt but allow rotation
         self.boundary = (0, None)
-
-    def __str__(self):
-        return (f'Pinned Reaction\n'
-                f'  Location: {self.location}\n'
-                f'     Force: {self.force}\n')
-
-    def __repr__(self):
-        return f'PinnedReaction(location={self.location})'
 
 
 class FixedReaction(Reaction):
 
     name = 'fixed'
 
-    def __init__(self, location, label=None):
-        super().__init__(location, label)
+    def __init__(self, location):
+        super().__init__(location)
         # do not allow vertical or rotational displacement
         self.boundary = (0, 0)
-
-    def __str__(self):
-        return (f'Fixed Reaction\n'
-                f'  Location: {self.location}\n'
-                f'     Force: {self.force}\n'
-                f'    Moment: {self.moment}\n')
-
-    def __repr__(self):
-        return f'FixedReaction(location={self.location})'
