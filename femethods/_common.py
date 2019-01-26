@@ -37,6 +37,21 @@ class Validator(object):
             return wrapper
         return decorator
 
+    @staticmethod
+    def islist(param_name='parameter'):
+        """Function decorator to handle validating input parameters to ensure
+        parameters are a list.
+
+        The input, param_name, is the parameter name that will show up in the
+        call-stack when an invalid parameter is entered.
+        """
+        def decorator(func):
+            def wrapper(*args, **kwargs):
+                if not isinstance(args[1], list):
+                    raise TypeError(param_name + ' must be a list!')
+                func(*args, **kwargs)
+            return wrapper
+        return decorator
 
 class Forces(object):
     """Base class for all loads and reactions"""
