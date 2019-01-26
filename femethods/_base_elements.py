@@ -158,6 +158,24 @@ class BeamElement(Element):
         self.invalidate()
 
     @property
+    def loads(self):
+        return self._loads
+
+    @loads.setter
+    @Validator.islist('loads')
+    def loads(self, loads):
+        self._loads = loads
+
+    @property
+    def reactions(self):
+        return self._reactions
+
+    @reactions.setter
+    @Validator.islist('reactions')
+    def reactions(self, reactions):
+        self._reactions = reactions
+
+    @property
     def node_deflections(self):
         if self._node_deflections is None:
             self._node_deflections = self._calc_node_deflections()
