@@ -6,84 +6,12 @@ the base element class that all FEM elements will be derived from
 import numpy as np
 import matplotlib.pyplot as plt
 
+from .mesh import Mesh
+from ._common import Validator
+
 # Importing loads is only used for checking the type. Find a better way to do
 # this without needing to import loads
 from .loads import PointLoad, MomentLoad
-
-
-class Decorator(object):
-    """Decorator class used to validate parameters"""
-    @staticmethod
-    def positive(param_name='parameter'):
-        """Function decorator to handle validating input parameters to ensure
-        parameters are positive values.
-
-        The input, param_name, is the parameter name that will show up in the
-        call-stack when an invalid parameter is entered.
-        """
-        def decorator(func):
-            def wrapper(*args, **kwargs):
-                if args[1] <= 0:
-                    raise ValueError(param_name + ' must be positive!')
-                func(*args, **kwargs)
-            return wrapper
-        return decorator
-
-
-class Mesh(object):
-    """define a mesh that will handle degrees-of-freedom (dof), element lengths
-    etc."""
-
-    def __init__(self, length, loads, reactions, dof):
-        self._nodes = self.__get_nodes(length, loads, reactions)
-        self._lengths = self.__get_lengths()
-        self._num_elements = len(self.lengths)
-        self._dof = dof * self.num_elements + dof
-
-    @property
-    def nodes(self):
-        return self._nodes
-
-    @property
-    def dof(self):
-        return self._dof
-
-    @property
-    def lengths(self):
-        return self._lengths
-
-    @property
-    def num_elements(self):
-        return self._num_elements
-
-    @num_elements.setter
-    @Decorator.positive('number of elements')
-    def num_elemnts(self, n):
-        self._num_elements = n
-
-    def __get_lengths(self):
-        # Calculate the lengths of each element
-        lengths = []
-        for k in range(len(self.nodes) - 1):
-            lengths.append(self.nodes[k + 1] - self.nodes[k])
-        return lengths
-
-    def __get_nodes(self, length, loads, reactions):
-        nodes = [0]  # ensure first node is always at zero (0)
-        for param in loads + reactions:
-            nodes.append(param.location)
-        nodes.append(length)  # ensure last node is at the end of the beam
-        nodes = list(set(nodes))   # remove duplicates
-        nodes.sort()
-        return nodes
-
-    def __str__(self):
-        s = ('MESH PARAMETERS\n'
-            f'Number of elements: {self.num_elements}\n'
-            f'Node locations: {self.nodes}\n'
-            f'Element Lengths: {self.lengths}\n'
-            f'Total degrees of freedom: {self.dof}\n')
-        return s
 
 
 class Base(object):
@@ -99,7 +27,7 @@ class Base(object):
         return self._length
 
     @length.setter
-    @Decorator.positive('length')
+    @Validator.positive('length')
     def length(self, length):
         self._length = length
 
@@ -108,7 +36,7 @@ class Base(object):
         return self._E
 
     @E.setter
-    @Decorator.positive("Young's modulus")
+    @Validator.positive("Young's modulus")
     def E(self, E):
         self._E = E
 
@@ -117,7 +45,7 @@ class Base(object):
         return self._Ixx
 
     @Ixx.setter
-    @Decorator.positive('Area moment of inertia')
+    @Validator.positive('Area moment of inertia')
     def Ixx(self, Ixx):
         self._Ixx = Ixx
 
