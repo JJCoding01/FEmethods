@@ -53,11 +53,12 @@ class Validator(object):
             return wrapper
         return decorator
 
+
 class Forces(object):
     """Base class for all loads and reactions"""
 
     def __init__(self, value, location=0):
-        self._location = location
+        self.location = location
         self._value = value
 
     @property
@@ -73,6 +74,7 @@ class Forces(object):
         return self._location
 
     @location.setter
+    @Validator.non_negative('location')
     def location(self, location):
         self._location = location
 
@@ -81,7 +83,7 @@ class Forces(object):
 
     def __repr__(self):
         return (f'{self.__class__.__name__}(value={self.value}, ' +
-                                           'location={self.location})')
+                                          f'location={self.location})')
 
     def __add__(self, force2):
         return self.value + force2.value
