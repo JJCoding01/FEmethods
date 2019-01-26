@@ -6,6 +6,10 @@ the base element class that all FEM elements will be derived from
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Importing loads is only used for checking the type. Find a better way to do
+# this without needing to import loads
+from .loads import PointLoad, MomentLoad
+
 
 class Decorator(object):
     """Decorator class used to validate parameters"""
@@ -123,6 +127,17 @@ class Element(Base):
 
     def __init__(self, length, E=1, Ixx=1):
         super().__init__(length, E, Ixx)
+        self._node_deflections = None
+        self._K = None  # global stiffness matrix
+
+    def remesh(self):
+        """force a remesh calculation and invalidate any calculation results"""
+        raise NotImplemented('method must be overloaded')
+
+    def invalidate(self):
+        """invalidate the element to force resolving"""
+        self._node_deflections = None
+        self._K = None
 
     @property
     def K(self):
@@ -130,6 +145,19 @@ class Element(Base):
         if self._K is None:
             self._K = self.stiffness_global()
         return self._K
+
+    def solve(self):
+        """solve the system the FEM system to define the nodal displacments
+        and reaction forces.
+        """
+        self._calc_node_deflections()
+        self._get_reaction_values()
+
+    def _calc_node_deflections(self):
+        raise NotImplemented('must be overloaded!')
+
+    def _get_reaction_values(self):
+        raise NotImplemented('must be overloaded!')
 
     def stiffness(self):
         """return local stiffness matrix, k, as numpy array evaluated with beam
@@ -196,6 +224,84 @@ class BeamElement(Element):
         self.loads = loads
         self.reactions = reactions
         self.mesh = Mesh(length, loads, reactions, 2)
+
+    def remesh(self):
+        self.mesh = Mesh(self.length, self.loads, self.reactions, 2)
+        self.invalidate()
+
+    @property
+    def node_deflections(self):
+        if self._node_deflections is None:
+            self._node_deflections = self._calc_node_deflections()
+        return self._node_deflections
+
+    def __get_boundary_conditions(self):
+        # Initialize the  boundary conditions to None for each node, then
+        # iterate over reactions and apply them to the boundary conditions
+        # based on the reaction type.
+        bc = [(None, None) for k in range(len(self.mesh.nodes))]
+        for r in self.reactions:
+            i = self.mesh.nodes.index(r.location)
+            bc[i] = r.boundary
+        return bc
+
+    def _calc_node_deflections(self):
+        """solve for vertical and angular displacement at each node"""
+
+        # Get the boundary conditions from the reactions
+        bc = self.__get_boundary_conditions()
+
+        # Apply boundary conditions to global stiffness matrix. Note that the
+        # boundary conditions are applied to a copy of the stiffness matrix to
+        # avoid changing the property K, so it can still be used with further
+        # calculations (ie, for calculating reaction values)
+        kg = self.K.copy()
+        kg = self.apply_boundary_conditions(kg, bc)
+
+        # Use the same method of adding the input loads as the boundary
+        # conditions. Start by initializing a numpy array to zero loads, then
+        # iterate over the loads and add them to the appropriate index based on
+        # the load type (force or moment)
+        p = np.zeros((self.mesh.dof, 1))
+        for ld in self.loads:
+            i = self.mesh.nodes.index(ld.location)
+            if isinstance(ld, PointLoad):
+                p[i * 2][0] = ld.value  # input force
+            elif isinstance(ld, MomentLoad):
+                p[i * 2 + 1][0] = ld.value  # input moment
+
+        # Solve the global system of equations {p} = [K]*{d} for {d}
+        # save the deflection vector for the beam, so the analysis can be
+        # reused without recalculating the stiffness matrix.
+        # This vector should be cleared anytime any of the beam parameters
+        # gets changed.
+        self._node_deflections = np.linalg.solve(kg, p)
+        return self._node_deflections
+
+    def _get_reaction_values(self):
+        """Calculate the nodal forces acting on the beam. Note that the forces
+        will also include the input forces.
+
+        reactions are calculated by solving the matrix equation
+        {r} = [K] * {d}
+
+        where
+           - {r} is the vector of forces acting on the beam
+           - [K] is the global stiffness matrix (without BCs applied)
+           - {d} displacements of nodes
+        """
+        K = self.K                 # global stiffness matrix
+        d = self.node_deflections  # force displacement vector
+        r = np.matmul(K, d)
+
+        for ri in self.reactions:
+            i = self.mesh.nodes.index(ri.location)
+            force, moment = r[i * 2: i * 2 + 2]
+
+            # set the values in the reaction objects
+            ri.force = force[0]
+            ri.moment = moment[0]
+        return r
 
     def shape(self, x, L=None):
         """return an array of the shape functions evaluated at x the local
