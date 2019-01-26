@@ -12,14 +12,14 @@ class PointLoad(Forces):
 
     name = 'point load'
 
-    def __init__(self, location, value):
-        super().__init__(location, value)
+    def __init__(self, value, location):
+        super().__init__(value, location)
 
     def __str__(self):
-        return f'PointLoad(location={self.location}, value={self.value})'
+        return f'PointLoad(value={self.value}, location={self.location})'
 
     def __repr__(self):
-        return f'PointLoad(location={self.location}, value={self.value})'
+        return f'PointLoad(value={self.value}, location={self.location})'
 
 
 class MomentLoad(Forces):
@@ -29,8 +29,11 @@ class MomentLoad(Forces):
 
     name = 'moment load'
 
-    def __init__(self, location, value):
-        super().__init__(location, value)
+    def __init__(self, value, location):
+        super().__init__(value, location)
 
     def __str__(self):
-        return f'MomentLoad(location={self.location}, value={self.value})'
+        return f'MomentLoad(value={self.value}, location={self.location})'
+
+    def __repr__(self):
+        return f'MomentLoad(value={self.value}, location={self.location})'

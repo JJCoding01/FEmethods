@@ -6,9 +6,8 @@ functions, and other code common to several modules
 class Forces(object):
     """Base class for all loads and reactions"""
 
-    def __init__(self, location, value=0, label=None):
+    def __init__(self, value, location=0):
         self._location = location
-        self._label = label
         self._value = value
 
     @property
@@ -27,22 +26,14 @@ class Forces(object):
     def location(self, location):
         self._location = location
 
-    @property
-    def label(self):
-        return self._label
-
-    @label.setter
-    def label(self, label):
-        self._label = label
-
     def moment(self):
-        return self._value * self.location
+        return self.value * self.location
 
     def __str__(self):
-        return f'{self._label} ({self._value}, {self._location})'
+        return f'{self._label} ({self._load}, {self._location})'
 
     def __add__(self, force2):
-        return self._value + force2._value
+        return self.value + force2.value
 
     def __sub__(self, load2):
         return self.value - load2.value

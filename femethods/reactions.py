@@ -11,7 +11,7 @@ class Reaction(Forces):
     name = None
 
     def __init__(self, location, label=None):
-        super().__init__(location, label)
+        super().__init__(value=None, location=location)
         self._force = None
         self._moment = None
 
@@ -57,7 +57,7 @@ class PinnedReaction(Reaction):
                 f'     Force: {self.force}\n')
 
     def __repr__(self):
-        return f'PinnedReaction(location={self.location}, label={self.label})'
+        return f'PinnedReaction(location={self.location})'
 
 
 class FixedReaction(Reaction):
@@ -74,3 +74,6 @@ class FixedReaction(Reaction):
                 f'  Location: {self.location}\n'
                 f'     Force: {self.force}\n'
                 f'    Moment: {self.moment}\n')
+
+    def __repr__(self):
+        return f'FixedReaction(location={self.location})'
