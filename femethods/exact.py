@@ -7,7 +7,7 @@ https://www.awc.org/pdf/codes-standards/publications/design-aids/AWC-DA6-BeamFor
 import numpy as np
 import matplotlib.pyplot as plt
 
-from .elements import Base
+from ._base_elements import Base
 
 from .reactions import PinnedReaction, FixedReaction
 from .loads import PointLoad, MomentLoad
