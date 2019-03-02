@@ -3,6 +3,8 @@ Module to define a general mesh element to be used for any FEM element, and
 the base element class that all FEM elements will be derived from
 """
 
+from warnings import warn
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -56,8 +58,8 @@ class Element(Base):
         super().__init__(length, E, Ixx)
         self._node_deflections = None
         self._K = None  # global stiffness matrix
-        self._loads = None
         self._reactions = None
+        self._loads = None
 
     @property
     def loads(self):
@@ -66,7 +68,44 @@ class Element(Base):
     @loads.setter
     @Validator.islist('loads')
     def loads(self, loads):
+
+        self.invalidate()
+        if self.reactions is None:
+            # should this raise an error, or something else
+            # warn RuntimeWarning('reactions should be set before loads')
+            warn('reactions should be set before loads', RuntimeWarning)
+            self._loads = loads
+            return
         self._loads = loads
+        self.__validate_load_locations()
+
+    def __validate_load_locations(self):
+        """All loads and reactions must have unique locations
+
+        This function will validate that all loads do not line up with any
+        reactions. If a load is aligned with a reaction, it is adjusted by a
+        slight amount so it can be solved.
+        :returns True if successful, False otherwise
+        """
+        if self.reactions is None:
+            warn('reactions should be set prior to adding loads')
+            return False
+        for reaction in self.reactions:
+            for load in self.loads:
+                if load.location == reaction.location:
+                    # the load is directly on the reaction. Offset the load
+                    # location a tiny amount so that it is very close, but not
+                    # exactly on the reaction.
+                    # This is done so that the global stiffness matrix
+                    # is calculated properly to give accurate results
+
+                    # offset the load towards the inside of the beam to be sure
+                    # the new load position is located on the beam.
+                    if reaction.location == 0:
+                        load.location += 1e-10
+                    else:
+                        load.location -= 1e-10
+        return True
 
     @property
     def reactions(self):
@@ -75,6 +114,7 @@ class Element(Base):
     @reactions.setter
     @Validator.islist('reactions')
     def reactions(self, reactions):
+        self.invalidate()
         self._reactions = reactions
 
     def remesh(self):
@@ -97,6 +137,8 @@ class Element(Base):
         """solve the system the FEM system to define the nodal displacements
         and reaction forces.
         """
+        self.__validate_load_locations()
+        self.remesh()
         self._calc_node_deflections()
         self._get_reaction_values()
 
@@ -169,8 +211,8 @@ class BeamElement(Element):
 
     def __init__(self, length, loads, reactions, E=1, Ixx=1):
         super().__init__(length, E, Ixx)
-        self.loads = loads
         self.reactions = reactions
+        self.loads = loads  # note loads are set after reactions
         self.mesh = Mesh(length, loads, reactions, 2)
 
     def remesh(self):
