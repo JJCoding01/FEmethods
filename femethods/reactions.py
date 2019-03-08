@@ -33,7 +33,7 @@ class Reaction(Forces):
 
     @property
     def value(self):
-        return (self.force, self.moment)
+        return self.force, self.moment
 
     def invalidate(self):
         """Invalidate the reaction values
@@ -41,7 +41,7 @@ class Reaction(Forces):
         To be used whenever the parameters change and the reaction values are
         no longer valid
         """
-        self.force, self.moment = (None, None)
+        self._force, self._moment = (None, None)
 
     def __str__(self):
         return (f'{self.__class__.__name__}\n'

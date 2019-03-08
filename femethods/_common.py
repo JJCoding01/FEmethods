@@ -5,6 +5,7 @@ Base module that contains base classes to be used by other modules
 
 class Validator(object):
     """Decorator class used to validate parameters"""
+
     @staticmethod
     def positive(param_name='parameter'):
         """Function decorator to handle validating input parameters to ensure
@@ -13,6 +14,7 @@ class Validator(object):
         The input, param_name, is the parameter name that will show up in the
         call-stack when an invalid parameter is entered.
         """
+
         def decorator(func):
             def wrapper(*args, **kwargs):
                 if args[1] <= 0:
@@ -29,6 +31,7 @@ class Validator(object):
         The input, param_name, is the parameter name that will show up in the
         call-stack when an invalid parameter is entered.
         """
+
         def decorator(func):
             def wrapper(*args, **kwargs):
                 if args[1] < 0:
@@ -45,6 +48,7 @@ class Validator(object):
         The input, param_name, is the parameter name that will show up in the
         call-stack when an invalid parameter is entered.
         """
+
         def decorator(func):
             def wrapper(*args, **kwargs):
                 if not isinstance(args[1], list):
@@ -78,12 +82,12 @@ class Forces(object):
     def location(self, location):
         self._location = location
 
-    def moment(self):
+    def __moment(self):
         return self.value * self.location
 
     def __repr__(self):
         return (f'{self.__class__.__name__}(value={self.value}, ' +
-                                          f'location={self.location})')
+                f'location={self.location})')
 
     def __add__(self, force2):
         return self.value + force2.value
