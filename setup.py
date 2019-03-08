@@ -1,11 +1,11 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 with open('README.md', 'r') as f:
     long_description = f.read()
 
 setup(
     name='femethods',
-    version='0.1.3dev',
+    version='0.1.4dev',
     author='Joseph Contreras',
     author_email='26684136+JosephJContreras@users.noreply.github.com',
     description='Implementation of Finite Element Analysis',
