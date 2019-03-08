@@ -3,15 +3,16 @@ Module to define a general mesh element to be used for any FEM element, and
 the base element class that all FEM elements will be derived from
 """
 
-import numpy as np
+from warnings import warn
+
 import matplotlib.pyplot as plt
+import numpy as np
 
-from .mesh import Mesh
 from ._common import Validator
-
 # Importing loads is only used for checking the type. Find a better way to do
 # this without needing to import loads
-from .loads import PointLoad, MomentLoad
+from .loads import MomentLoad, PointLoad
+from .mesh import Mesh
 
 
 class Base(object):
@@ -19,7 +20,7 @@ class Base(object):
 
     def __init__(self, length, E=1, Ixx=1):
         self.length = length
-        self.E = E      # Young's modulus
+        self.E = E  # Young's modulus
         self.Ixx = Ixx  # area moment of inertia
 
     @property
@@ -57,6 +58,64 @@ class Element(Base):
         super().__init__(length, E, Ixx)
         self._node_deflections = None
         self._K = None  # global stiffness matrix
+        self._reactions = None
+        self._loads = None
+
+    @property
+    def loads(self):
+        return self._loads
+
+    @loads.setter
+    @Validator.islist('loads')
+    def loads(self, loads):
+
+        self.invalidate()
+        if self.reactions is None:
+            # should this raise an error, or something else
+            # warn RuntimeWarning('reactions should be set before loads')
+            warn('reactions should be set before loads', RuntimeWarning)
+            self._loads = loads
+            return
+        self._loads = loads
+        self.__validate_load_locations()
+
+    def __validate_load_locations(self):
+        """All loads and reactions must have unique locations
+
+        This function will validate that all loads do not line up with any
+        reactions. If a load is aligned with a reaction, it is adjusted by a
+        slight amount so it can be solved.
+        :returns True if successful, False otherwise
+        """
+        if self.reactions is None:
+            warn('reactions should be set prior to adding loads')
+            return False
+        for reaction in self.reactions:
+            for load in self.loads:
+                if load.location == reaction.location:
+                    # the load is directly on the reaction. Offset the load
+                    # location a tiny amount so that it is very close, but not
+                    # exactly on the reaction.
+                    # This is done so that the global stiffness matrix
+                    # is calculated properly to give accurate results
+
+                    # offset the load towards the inside of the beam to be sure
+                    # the new load position is located on the beam.
+                    if reaction.location == 0:
+                        load.location += 1e-8
+                    else:
+                        load.location -= 1e-8
+        return True
+
+    @property
+    def reactions(self):
+        return self._reactions
+
+    @reactions.setter
+    @Validator.islist('reactions')
+    def reactions(self, reactions):
+        self.invalidate()
+        self._reactions = reactions
 
     def remesh(self):
         """force a remesh calculation and invalidate any calculation results"""
@@ -75,9 +134,11 @@ class Element(Base):
         return self._K
 
     def solve(self):
-        """solve the system the FEM system to define the nodal displacments
+        """solve the system the FEM system to define the nodal displacements
         and reaction forces.
         """
+        self.__validate_load_locations()
+        self.remesh()
         self._calc_node_deflections()
         self._get_reaction_values()
 
@@ -99,7 +160,8 @@ class Element(Base):
         # global stiffness matrix.
         raise NotImplemented('Method must be overloaded!')
 
-    def apply_boundary_conditions(self, k, bcs):
+    @staticmethod
+    def apply_boundary_conditions(k, bcs):
         """
         Given the stiffness matrix 'k', and the boundary conditions as a list
         of tuples, apply the boundary conditions to the stiffness matrix by
@@ -109,7 +171,7 @@ class Element(Base):
         The boundary conditions (bcs) are in the form
         bcs = [(displacement1, rotation1), (displacement2, rotation2)]
 
-        For the boundary condition, if the conditional evaulates to None, then
+        For the boundary condition, if the conditional evaluates to None, then
         movement is allowed, otherwise no displacement is allowed.
 
         The boundary condition coordinates must match the stiffness matrix.
@@ -149,31 +211,13 @@ class BeamElement(Element):
 
     def __init__(self, length, loads, reactions, E=1, Ixx=1):
         super().__init__(length, E, Ixx)
-        self.loads = loads
         self.reactions = reactions
+        self.loads = loads  # note loads are set after reactions
         self.mesh = Mesh(length, loads, reactions, 2)
 
     def remesh(self):
         self.mesh = Mesh(self.length, self.loads, self.reactions, 2)
         self.invalidate()
-
-    @property
-    def loads(self):
-        return self._loads
-
-    @loads.setter
-    @Validator.islist('loads')
-    def loads(self, loads):
-        self._loads = loads
-
-    @property
-    def reactions(self):
-        return self._reactions
-
-    @reactions.setter
-    @Validator.islist('reactions')
-    def reactions(self, reactions):
-        self._reactions = reactions
 
     @property
     def node_deflections(self):
@@ -185,7 +229,7 @@ class BeamElement(Element):
         # Initialize the  boundary conditions to None for each node, then
         # iterate over reactions and apply them to the boundary conditions
         # based on the reaction type.
-        bc = [(None, None) for k in range(len(self.mesh.nodes))]
+        bc = [(None, None) for _ in range(len(self.mesh.nodes))]
         for r in self.reactions:
             i = self.mesh.nodes.index(r.location)
             bc[i] = r.boundary
@@ -255,10 +299,10 @@ class BeamElement(Element):
         """
         if L is None:
             L = self.length
-        N1 = 1 / L**3 * (L**3 - 3 * L * x**2 + 2 * x**3)
-        N2 = 1 / L**2 * (L**2 * x - 2 * L * x**2 + x**3)
-        N3 = 1 / L**3 * (3 * L * x**2 - 2 * x**3)
-        N4 = 1 / L**2 * (-L * x**2 + x**3)
+        N1 = 1 / L ** 3 * (L ** 3 - 3 * L * x ** 2 + 2 * x ** 3)
+        N2 = 1 / L ** 2 * (L ** 2 * x - 2 * L * x ** 2 + x ** 3)
+        N3 = 1 / L ** 3 * (3 * L * x ** 2 - 2 * x ** 3)
+        N4 = 1 / L ** 2 * (-L * x ** 2 + x ** 3)
         return np.array([N1, N2, N3, N4])
 
     def plot_shapes(self, n=25):
@@ -283,7 +327,7 @@ class BeamElement(Element):
         for k in range(4):
             ax = axes[k]
             ax.grid(True)
-            ax.plot(x, N[k], label=f'$N_{k+1}$')
+            ax.plot(x, N[k], label=f'$N_{k + 1}$')
             ax.legend()
 
         fig.subplots_adjust(wspace=0.25, hspace=0)
@@ -299,11 +343,11 @@ class BeamElement(Element):
         E = self.E
         Ixx = self.Ixx
 
-        k = np.array([[12,       6 * L,       -12,        6 * L   ],
-                      [6 * L,    4 * L**2,     -6 * L,    2 * L**2],
-                      [-12,     -6 * L,        12,       -6 * L   ],
-                      [6 * L,    2 * L**2,     -6 * L,    4 * L**2]])
-        return E * Ixx / L**3 * k
+        k = np.array([[12, 6 * L, -12, 6 * L],
+                      [6 * L, 4 * L ** 2, -6 * L, 2 * L ** 2],
+                      [-12, -6 * L, 12, -6 * L],
+                      [6 * L, 2 * L ** 2, -6 * L, 4 * L ** 2]])
+        return E * Ixx / L ** 3 * k
 
     def stiffness_global(self):
         # Initialize the global stiffness matrix, then iterate over the

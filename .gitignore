@@ -9,3 +9,6 @@ dist/*
 femethods.egg-info/*
 
 __pycache__/
+
+# pycharm project files
+.idea/

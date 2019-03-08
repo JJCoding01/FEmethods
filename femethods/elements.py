@@ -1,13 +1,12 @@
 """
 Define a beam object that will have Loads and Reactions.
 """
-from scipy.misc import derivative
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.misc import derivative
 
 # local imports
 from ._base_elements import BeamElement
-# from .reactions import PinnedReaction, FixedReaction
 
 
 class Beam(BeamElement):
@@ -22,15 +21,16 @@ class Beam(BeamElement):
         """
 
         # TODO: store the lengths/node locations in the class so they only have
-        # to be assessed without recalculating
+        #  to be assessed without recalculating
         nodes = self.mesh.nodes
         L, d = None, None
 
         # Using the given global x-value, determine the local x-value, length
         # of active element, and the nodal displacements (vertical, angular)
         # vector d
+        x_local = None
         for i in range(len(self.mesh.lengths)):
-            if nodes[i] <= x and x <= nodes[i + 1]:
+            if nodes[i] <= x <= nodes[i + 1]:
                 # this is the element where the global x-value falls into.
                 # Get the parameters in the local system and exit the loop
                 x_local = x - nodes[i]
@@ -68,7 +68,7 @@ class Beam(BeamElement):
         """plot the deflection, moment, and shear along the length of the beam
         """
         rows = 4 if plot_stress else 3
-        fig, axes = plt.subplots(rows, 1, sharex=True)
+        fig, axes = plt.subplots(rows, 1, sharex='all')
 
         # locations of nodes in global coordinate system
         locations = self.mesh.nodes
@@ -126,7 +126,7 @@ class Beam(BeamElement):
                f'Length (length): {self.length}\n'
                f"Young's Modulus (E): {self.E}\n"
                f'Area moment of inertia (Ixx): {self.Ixx}\n'
-                'LOADING\n'
+               f'LOADING\n'
                f'{L}\n'
                f'REACTIONS\n'
                f'{r}\n')
