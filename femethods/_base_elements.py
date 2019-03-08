@@ -102,9 +102,9 @@ class Element(Base):
                     # offset the load towards the inside of the beam to be sure
                     # the new load position is located on the beam.
                     if reaction.location == 0:
-                        load.location += 1e-10
+                        load.location += 1e-8
                     else:
-                        load.location -= 1e-10
+                        load.location -= 1e-8
         return True
 
     @property
