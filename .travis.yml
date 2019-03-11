@@ -2,10 +2,9 @@ dist: xenial
 language: python
 python: 3.7.0
 install:
-  - pip install -r requirements.txt
+  - pip install -r requirements_dev.txt
   - pip install -e .
 script:
   - pytest
-#  - pytest --cov=FEMethods/
 after_success:
   - coveralls
