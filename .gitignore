@@ -12,3 +12,7 @@ __pycache__/
 
 # pycharm project files
 .idea/
+
+# ignore coveralls.yml to keep repo token private
+.coveralls.yml
+.coverage
