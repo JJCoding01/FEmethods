@@ -6,6 +6,6 @@ install:
   - pip install -e .
 script:
   - pytest
-  - pytest --cov=femethods/
-after_success:
-  - coveralls
+#  - pytest --cov=femethods/
+#after_success:
+#  - coveralls
