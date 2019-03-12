@@ -125,6 +125,9 @@ class Element(Base):
         """invalidate the element to force resolving"""
         self._node_deflections = None
         self._K = None
+        if self.reactions is not None:
+            for reaction in self.reactions:
+                reaction.invalidate()
 
     @property
     def K(self):
