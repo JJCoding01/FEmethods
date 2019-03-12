@@ -52,6 +52,18 @@ class Reaction(Forces):
     def __repr__(self):
         return f'{self.__class__.__name__}(location={self.location})'
 
+    def __eq__(self, other):
+
+        if self.__class__ != other.__class__:
+            return False
+
+        if self.location == other.location and \
+                self.force == other.force and \
+                self.moment == other.moment:
+            return True
+
+        return False
+
 
 class PinnedReaction(Reaction):
 
