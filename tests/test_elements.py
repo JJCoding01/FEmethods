@@ -105,6 +105,17 @@ class TestBeam(unittest.TestCase):
             npt.assert_almost_equal(self.beam.stiffness(x), k(x),
                                     err_msg='stiffness matrix does not match')
 
+    def test_invalid_deflection(self):
+        self.beam.solve()
+        self.assertEqual(self.beam.deflection(15), None,
+                         msg='invalid deflection location')
+
+    def test_shear(self):
+        self.beam.solve()
+        # print(self.beam)
+
+
+
 
 class TestMesh(unittest.TestCase):
 
@@ -129,6 +140,29 @@ class TestMesh(unittest.TestCase):
                          msg='wrong number of elements')
         self.assertEqual(self.mesh.lengths, [5, 5],
                          msg='mesh elements are not correct length')
+
+
+class TestReactions(unittest.TestCase):
+
+    def setUp(self):
+        self.loads = [PointLoad(value=100, location=10)]
+        self.reactions = [PinnedReaction(0), FixedReaction(10)]
+        self.beam = Beam(length=10,
+                         reactions=self.reactions,
+                         loads=self.loads)
+        self.beam.solve()
+
+    def test_reaction_invalidate(self):
+        for reaction in self.reactions:
+            reaction.invalidate()
+            self.assertEqual(reaction.force, None, 'Force was not invalidated')
+            self.assertEqual(reaction.moment, None, 'Moment was not invalidated')
+
+    def test_beam_invalidate(self):
+        self.beam.invalidate()
+        for reaction in self.reactions:
+            self.assertEqual(reaction.force, None, 'Force was not invalidated')
+            self.assertEqual(reaction.moment, None, 'Moment was not invalidated')
 
 
 if __name__ == '__main__':

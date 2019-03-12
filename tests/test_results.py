@@ -59,7 +59,6 @@ class TestSimplySupportedBeam(unittest.TestCase):
     def test_simply_supported_beam_equal_symmetrical_loads(self):
         loads = [PointLoad(-1000, 30), PointLoad(-1000, 90)]
         self.beam.loads = loads
-        print(self.beam.loads)
         self.beam.solve()
 
         for r in self.beam.reactions:
@@ -139,6 +138,17 @@ class TestSimplySupportedBeam(unittest.TestCase):
             for r in reactions:
                 self.assertAlmostEqual(r.value[1], 0, places=5,
                                        msg=NON_ZERO_MOMENT)
+
+    def test_shear_force(self):
+
+        self.assertAlmostEqual(self.beam.shear(30), 500, places=7,
+                               msg='shear force not calculated correctly')
+
+        self.assertAlmostEqual(self.beam.shear(90), -500, places=7,
+                               msg='shear force not calculated correctly')
+
+    def test_moment(self):
+        self.assertAlmostEqual(self.beam.moment(60), 1000 * 120 / 4)
 
 
 class TestSimplySupportedBeamWithOverhang(unittest.TestCase):
