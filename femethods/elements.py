@@ -43,22 +43,22 @@ class Beam(BeamElement):
             return
         return self.shape(x_local, L).dot(d)[0]
 
-    def moment(self, x, dx=1):
+    def moment(self, x, dx=1e-4, order=9):
         """calculate the moment in the beam at the global x value by taking
         the second derivative of the deflection curve.
 
         M(x) = E * Ixx * d^2 v(x) / dx^2
         """
-        return self.E * self.Ixx * derivative(self.deflection, x, dx=dx, n=2)
+        return self.E * self.Ixx * derivative(self.deflection, x, dx=dx, n=2, order=order)
 
-    def shear(self, x, dx=1):
+    def shear(self, x, dx=1, order=5):
         """calculate the shear force at a given x location as the third
         derivative of displacement with respect to x
 
         V(x) = E * Ixx * d^3 v(x) / dx^3
         """
         return self.E * self.Ixx * derivative(self.deflection, x, dx=dx, n=3,
-                                              order=5)
+                                              order=order)
 
     def bending_stress(self, x, dx=1, c=1):
         """returns the bending stress at global coordinate x"""
