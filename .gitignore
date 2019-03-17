@@ -16,3 +16,5 @@ __pycache__/
 # ignore coveralls.yml to keep repo token private
 .coveralls.yml
 .coverage
+# ignore local coverage report
+htmlcov/*
