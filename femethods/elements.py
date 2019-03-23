@@ -7,6 +7,7 @@ from scipy.misc import derivative
 
 # local imports
 from ._base_elements import BeamElement
+from ._common import derivative as comm_derivative
 
 
 class Beam(BeamElement):
@@ -43,13 +44,33 @@ class Beam(BeamElement):
             return
         return self.shape(x_local, L).dot(d)[0]
 
-    def moment(self, x, dx=1e-4, order=9):
+    def moment(self, x, dx=1e-5, order=9):
         """calculate the moment in the beam at the global x value by taking
         the second derivative of the deflection curve.
 
         M(x) = E * Ixx * d^2 v(x) / dx^2
         """
-        return self.E * self.Ixx * derivative(self.deflection, x, dx=dx, n=2, order=order)
+
+        try:
+            return self.E * self.Ixx * derivative(self.deflection, x, dx=dx, n=2, order=order)
+        except TypeError:
+            # there was an error, probably due to the central difference
+            # method attempting to calculate the moment near the ends of the
+            # beam. Determine whether the desired position is near the start
+            # or end of the beam, and use the forward/backward difference
+            # method accordingly
+            #
+
+            if x <= self.length / 2:
+                # the desired moment is near the beginning of the beam, use the
+                # forward difference method
+                method = 'forward'
+            else:
+                # the desired moment is near the end of the beam, use the
+                # backward difference method
+                method = 'backward'
+            return self.E * self.Ixx * comm_derivative(self.deflection, x,
+                                                       method=method, n=2)
 
     def shear(self, x, dx=1, order=5):
         """calculate the shear force at a given x location as the third
