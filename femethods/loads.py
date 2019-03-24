@@ -12,8 +12,8 @@ class PointLoad(Forces):
 
     name = 'point load'
 
-    def __init__(self, value, location):
-        super().__init__(value, location)
+    def __init__(self, magnitude, location):
+        super().__init__(magnitude, location)
 
 
 class MomentLoad(Forces):
@@ -23,5 +23,5 @@ class MomentLoad(Forces):
 
     name = 'moment load'
 
-    def __init__(self, value, location):
-        super().__init__(value, location)
+    def __init__(self, magnitude, location):
+        super().__init__(magnitude, location)

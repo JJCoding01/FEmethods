@@ -11,7 +11,7 @@ class Reaction(Forces):
     name = None
 
     def __init__(self, location):
-        super().__init__(value=None, location=location)
+        super().__init__(magnitude=None, location=location)
         self._force = None
         self._moment = None
 
@@ -71,7 +71,7 @@ class PinnedReaction(Reaction):
 
     def __init__(self, location):
         super().__init__(location)
-        # limit the vertical displacemnt but allow rotation
+        # limit the vertical displacement but allow rotation
         self.boundary = (0, None)
 
 
