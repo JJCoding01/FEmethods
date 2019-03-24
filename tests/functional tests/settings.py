@@ -8,4 +8,4 @@ P = -1000  # lbs, load acting on beam
 E = 29e6  # psi, Young's modulus
 Ixx = 350  # in^4 area moment of inertia of beam
 EI = E * Ixx  # common constant
-TOL = 1e-4  # allowable tolerance between exact and numerical solutions to pass
+TOL = 1e-1  # allowable tolerance between exact and numerical solutions to pass
