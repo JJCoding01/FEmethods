@@ -252,9 +252,9 @@ class BeamElement(Element):
         for ld in self.loads:
             i = self.mesh.nodes.index(ld.location)
             if isinstance(ld, PointLoad):
-                p[i * 2][0] = ld.value  # input force
+                p[i * 2][0] = ld.magnitude  # input force
             elif isinstance(ld, MomentLoad):
-                p[i * 2 + 1][0] = ld.value  # input moment
+                p[i * 2 + 1][0] = ld.magnitude  # input moment
 
         # Solve the global system of equations {p} = [K]*{d} for {d}
         # save the deflection vector for the beam, so the analysis can be

@@ -25,7 +25,7 @@ def test_simply_supported_beam_center_load():
     # Numerical setup
     beam = Beam(
         length=L,
-        loads=[PointLoad(value=P, location=L / 2)],
+        loads=[PointLoad(magnitude=P, location=L / 2)],
         reactions=[PinnedReaction(x) for x in [0, L]],
         E=E,
         Ixx=Ixx,
@@ -73,7 +73,7 @@ def test_simply_supported_beam_equal_symmetric_loads():
     M_loc = -P * a  # max moment (at center between loads)
     d_loc = P * a / (24 * EI) * (3 * L ** 2 - 4 * a ** 2)  # max deflection (at center)
 
-    p = [PointLoad(value=P, location=x) for x in [a, L - a]]
+    p = [PointLoad(magnitude=P, location=x) for x in [a, L - a]]
     r = [PinnedReaction(x) for x in [0, L]]
     beam = Beam(length=L, loads=p, reactions=r, E=E, Ixx=Ixx)
     beam.solve()
@@ -97,7 +97,7 @@ def test_simply_supported_beam_equal_non_symmetric_loads():
     Mx = R1 * x + P * (x - a)  # moment at center
     M2 = R2 * b  # moment at second load
 
-    p = [PointLoad(value=P, location=x) for x in [a, L - b]]
+    p = [PointLoad(magnitude=P, location=x) for x in [a, L - b]]
     r = [PinnedReaction(x) for x in [0, L]]
     beam = Beam(length=L, loads=p, reactions=r, E=E, Ixx=Ixx)
     beam.solve()
@@ -125,7 +125,7 @@ def test_simply_supported_beam_unequal_non_symmetric_loads():
     Mx = R1 * x + P1 * (x - a)
     M2 = R2 * b
 
-    p = [PointLoad(value=P1, location=a), PointLoad(value=P2, location=L - b)]
+    p = [PointLoad(magnitude=P1, location=a), PointLoad(magnitude=P2, location=L - b)]
     r = [PinnedReaction(x) for x in [0, L]]
     beam = Beam(length=L, loads=p, reactions=r, E=E, Ixx=Ixx)
     beam.solve()

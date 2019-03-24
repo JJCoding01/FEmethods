@@ -26,7 +26,7 @@ def test_cantilevered_beam_load_at_end():
 
     beam = Beam(
         length=L,
-        loads=[PointLoad(value=P, location=0)],
+        loads=[PointLoad(magnitude=P, location=0)],
         reactions=[FixedReaction(L)],
         E=E,
         Ixx=Ixx,
