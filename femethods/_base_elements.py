@@ -68,14 +68,7 @@ class Element(Base):
     @loads.setter
     @Validator.islist('loads')
     def loads(self, loads):
-
         self.invalidate()
-        if self.reactions is None:
-            # should this raise an error, or something else
-            # warn RuntimeWarning('reactions should be set before loads')
-            warn('reactions should be set before loads', RuntimeWarning)
-            self._loads = loads
-            return
         self._loads = loads
         self.__validate_load_locations()
 
@@ -119,7 +112,7 @@ class Element(Base):
 
     def remesh(self):
         """force a remesh calculation and invalidate any calculation results"""
-        raise NotImplemented('method must be overloaded')
+        raise NotImplementedError('method must be overloaded')
 
     def invalidate(self):
         """invalidate the element to force resolving"""
@@ -146,22 +139,22 @@ class Element(Base):
         self._get_reaction_values()
 
     def _calc_node_deflections(self):
-        raise NotImplemented('must be overloaded!')
+        raise NotImplementedError('must be overloaded!')
 
     def _get_reaction_values(self):
-        raise NotImplemented('must be overloaded!')
+        raise NotImplementedError('must be overloaded!')
 
     def stiffness(self):
         """return local stiffness matrix, k, as numpy array evaluated with beam
         element length L, where L defaults to the length of the beam
         """
-        raise NotImplemented('Method must be overloaded!')
+        raise NotImplementedError('Method must be overloaded!')
 
     def stiffness_global(self):
         # Initialize the global stiffness matrix, then iterate over the
         # elements, calculate a local stiffness matrix, and add it to the
         # global stiffness matrix.
-        raise NotImplemented('Method must be overloaded!')
+        raise NotImplementedError('Method must be overloaded!')
 
     @staticmethod
     def apply_boundary_conditions(k, bcs):
