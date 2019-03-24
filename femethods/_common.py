@@ -17,6 +17,8 @@ class Validator(object):
 
         def decorator(func):
             def wrapper(*args, **kwargs):
+                if type(args[1]) not in (int, float):
+                    raise TypeError(param_name + ' must be a positive number!')
                 if args[1] <= 0:
                     raise ValueError(param_name + ' must be positive!')
                 func(*args, **kwargs)
@@ -34,6 +36,8 @@ class Validator(object):
 
         def decorator(func):
             def wrapper(*args, **kwargs):
+                if type(args[1]) not in (int, float):
+                    raise TypeError(param_name + ' must be a positive number!')
                 if args[1] < 0:
                     raise ValueError(param_name + ' must be non-negative!')
                 func(*args, **kwargs)
@@ -61,17 +65,20 @@ class Validator(object):
 class Forces(object):
     """Base class for all loads and reactions"""
 
-    def __init__(self, value, location=0):
+    def __init__(self, magnitude, location=0):
+        self.magnitude = magnitude
         self.location = location
-        self._value = value
 
     @property
-    def value(self):
-        return self._value
+    def magnitude(self):
+        return self._magnitude
 
-    @value.setter
-    def value(self, value):
-        self._value = value
+    #
+    @magnitude.setter
+    def magnitude(self, magnitude):
+        if not isinstance(magnitude, (int, float, type(None))):
+            raise TypeError('force value must be a number')
+        self._magnitude = magnitude
 
     @property
     def location(self):
@@ -82,21 +89,35 @@ class Forces(object):
     def location(self, location):
         self._location = location
 
-    def __moment(self):
-        return self.value * self.location
-
     def __repr__(self):
-        return (f'{self.__class__.__name__}(value={self.value}, ' +
+        return (f'{self.__class__.__name__}(magnitude={self.magnitude}, ' +
                 f'location={self.location})')
 
     def __add__(self, force2):
-        return self.value + force2.value
+        f1 = self.magnitude
+        x1 = self.location
 
-    def __sub__(self, load2):
-        return self.value - load2.value
+        f2 = force2.magnitude
+        x2 = force2.location
+
+        x = (f1 * x1 + f2 * x2) / (f1 + f2)
+        return self.__class__(f1 + f2, x)
+
+    def __eq__(self, other):
+        return self.magnitude * self.location == other.magnitude * other.location
+
+    def __sub__(self, force2):
+        f1 = self.magnitude
+        x1 = self.location
+
+        f2 = force2.magnitude
+        x2 = force2.location
+
+        x = (f1 * x1 - f2 * x2) / (f1 - f2)
+        return self.__class__(f1 - f2, x)
 
 
-def derivative(func, x0, n=1, method='forward'):
+def derivative(func, x0, n=1, method='forward'):  # pragma: no cover
     """
     Calculate the nth derivative of function f at x0
 
