@@ -85,7 +85,7 @@ class Beam(BeamElement):
         """returns the bending stress at global coordinate x"""
         return self.moment(x, dx=dx) * c / self.Ixx
 
-    def plot(self, n=250, plot_stress=True, title='Beam Analysis'):
+    def plot(self, n=250, plot_stress=True, title='Beam Analysis'):  # pragma: no cover
         """plot the deflection, moment, and shear along the length of the beam
         """
         rows = 4 if plot_stress else 3

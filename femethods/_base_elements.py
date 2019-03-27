@@ -301,7 +301,7 @@ class BeamElement(Element):
         N4 = 1 / L ** 2 * (-L * x ** 2 + x ** 3)
         return np.array([N1, N2, N3, N4])
 
-    def plot_shapes(self, n=25):
+    def plot_shapes(self, n=25):  # pragma: no cover
         """plot shape functions for the with n data points"""
         x = np.linspace(0, self.length, n)
 
