@@ -5,11 +5,8 @@ from femethods.loads import PointLoad
 from femethods.reactions import PinnedReaction
 
 
-def test_beam_init():
-    PinnedReaction(5)
-    # r = PinnedReaction(0)
-    # reactions = [PinnedReaction(0)]
-    # reactions.append(PinnedReaction(120))
+def test_beam_params():
+
     reactions = [PinnedReaction(x) for x in [1, 120]]
     loads = [PointLoad(magnitude=-120, location=50)]
     beam = Beam(length=120, loads=loads, reactions=reactions,
