@@ -5,7 +5,11 @@ Mesh module that will define the mesh.
 
 class Mesh(object):
     """define a mesh that will handle degrees-of-freedom (dof), element lengths
-    etc."""
+    etc.
+
+    the input degree-of-freedom (dof) parameter is the degrees-of-freedom for
+    a single element
+    """
 
     def __init__(self, length, loads, reactions, dof):
         self._nodes = self.__get_nodes(length, loads, reactions)
