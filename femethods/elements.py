@@ -37,7 +37,7 @@ class Beam(BeamElement):
                 x_local = x - nodes[i]
                 # L = lengths[i]
                 L = self.mesh.lengths[i]
-                d = self.node_deflections[i * 2:i * 2 + 4]
+                d = self.node_deflections[i * 2: i * 2 + 4]
                 break
 
         if L is None or d is None:
@@ -52,7 +52,11 @@ class Beam(BeamElement):
         """
 
         try:
-            return self.E * self.Ixx * derivative(self.deflection, x, dx=dx, n=2, order=order)
+            return (
+                    self.E
+                    * self.Ixx
+                    * derivative(self.deflection, x, dx=dx, n=2, order=order)
+            )
         except TypeError:
             # there was an error, probably due to the central difference
             # method attempting to calculate the moment near the ends of the
@@ -64,13 +68,16 @@ class Beam(BeamElement):
             if x <= self.length / 2:
                 # the desired moment is near the beginning of the beam, use the
                 # forward difference method
-                method = 'forward'
+                method = "forward"
             else:
                 # the desired moment is near the end of the beam, use the
                 # backward difference method
-                method = 'backward'
-            return self.E * self.Ixx * comm_derivative(self.deflection, x,
-                                                       method=method, n=2)
+                method = "backward"
+            return (
+                    self.E
+                    * self.Ixx
+                    * comm_derivative(self.deflection, x, method=method, n=2)
+            )
 
     def shear(self, x, dx=1, order=5):
         """calculate the shear force at a given x location as the third
@@ -78,18 +85,19 @@ class Beam(BeamElement):
 
         V(x) = E * Ixx * d^3 v(x) / dx^3
         """
-        return self.E * self.Ixx * derivative(self.deflection, x, dx=dx, n=3,
-                                              order=order)
+        return (
+                self.E * self.Ixx * derivative(self.deflection, x, dx=dx, n=3, order=order)
+        )
 
     def bending_stress(self, x, dx=1, c=1):
         """returns the bending stress at global coordinate x"""
         return self.moment(x, dx=dx) * c / self.Ixx
 
-    def plot(self, n=250, plot_stress=True, title='Beam Analysis'):  # pragma: no cover
+    def plot(self, n=250, plot_stress=True, title="Beam Analysis"):  # pragma: no cover
         """plot the deflection, moment, and shear along the length of the beam
         """
         rows = 4 if plot_stress else 3
-        fig, axes = plt.subplots(rows, 1, sharex='all')
+        fig, axes = plt.subplots(rows, 1, sharex="all")
 
         # locations of nodes in global coordinate system
         locations = self.mesh.nodes
@@ -100,55 +108,57 @@ class Beam(BeamElement):
         # difference formula, which cannot calculate the value at the
         # endpoints
         xd = np.linspace(0, self.length, n)  # deflection
-        xm = xd[1:-2]                        # moment (and stress)
-        xv = xm[2:-3]                        # shear
-        v = [self.deflection(xi) for xi in xd]                  # deflection
+        xm = xd[1:-2]  # moment (and stress)
+        xv = xm[2:-3]  # shear
+        v = [self.deflection(xi) for xi in xd]  # deflection
         m = [self.moment(xi, dx=self.length / n) for xi in xm]  # moment
-        V = [self.shear(xi, dx=self.length / n) for xi in xv]   # shear
+        V = [self.shear(xi, dx=self.length / n) for xi in xv]  # shear
 
         # Set up plotting variables to be able to iterate over them more easily
         xs = [xv, xm, xd]
         y = [V, m, v]
-        labels = ['shear', 'moment', 'deflection']
+        labels = ["shear", "moment", "deflection"]
         if plot_stress:
             q = [self.bending_stress(xi, dx=self.length / n) for xi in xm]
             xs.append(xm)
             y.append(q)
-            labels.append('stress')
+            labels.append("stress")
 
         for ax, x, y, label in zip(axes, xs, y, labels):
             ax.plot(x, y)
-            ax.fill_between(x, y, 0, color='b', alpha=0.25)
+            ax.fill_between(x, y, 0, color="b", alpha=0.25)
             ax.set_ylabel(label)
             ax.grid(True)
 
-        axes[-1].set_xlabel('Beam position, x')
+        axes[-1].set_xlabel("Beam position, x")
         axes[-1].set_xticks(locations)
 
-        fig.subplots_adjust(hspace=.25)
+        fig.subplots_adjust(hspace=0.25)
         fig.suptitle(title)
         return fig
 
     def __str__(self):
-        L = ''
+        L = ""
         for load in self.loads:
-            L += 'Type: {}\n'.format(load.name)
-            L += '    Location: {}\n'.format(load.location)
-            L += '       Value: {}\n'.format(load.value)
+            L += "Type: {}\n".format(load.name)
+            L += "    Location: {}\n".format(load.location)
+            L += "       Value: {}\n".format(load.value)
 
-        r = ''
+        r = ""
         for reaction in self.reactions:
-            r += 'Type: {}\n'.format(reaction.name)
-            r += '    Location: {}\n'.format(reaction.location)
-            r += '       Force: {}\n'.format(reaction.force)
-            r += '      Moment: {}\n'.format(reaction.moment)
+            r += "Type: {}\n".format(reaction.name)
+            r += "    Location: {}\n".format(reaction.location)
+            r += "       Force: {}\n".format(reaction.force)
+            r += "      Moment: {}\n".format(reaction.moment)
 
-        msg = ('PARAMETERS\n'
-               f'Length (length): {self.length}\n'
-               f"Young's Modulus (E): {self.E}\n"
-               f'Area moment of inertia (Ixx): {self.Ixx}\n'
-               f'LOADING\n'
-               f'{L}\n'
-               f'REACTIONS\n'
-               f'{r}\n')
+        msg = (
+            "PARAMETERS\n"
+            f"Length (length): {self.length}\n"
+            f"Young's Modulus (E): {self.E}\n"
+            f"Area moment of inertia (Ixx): {self.Ixx}\n"
+            f"LOADING\n"
+            f"{L}\n"
+            f"REACTIONS\n"
+            f"{r}\n"
+        )
         return msg

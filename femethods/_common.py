@@ -7,7 +7,7 @@ class Validator(object):
     """Decorator class used to validate parameters"""
 
     @staticmethod
-    def positive(param_name='parameter'):
+    def positive(param_name="parameter"):
         """Function decorator to handle validating input parameters to ensure
         parameters are positive values.
 
@@ -18,15 +18,17 @@ class Validator(object):
         def decorator(func):
             def wrapper(*args, **kwargs):
                 if type(args[1]) not in (int, float):
-                    raise TypeError(param_name + ' must be a positive number!')
+                    raise TypeError(param_name + " must be a positive number!")
                 if args[1] <= 0:
-                    raise ValueError(param_name + ' must be positive!')
+                    raise ValueError(param_name + " must be positive!")
                 func(*args, **kwargs)
+
             return wrapper
+
         return decorator
 
     @staticmethod
-    def non_negative(param_name='parameter'):
+    def non_negative(param_name="parameter"):
         """Function decorator to handle validating input parameters to ensure
         parameters are non-negative (positive or zero values).
 
@@ -37,15 +39,17 @@ class Validator(object):
         def decorator(func):
             def wrapper(*args, **kwargs):
                 if type(args[1]) not in (int, float):
-                    raise TypeError(param_name + ' must be a positive number!')
+                    raise TypeError(param_name + " must be a positive number!")
                 if args[1] < 0:
-                    raise ValueError(param_name + ' must be non-negative!')
+                    raise ValueError(param_name + " must be non-negative!")
                 func(*args, **kwargs)
+
             return wrapper
+
         return decorator
 
     @staticmethod
-    def islist(param_name='parameter'):
+    def islist(param_name="parameter"):
         """Function decorator to handle validating input parameters to ensure
         parameters are a list.
 
@@ -56,9 +60,11 @@ class Validator(object):
         def decorator(func):
             def wrapper(*args, **kwargs):
                 if not isinstance(args[1], list):
-                    raise TypeError(param_name + ' must be a list!')
+                    raise TypeError(param_name + " must be a list!")
                 func(*args, **kwargs)
+
             return wrapper
+
         return decorator
 
 
@@ -77,7 +83,7 @@ class Forces(object):
     @magnitude.setter
     def magnitude(self, magnitude):
         if not isinstance(magnitude, (int, float, type(None))):
-            raise TypeError('force value must be a number')
+            raise TypeError("force value must be a number")
         self._magnitude = magnitude
 
     @property
@@ -85,13 +91,15 @@ class Forces(object):
         return self._location
 
     @location.setter
-    @Validator.non_negative('location')
+    @Validator.non_negative("location")
     def location(self, location):
         self._location = location
 
     def __repr__(self):
-        return (f'{self.__class__.__name__}(magnitude={self.magnitude}, ' +
-                f'location={self.location})')
+        return (
+                f"{self.__class__.__name__}(magnitude={self.magnitude}, "
+                + f"location={self.location})"
+        )
 
     def __add__(self, force2):
         f1 = self.magnitude
@@ -117,7 +125,7 @@ class Forces(object):
         return self.__class__(f1 - f2, x)
 
 
-def derivative(func, x0, n=1, method='forward'):  # pragma: no cover
+def derivative(func, x0, n=1, method="forward"):  # pragma: no cover
     """
     Calculate the nth derivative of function f at x0
 
@@ -126,18 +134,18 @@ def derivative(func, x0, n=1, method='forward'):  # pragma: no cover
     """
 
     if n not in (1, 2):
-        raise ValueError('n must be 1 or 2')
+        raise ValueError("n must be 1 or 2")
 
     # Note that the value for dx is set manually. This is because the ideal
     # values are not constant based on the method used.
     # TODO determine better method for choosing a more ideal dx value
-    if method == 'forward':
+    if method == "forward":
         dx = 1e-8
         if n == 1:
             return (func(x0 + dx) - func(x0)) / dx
         elif n == 2:
             return (func(x0 + 2 * dx) - 2 * func(x0 + dx) + func(x0)) / dx ** 2
-    elif method == 'backward':
+    elif method == "backward":
         dx = 1e-5
         if n == 1:
             return (func(x0) - func(x0 - dx)) / dx

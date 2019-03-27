@@ -28,7 +28,7 @@ class Base(object):
         return self._length
 
     @length.setter
-    @Validator.positive('length')
+    @Validator.positive("length")
     def length(self, length):
         self._length = length
 
@@ -46,7 +46,7 @@ class Base(object):
         return self._Ixx
 
     @Ixx.setter
-    @Validator.positive('Area moment of inertia')
+    @Validator.positive("Area moment of inertia")
     def Ixx(self, Ixx):
         self._Ixx = Ixx
 
@@ -66,7 +66,7 @@ class Element(Base):
         return self._loads
 
     @loads.setter
-    @Validator.islist('loads')
+    @Validator.islist("loads")
     def loads(self, loads):
         self.invalidate()
         self._loads = loads
@@ -81,7 +81,7 @@ class Element(Base):
         :returns True if successful, False otherwise
         """
         if self.reactions is None:
-            warn('reactions should be set prior to adding loads')
+            warn("reactions should be set prior to adding loads")
             return False
         for reaction in self.reactions:
             for load in self.loads:
@@ -105,14 +105,14 @@ class Element(Base):
         return self._reactions
 
     @reactions.setter
-    @Validator.islist('reactions')
+    @Validator.islist("reactions")
     def reactions(self, reactions):
         self.invalidate()
         self._reactions = reactions
 
     def remesh(self):
         """force a remesh calculation and invalidate any calculation results"""
-        raise NotImplementedError('method must be overloaded')
+        raise NotImplementedError("method must be overloaded")
 
     def invalidate(self):
         """invalidate the element to force resolving"""
@@ -139,22 +139,22 @@ class Element(Base):
         self._get_reaction_values()
 
     def _calc_node_deflections(self):
-        raise NotImplementedError('must be overloaded!')
+        raise NotImplementedError("must be overloaded!")
 
     def _get_reaction_values(self):
-        raise NotImplementedError('must be overloaded!')
+        raise NotImplementedError("must be overloaded!")
 
     def stiffness(self):
         """return local stiffness matrix, k, as numpy array evaluated with beam
         element length L, where L defaults to the length of the beam
         """
-        raise NotImplementedError('Method must be overloaded!')
+        raise NotImplementedError("Method must be overloaded!")
 
     def stiffness_global(self):
         # Initialize the global stiffness matrix, then iterate over the
         # elements, calculate a local stiffness matrix, and add it to the
         # global stiffness matrix.
-        raise NotImplementedError('Method must be overloaded!')
+        raise NotImplementedError("Method must be overloaded!")
 
     @staticmethod
     def apply_boundary_conditions(k, bcs):
@@ -184,7 +184,7 @@ class Element(Base):
 
             return the stiffness matrix k with boundary conditions applied
             """
-            k[i] = 0     # set entire row to zeros
+            k[i] = 0  # set entire row to zeros
             k[:, i] = 0  # set entire column to zeros
             k[i][i] = 1  # set diagonal to 1
             return k
@@ -276,7 +276,7 @@ class BeamElement(Element):
            - [K] is the global stiffness matrix (without BCs applied)
            - {d} displacements of nodes
         """
-        K = self.K                 # global stiffness matrix
+        K = self.K  # global stiffness matrix
         d = self.node_deflections  # force displacement vector
         r = np.matmul(K, d)
 
@@ -323,7 +323,7 @@ class BeamElement(Element):
         for k in range(4):
             ax = axes[k]
             ax.grid(True)
-            ax.plot(x, N[k], label=f'$N_{k + 1}$')
+            ax.plot(x, N[k], label=f"$N_{k + 1}$")
             ax.legend()
 
         fig.subplots_adjust(wspace=0.25, hspace=0)
@@ -339,10 +339,14 @@ class BeamElement(Element):
         E = self.E
         Ixx = self.Ixx
 
-        k = np.array([[12, 6 * L, -12, 6 * L],
-                      [6 * L, 4 * L ** 2, -6 * L, 2 * L ** 2],
-                      [-12, -6 * L, 12, -6 * L],
-                      [6 * L, 2 * L ** 2, -6 * L, 4 * L ** 2]])
+        k = np.array(
+            [
+                [12, 6 * L, -12, 6 * L],
+                [6 * L, 4 * L ** 2, -6 * L, 2 * L ** 2],
+                [-12, -6 * L, 12, -6 * L],
+                [6 * L, 2 * L ** 2, -6 * L, 4 * L ** 2],
+            ]
+        )
         return E * Ixx / L ** 3 * k
 
     def stiffness_global(self):
@@ -354,8 +358,8 @@ class BeamElement(Element):
             # iterate over all the elements and add the local stiffness matrix
             # to the global stiffness matrix at the proper index
             k = self.stiffness(self.mesh.lengths[e])  # local stiffness matrix
-            i1, i2 = (e * 2, e * 2 + 4)               # global slicing index
-            kg[i1:i2, i1:i2] = kg[i1:i2, i1:i2] + k   # current element
+            i1, i2 = (e * 2, e * 2 + 4)  # global slicing index
+            kg[i1:i2, i1:i2] = kg[i1:i2, i1:i2] + k  # current element
         self._K = kg
 
         return self._K

@@ -45,14 +45,16 @@ class Mesh(object):
         for param in loads + reactions:
             nodes.append(param.location)
         nodes.append(length)  # ensure last node is at the end of the beam
-        nodes = list(set(nodes))   # remove duplicates
+        nodes = list(set(nodes))  # remove duplicates
         nodes.sort()
         return nodes
 
     def __str__(self):
-        s = ('MESH PARAMETERS\n'
-            f'Number of elements: {self.num_elements}\n'
-            f'Node locations: {self.nodes}\n'
-            f'Element Lengths: {self.lengths}\n'
-            f'Total degrees of freedom: {self.dof}\n')
+        s = (
+            "MESH PARAMETERS\n"
+            f"Number of elements: {self.num_elements}\n"
+            f"Node locations: {self.nodes}\n"
+            f"Element Lengths: {self.lengths}\n"
+            f"Total degrees of freedom: {self.dof}\n"
+        )
         return s

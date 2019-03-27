@@ -42,7 +42,7 @@ class Reaction(Forces):
         return self._location
 
     @location.setter
-    @Validator.non_negative('location')
+    @Validator.non_negative("location")
     def location(self, location):
         """
         Set the location of the Reaction along the length of the beam
@@ -66,30 +66,33 @@ class Reaction(Forces):
         self._force, self._moment = (None, None)
 
     def __str__(self):
-        return (f'{self.__class__.__name__}\n'
-                f'  Location: {self.location}\n'
-                f'     Force: {self.force}\n'
-                f'    Moment: {self.moment}\n')
+        return (
+            f"{self.__class__.__name__}\n"
+            f"  Location: {self.location}\n"
+            f"     Force: {self.force}\n"
+            f"    Moment: {self.moment}\n"
+        )
 
     def __repr__(self):
-        return f'{self.__class__.__name__}(location={self.location})'
+        return f"{self.__class__.__name__}(location={self.location})"
 
     def __eq__(self, other):
 
         if self.__class__ != other.__class__:
             return False
 
-        if self.location == other.location and \
-                self.force == other.force and \
-                self.moment == other.moment:
+        if (
+                self.location == other.location
+                and self.force == other.force
+                and self.moment == other.moment
+        ):
             return True
 
         return False
 
 
 class PinnedReaction(Reaction):
-
-    name = 'pinned'
+    name = "pinned"
 
     def __init__(self, location):
         super().__init__(location)
@@ -98,8 +101,7 @@ class PinnedReaction(Reaction):
 
 
 class FixedReaction(Reaction):
-
-    name = 'fixed'
+    name = "fixed"
 
     def __init__(self, location):
         super().__init__(location)
