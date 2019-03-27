@@ -9,21 +9,20 @@ def test_beam_params():
 
     reactions = [PinnedReaction(x) for x in [1, 120]]
     loads = [PointLoad(magnitude=-120, location=50)]
-    beam = Beam(length=120, loads=loads, reactions=reactions,
-                E=29e6, Ixx=350)
+    beam = Beam(length=120, loads=loads, reactions=reactions, E=29e6, Ixx=350)
 
     # check parameters of the beam to ensure they match the input
-    assert beam.length == 120, 'beam length does not match input'
+    assert beam.length == 120, "beam length does not match input"
     assert beam.E == 29e6, "Young's modulus does not match input"
-    assert beam.Ixx == 350, 'area moment of inertia does not match input'
+    assert beam.Ixx == 350, "area moment of inertia does not match input"
 
     # update parameters and verify update was successful
     beam.length = 130
     beam.E = 29.9e6
     beam.Ixx = 345
-    assert beam.length == 130, 'beam length does not match input'
+    assert beam.length == 130, "beam length does not match input"
     assert beam.E == 29.9e6, "Young's modulus does not match input"
-    assert beam.Ixx == 345, 'area moment of inertia does not match input'
+    assert beam.Ixx == 345, "area moment of inertia does not match input"
 
 
 def test_reaction_load_warnings():
@@ -42,7 +41,7 @@ def test_reaction_load_warnings():
         Beam(-10, reactions=reactions, loads=loads)
     with pytest.raises(TypeError):
         # beam length must be a number
-        Beam('length is not a number', reactions=reactions, loads=loads)
+        Beam("length is not a number", reactions=reactions, loads=loads)
 
 
 def test_load_positions():

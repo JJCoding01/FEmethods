@@ -6,14 +6,14 @@ from femethods.loads import MomentLoad, PointLoad
 def check_load(load):
     p = load(magnitude=-5, location=25)
 
-    assert p.magnitude == -5, f'{load.__name__} magnitude does not match input'
-    assert p.location == 25, f'{load.__name__} location does not match input'
+    assert p.magnitude == -5, f"{load.__name__} magnitude does not match input"
+    assert p.location == 25, f"{load.__name__} location does not match input"
 
     # verify parameters are updated successfully
     p.magnitude = -15
     p.location = 30
-    assert p.magnitude == -15, f'{load.__name__} magnitude was not updated'
-    assert p.location == 30, f'{load.__name__} location was not updated'
+    assert p.magnitude == -15, f"{load.__name__} magnitude was not updated"
+    assert p.location == 30, f"{load.__name__} location was not updated"
 
     # Check load arithmetic
     p1 = load(magnitude=-2, location=10)
@@ -32,10 +32,10 @@ def check_load(load):
         # or 0
 
     with pytest.raises(TypeError):
-        load(magnitude=-3, location='a string')  # location must be a number
+        load(magnitude=-3, location="a string")  # location must be a number
 
     with pytest.raises(TypeError):
-        load(magnitude='a string', location=10)  # magnitude must be a number
+        load(magnitude="a string", location=10)  # magnitude must be a number
 
 
 def test_loads():
