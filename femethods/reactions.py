@@ -2,7 +2,7 @@
 Module to define different reaction types
 """
 
-from ._common import Forces
+from ._common import Forces, Validator
 
 
 class Reaction(Forces):
@@ -30,6 +30,28 @@ class Reaction(Forces):
     @moment.setter
     def moment(self, m):
         self._moment = m
+
+    @property
+    def location(self):
+        """
+        Location of the reaction along the length of the beam
+
+        The location is overloading the location property in Forces so that
+        the reaction can be invalidated when the location is changed
+        """
+        return self._location
+
+    @location.setter
+    @Validator.non_negative('location')
+    def location(self, location):
+        """
+        Set the location of the Reaction along the length of the beam
+
+        The location is overloading the location property in Forces so that
+        the reaction can be invalidated when the location is changed
+        """
+        self.invalidate()
+        self._location = location
 
     @property
     def value(self):
