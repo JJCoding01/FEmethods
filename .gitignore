@@ -18,3 +18,5 @@ __pycache__/
 .coverage
 # ignore local coverage report
 htmlcov/*
+
+.pytest_cache/*
