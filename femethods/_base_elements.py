@@ -191,14 +191,12 @@ class Element(Base):
 
         # TODO: Check the sizes of the boundary conditions and stiffness matrix
 
-        node = 0
-        for bc in bcs:
+        for node, bc in enumerate(bcs):
             v, q = bc
             if v is not None:
                 k = apply(k, node * 2)
             if q is not None:
                 k = apply(k, node * 2 + 1)
-            node += 1
         return k
 
 
