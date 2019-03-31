@@ -2,7 +2,7 @@ import pytest
 
 from femethods.elements import Beam
 from femethods.loads import PointLoad
-from femethods.reactions import PinnedReaction
+from femethods.reactions import FixedReaction, PinnedReaction
 
 
 def test_beam_params():
@@ -94,3 +94,16 @@ def test_shape_function():
     assert n3 == 1, "N3(x=L) != 1"
 
     # TODO: Add more tests to verify shape functions
+
+
+def test_stiffness_matrix_k():
+    beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], 29e6, 345)
+    assert beam.K.shape == (4, 4), "stiffness matrix is not expected size"
+
+    # add another point load and verify the stiffness matrix changes size
+    # accordingly
+    beam.loads.append(PointLoad(-500, 12))
+    beam.remesh()
+    assert beam.K.shape == (6, 6), "stiffness matrix size did not update"
+
+    # TODO: Add additional checks to verify stiffness function values
