@@ -3,8 +3,6 @@ Module to define a general mesh element to be used for any FEM element, and
 the base element class that all FEM elements will be derived from
 """
 
-from warnings import warn
-
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -80,9 +78,7 @@ class Element(Base):
         slight amount so it can be solved.
         :returns True if successful, False otherwise
         """
-        if self.reactions is None:
-            warn("reactions should be set prior to adding loads")
-            return False
+
         for reaction in self.reactions:
             for load in self.loads:
                 if load.location == reaction.location:
@@ -327,12 +323,9 @@ class BeamElement(Element):
         fig.subplots_adjust(wspace=0.25, hspace=0)
         plt.show()
 
-    def stiffness(self, L=None):
+    def stiffness(self, L):
         """return local stiffness matrix, k, as numpy array evaluated with beam
-        element length L, where L defaults to the length of the beam"""
-
-        if L is None:
-            L = self.length
+        element length L"""
 
         E = self.E
         Ixx = self.Ixx
