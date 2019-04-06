@@ -5,7 +5,15 @@ Module to define different loads
 from ._common import Forces
 
 
-class PointLoad(Forces):
+class Load(Forces):
+    """Base class for all load types
+
+    Used primarily for type checking the loads on input
+    """
+    pass
+
+
+class PointLoad(Load):
     """
     class specific to a point load
     """
@@ -16,7 +24,7 @@ class PointLoad(Forces):
         super().__init__(magnitude, location)
 
 
-class MomentLoad(Forces):
+class MomentLoad(Load):
     """
     class specific to a moment load
     """

@@ -75,6 +75,20 @@ def test_invalid_reactions_warnings():
     # print(beam.loads[0])
 
 
+def test_invalid_load_errors():
+    # Check for a TypeError for a variety of invalid loads
+    for invalid_load in ['a string', FixedReaction(0), [], 10]:
+        with pytest.raises(TypeError):
+            Beam(25, loads=[invalid_load], reactions=[FixedReaction(0)])
+
+
+def test_invalid_reaction_errors():
+    # Check for an TypeError for a variety of invalid reactions
+    for invalid_reaction in ['a string', PointLoad(25, 15), [], 10]:
+        with pytest.raises(TypeError):
+            Beam(25, loads=[PointLoad(-100, 15)], reactions=[invalid_reaction])
+
+
 def test_shape_function():
     reactions = [PinnedReaction(x) for x in [0, 50, 100]]
     loads = [PointLoad(-100, x) for x in [0, 50, 100]]

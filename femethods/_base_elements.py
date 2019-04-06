@@ -9,8 +9,9 @@ import numpy as np
 from ._common import Validator
 # Importing loads is only used for checking the type. Find a better way to do
 # this without needing to import loads
-from .loads import MomentLoad, PointLoad
+from .loads import Load, MomentLoad, PointLoad
 from .mesh import Mesh
+from .reactions import Reaction
 
 
 class Base(object):
@@ -66,6 +67,11 @@ class Element(Base):
     @loads.setter
     @Validator.islist("loads")
     def loads(self, loads):
+        # validate that loads is a list of valid Loads
+        for load in loads:
+            if not isinstance(load, Load):
+                raise TypeError(f'type {type(load)} is not of type Load')
+
         self.invalidate()
         self._loads = loads
         self.__validate_load_locations()
@@ -103,6 +109,9 @@ class Element(Base):
     @reactions.setter
     @Validator.islist("reactions")
     def reactions(self, reactions):
+        for reaction in reactions:
+            if not isinstance(reaction, Reaction):
+                raise TypeError(f'type {type(reaction)} is not of type Reaction')
         self.invalidate()
         self._reactions = reactions
 
