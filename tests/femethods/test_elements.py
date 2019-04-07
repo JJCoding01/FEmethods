@@ -44,27 +44,12 @@ def test_reaction_load_warnings():
         Beam("length is not a number", reactions=reactions, loads=loads)
 
 
-def test_load_positions():
-    """check that load positions are adjusted when they line up with the
-    reaction position
-    """
-
-    reactions = [PinnedReaction(x) for x in [0, 50, 100]]
-    loads = [PointLoad(-100, x) for x in [0, 50, 100]]
-
-    for load, reaction in zip(loads, reactions):
-        assert load.location == reaction.location
-
-    beam = Beam(100, loads=loads, reactions=reactions)
-
-    for load, reaction in zip(beam.loads, beam.reactions):
-        assert load.location != reaction.location
-
-
 def test_invalid_load_placement():
     reactions = [PinnedReaction(x) for x in [0, 50, 100]]
     loads = [PointLoad(-100, x) for x in [0, 50, 100]]
 
+    # there should be a warning indicating that the load position was moved
+    # slightly so it does not line up with the reaction.
     with pytest.warns(UserWarning):
         beam = Beam(100, loads=loads, reactions=reactions)
 
