@@ -161,7 +161,6 @@ def test_solve_method():
     beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], 29e6, 345)
 
     reaction = beam.reactions[0]
-    print(reaction)
     assert reaction.force is None, \
         "Reaction force was not None before being solved"
     assert reaction.moment is None, \
@@ -173,3 +172,43 @@ def test_solve_method():
         "Reaction force must be equal to and opposite load"
     assert reaction.moment == 100 * 25, \
         "Reaction moment must be equal to the load times the moment arm"
+
+
+def test_invalid_deflection_location():
+    beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], 29e6, 345)
+
+    with pytest.raises(ValueError):
+        beam.deflection(-4)  # a value less than 0
+
+    with pytest.raises(ValueError):
+        beam.deflection(beam.length + 5)  # a value greater then the length
+
+    with pytest.raises(TypeError):
+        beam.deflection('a string (not a number)')
+
+
+def test_deflection_for_fixed_cantilevered_beam_with_load_at_any_point():
+    P = -1000  # load in lbs down
+    a = 7  # position of load in inches
+    L = 25  # length of beam in inches
+    E = 29e6  # Young's modulus in psi
+    Ixx = 345  # area moment of inertia in in**4
+    b = L - a
+
+    # function to calculate deflection anywhere along the length of the beam
+    d1 = lambda x: P * b ** 2 / (6 * E * Ixx) * (3 * L - 3 * x - b)  # x < a
+    d2 = lambda x: P * (L - x) ** 2 / (6 * E * Ixx) * (3 * b - L + x)  # x > a
+    d3 = lambda x: P * b ** 3 / (3 * E * Ixx)  # x == a
+
+    beam = Beam(L, [PointLoad(P, a)], [FixedReaction(L)], E, Ixx)
+
+    for x in [0, 7, 12.5, 25]:
+        # check the deflection of the beam at both end points, and the center
+        if x < a:
+            exact = d1(x)
+        elif x > a:
+            exact = d2(x)
+        else:
+            exact = d3(x)
+        assert pytest.approx(beam.deflection(x), rel=1e-12) == exact, \
+            f"Calculated deflection does not match expected deflection at {x}"

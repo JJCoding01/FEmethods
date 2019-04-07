@@ -24,25 +24,32 @@ class Beam(BeamElement):
         # TODO: store the lengths/node locations in the class so they only have
         #  to be assessed without recalculating
         nodes = self.mesh.nodes
-        L, d = None, None
+
+        # validate that x is a valid by ensuring that x is
+        # - x is a number
+        # - 0 <= x <= length of beam
+        try:
+            x = float(x)
+        except ValueError:
+            raise TypeError(f'Cannot calculate deflection with location of'
+                            f'type {type(x)}')
+
+        if x < 0 or self.length < x:
+            raise ValueError(f'cannot calculate deflection at location {x} as '
+                             f'it is outside of the beam!')
 
         # Using the given global x-value, determine the local x-value, length
         # of active element, and the nodal displacements (vertical, angular)
         # vector d
-        x_local = None
         for i in range(len(self.mesh.lengths)):
             if nodes[i] <= x <= nodes[i + 1]:
                 # this is the element where the global x-value falls into.
                 # Get the parameters in the local system and exit the loop
                 x_local = x - nodes[i]
-                # L = lengths[i]
                 L = self.mesh.lengths[i]
                 d = self.node_deflections[i * 2: i * 2 + 4]
-                break
+                return self.shape(x_local, L).dot(d)[0]
 
-        if L is None or d is None:
-            return
-        return self.shape(x_local, L).dot(d)[0]
 
     def moment(self, x, dx=1e-5, order=9):
         """calculate the moment in the beam at the global x value by taking
