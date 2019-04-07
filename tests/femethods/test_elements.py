@@ -173,6 +173,3 @@ def test_solve_method():
         "Reaction force must be equal to and opposite load"
     assert reaction.moment == 100 * 25, \
         "Reaction moment must be equal to the load times the moment arm"
-    print(reaction)
-    # assert reaction.force is None, "Reaction force was not None before being solved"
-    # assert reaction.moment is None, "Reaction moment was not None before being solved"
