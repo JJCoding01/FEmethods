@@ -3,13 +3,15 @@ Module to define a general mesh element to be used for any FEM element, and
 the base element class that all FEM elements will be derived from
 """
 
+from warnings import warn
+
 import matplotlib.pyplot as plt
 import numpy as np
 
 from ._common import Validator
 # Importing loads is only used for checking the type. Find a better way to do
 # this without needing to import loads
-from .loads import Load, MomentLoad, PointLoad
+from .loads import Load, PointLoad
 from .mesh import Mesh
 from .reactions import Reaction
 
@@ -98,8 +100,12 @@ class Element(Base):
                     # the new load position is located on the beam.
                     if reaction.location == 0:
                         load.location += 1e-8
+                        warn(f'load location moved by 1e-8 to avoid reaction '
+                             f'at {reaction.location}')
                     else:
                         load.location -= 1e-8
+                        warn(f'load location moved by -1e-8 to avoid reaction'
+                             f' at {reaction.location}')
         return True
 
     @property

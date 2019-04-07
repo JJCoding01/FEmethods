@@ -61,18 +61,16 @@ def test_load_positions():
         assert load.location != reaction.location
 
 
-def test_invalid_reactions_warnings():
+def test_invalid_load_placement():
     reactions = [PinnedReaction(x) for x in [0, 50, 100]]
     loads = [PointLoad(-100, x) for x in [0, 50, 100]]
 
-    for load, reaction in zip(loads, reactions):
-        assert load.location == reaction.location
+    with pytest.warns(UserWarning):
+        beam = Beam(100, loads=loads, reactions=reactions)
 
-    beam = Beam(100, loads=loads, reactions=reactions)
-
-    beam.reactions = [None]
-    # beam.loads[0].location = 45
-    # print(beam.loads[0])
+    for load, reaction in zip(beam.loads, beam.reactions):
+        assert load.location != reaction.location, \
+            'moved load is still the same as a reaction'
 
 
 def test_invalid_load_errors():
