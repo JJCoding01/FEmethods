@@ -155,7 +155,7 @@ class Element(Base):
     def _get_reaction_values(self):
         raise NotImplementedError("must be overloaded!")
 
-    def stiffness(self):
+    def stiffness(self, L):
         """return local stiffness matrix, k, as numpy array evaluated with beam
         element length L, where L defaults to the length of the beam
         """
