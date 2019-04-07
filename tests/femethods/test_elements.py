@@ -142,35 +142,31 @@ def test_apply_boundary_conditions():
     #  2. The row/column of all boundary conditions that are removed are all 0's
 
 
-def test_node_deflections():
+def test_shape_of_node_deflections():
     beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], 29e6, 345)
-    # beam.solve()
+    assert beam.node_deflections.shape == (4, 1), \
+        "nodal deflections shape is not expected"
 
-    assert beam.node_deflections.shape == (4, 1), "nodal deflections shape is not expected"
-    # check that the deflection at the fixed end is 0
-    dv = beam.node_deflections[0][0]  # vertical displacement at fixed end
-    dq = beam.node_deflections[1][0]  # angular displacement at fixed end
-    assert dv == 0, "displacement at fixed end is non-zero"
-    assert dq == 0, "angular displacement at fixed end is non-zero"
 
-    # check that the deflection at the free end is non-zero and negative
-    dv = beam.node_deflections[2][0]  # vertical displacement at free end
-    dq = beam.node_deflections[3][0]  # angular displacement at free end
-    assert dv < 0, "displacement at free end is not negative"
-    assert dq < 0, "angular displacement at free end is not negative"
+def test_node_deflections_at_fixed_end():
+    for load in [PointLoad(-100, 25), MomentLoad(-100, 25)]:
+        beam = Beam(25, [load], [FixedReaction(0)], 29e6, 345)
+        # check that the deflection at the fixed end is 0
+        msgs = [
+            "displacement at fixed end is non-zero",
+            "angular displacement at fixed end is non-zero",
+        ]
+        for i, msg in enumerate(msgs):
+            assert beam.node_deflections[i][0] == 0, msg
 
-    # calculate the nodal deflections with a moment load
-    beam = Beam(25, [MomentLoad(-100, 25)], [FixedReaction(0)], 29e6, 345)
 
-    assert beam.node_deflections.shape == (4, 1), "nodal deflections shape is not expected"
-    # check that the deflection at the fixed end is 0
-    dv = beam.node_deflections[0][0]  # vertical displacement at fixed end
-    dq = beam.node_deflections[1][0]  # angular displacement at fixed end
-    assert dv == 0, "displacement at fixed end is non-zero"
-    assert dq == 0, "angular displacement at fixed end is non-zero"
-
-    # check that the deflection at the free end is non-zero and negative
-    dv = beam.node_deflections[2][0]  # vertical displacement at free end
-    dq = beam.node_deflections[3][0]  # angular displacement at free end
-    assert dv < 0, "displacement at free end is not negative"
-    assert dq < 0, "angular displacement at free end is not negative"
+def test_node_deflections_at_free_end():
+    for load in [PointLoad(-100, 25), MomentLoad(-100, 25)]:
+        beam = Beam(25, [load], [FixedReaction(0)], 29e6, 345)
+        # check that the deflection at the free end is non-zero and negative
+        msgs = [
+            "displacement at free end is not negative",
+            "angular displacement at free end is not negative",
+        ]
+        for i, msg in enumerate(msgs, 2):
+            assert beam.node_deflections[i][0] < 0, msg
