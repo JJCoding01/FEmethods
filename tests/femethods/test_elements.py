@@ -170,3 +170,24 @@ def test_node_deflections_at_free_end():
         ]
         for i, msg in enumerate(msgs, 2):
             assert beam.node_deflections[i][0] < 0, msg
+
+
+def test_solve_method():
+    beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], 29e6, 345)
+
+    reaction = beam.reactions[0]
+    print(reaction)
+    assert reaction.force is None, \
+        "Reaction force was not None before being solved"
+    assert reaction.moment is None, \
+        "Reaction moment was not None before being solved"
+
+    beam.solve()
+    reaction = beam.reactions[0]
+    assert reaction.force == 100, \
+        "Reaction force must be equal to and opposite load"
+    assert reaction.moment == 100 * 25, \
+        "Reaction moment must be equal to the load times the moment arm"
+    print(reaction)
+    # assert reaction.force is None, "Reaction force was not None before being solved"
+    # assert reaction.moment is None, "Reaction moment was not None before being solved"
