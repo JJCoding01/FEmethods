@@ -212,3 +212,24 @@ def test_deflection_for_fixed_cantilevered_beam_with_load_at_any_point():
             exact = d3(x)
         assert pytest.approx(beam.deflection(x), rel=1e-12) == exact, \
             f"Calculated deflection does not match expected deflection at {x}"
+
+
+def test_moment_for_fixed_cantilevered_beam_with_load_at_end():
+    P = -1000  # load in lbs down
+    L = 25  # length of beam in inches
+    E = 29e6  # Young's modulus in psi
+    Ixx = 345  # area moment of inertia in in**4
+
+    # function to calculate moment anywhere along the length of the beam
+    m = lambda x: P * x
+
+    beam = Beam(L, [PointLoad(P, 0)], [FixedReaction(L)], E, Ixx)
+
+    for x in [7, 12.5, 25]:
+        # check the deflection of the beam at both end points, and the center
+        assert pytest.approx(beam.moment(x), rel=0.01) == m(
+            x
+        ), f"Calculated moment does not match expected moment at {x}"
+
+    with pytest.warns(UserWarning):
+        beam.moment(0)

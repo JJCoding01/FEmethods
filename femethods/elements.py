@@ -1,6 +1,8 @@
 """
 Define a beam object that will have Loads and Reactions.
 """
+from warnings import warn
+
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.misc import derivative
@@ -50,7 +52,6 @@ class Beam(BeamElement):
                 d = self.node_deflections[i * 2: i * 2 + 4]
                 return self.shape(x_local, L).dot(d)[0]
 
-
     def moment(self, x, dx=1e-5, order=9):
         """calculate the moment in the beam at the global x value by taking
         the second derivative of the deflection curve.
@@ -58,13 +59,19 @@ class Beam(BeamElement):
         M(x) = E * Ixx * d^2 v(x) / dx^2
         """
 
+        # TODO: Update so that moment can be calculated at both ends of beam
+        if x < 0.75:
+            # this cut-off was found experimentally. Anything less than this,
+            # and calculating the derivative is unreliable
+            warn("Calculated moments below 0.75 may be unreliable")
+
         try:
             return (
                     self.E
                     * self.Ixx
                     * derivative(self.deflection, x, dx=dx, n=2, order=order)
             )
-        except TypeError:
+        except ValueError:
             # there was an error, probably due to the central difference
             # method attempting to calculate the moment near the ends of the
             # beam. Determine whether the desired position is near the start
