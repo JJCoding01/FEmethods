@@ -227,9 +227,8 @@ def test_moment_for_fixed_cantilevered_beam_with_load_at_end():
 
     for x in [7, 12.5, 25]:
         # check the deflection of the beam at both end points, and the center
-        assert pytest.approx(beam.moment(x), rel=0.01) == m(
-            x
-        ), f"Calculated moment does not match expected moment at {x}"
+        assert pytest.approx(beam.moment(x), rel=0.01) == m(x), \
+            f"Calculated moment does not match expected moment at {x}"
 
     with pytest.warns(UserWarning):
         beam.moment(0)
