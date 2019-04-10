@@ -232,3 +232,24 @@ def test_moment_for_fixed_cantilevered_beam_with_load_at_end():
 
     with pytest.warns(UserWarning):
         beam.moment(0)
+
+
+def test_shear():
+    beam = Beam(25, [PointLoad(-1000, 25)], [FixedReaction(0)])
+
+    for x in [0.5, 5, 13, 20, 24.5]:
+        assert pytest.approx(beam.shear(x), rel=1e-5) == 1000, \
+            f"shear does not equal load at location {x}"
+
+    # right now, the derivative function will try to calculate shear outside
+    # of the beam when calculating shear at or near endpoints. Verify that
+    # calculating shear at ends raises a ValueError. It should also raise a
+    # ValueError when the input is outside the beam
+    for x in [-5, 0, 25, 35]:
+        with pytest.raises(ValueError):
+            beam.shear(x)
+
+# def test_beam_bending_stress():
+#     beam = Beam(25, [PointLoad(-1000, 25)], [FixedReaction(0)])
+#
+#     assert beam.bending_stress(3) == 0, 'bending stress does not match expected'

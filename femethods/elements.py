@@ -93,7 +93,7 @@ class Beam(BeamElement):
                     * comm_derivative(self.deflection, x, method=method, n=2)
             )
 
-    def shear(self, x, dx=1, order=5):
+    def shear(self, x, dx=0.01, order=5):
         """calculate the shear force at a given x location as the third
         derivative of displacement with respect to x
 
