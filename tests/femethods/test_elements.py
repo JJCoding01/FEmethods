@@ -248,8 +248,3 @@ def test_shear():
     for x in [-5, 0, 25, 35]:
         with pytest.raises(ValueError):
             beam.shear(x)
-
-# def test_beam_bending_stress():
-#     beam = Beam(25, [PointLoad(-1000, 25)], [FixedReaction(0)])
-#
-#     assert beam.bending_stress(3) == 0, 'bending stress does not match expected'
