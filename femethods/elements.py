@@ -151,6 +151,16 @@ class Beam(BeamElement):
         fig.suptitle(title)
         return fig
 
+    @staticmethod
+    def show(*args, **kwargs):
+        """Show figure
+
+        This method gives direct access to show the figure after it has been
+        created. This is to make it easier to show a plot after creating a
+        beam. This is so the calling code does not have to import matplotlib
+        """
+        plt.show(*args, **kwargs)  # pragma: no cover
+
     def __str__(self):
         L = ""
         for load in self.loads:
