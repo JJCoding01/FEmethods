@@ -1,5 +1,20 @@
 """
-Module to define different reaction types
+Reactions module defines different reaction classes
+
+A reaction is required to support a Beam element and resist any input forces.
+
+There are two types of reactions that are defined.
+
+    * PinnnedReaction
+      A PinnedReaction represents a pinned, frictionless pivot that can
+      resist motion in two directions. Normal and axially to the beam.
+      A PinnedReaction does not have any ability to resist moments.
+      The deflection of a beam at the PinnedReaction is always zero, but
+      the angle is free to change
+    * FixedReaction
+      A FixedReaction resists both force and moments. The displacement and the
+      angle are both constrained and must be zero at the reaction point.
+      FixedReactions are typically applied at the ends of a Beam.
 """
 
 from ._common import Forces, Validator
