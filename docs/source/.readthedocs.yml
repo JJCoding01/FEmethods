@@ -1,0 +1,13 @@
+# Read the Docs configuration file
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+
+# Required
+version: 2
+
+sphinx:
+  configuration: docs/source/conf.py
+  builder: html
+
+
+# Optionally build your docs in additional formats such as PDF and ePub
+formats: htmlzip
