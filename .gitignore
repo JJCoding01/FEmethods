@@ -20,3 +20,6 @@ __pycache__/
 htmlcov/*
 
 .pytest_cache/*
+
+# ignore build files for docs
+docs/build/*
