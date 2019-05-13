@@ -1,6 +1,16 @@
 """
-Define a beam object that will have Loads and Reactions.
+The elements module contains finite element classes
+
+Currently the only element that is defined is a beam element.
+
+Beam Element
+-------------
+
+A beam element is a slender member that is subjected to transverse loading.
+It is assumed to have homogeneous properties, with a constant cross-section.
+
 """
+
 from warnings import warn
 
 import matplotlib.pyplot as plt
@@ -13,14 +23,45 @@ from ._common import derivative as comm_derivative
 
 
 class Beam(BeamElement):
-    """definition of a beam object"""
+    """A Beam defines a beam element for analysis
+
+    Parameters:
+        length (:obj:`float`): the length of a beam. This is the total length
+                        of the beam, this is not the length of the meshed
+                        element. This must be a float that is greater than 0.
+        loads (:obj:`list`): list of load elements
+        reactions (:obj:`list`): list of reactions acting on the beam
+        E (:obj:`float`, optional): Young's modulus of the beam in units of
+                         :math:`\\frac{force}{length^2}`. Defaults to 1.
+                         The :math:`force` units used here are the same
+                         units that are used in the input forces, and
+                         calculated reaction forces. The :math:`length` unit
+                         must be the same as the area moment of inertia
+                         (**Ixx**) and the beam **length** units.
+        Ixx (:obj:`float`, optional): Area moment of inertia of the beam.
+                    Defaults to 1. This is constant (constant cross-sectional
+                    area) along the length of the beam. This is in units of
+                    :math:`length^4`. This must be the same length unit of
+                    Young's modulus (**E**) and the beam **length**.
+
+    """
 
     def __init__(self, length, loads, reactions, E=1, Ixx=1):
         super().__init__(length, loads, reactions, E=E, Ixx=Ixx)
 
     def deflection(self, x):
-        """calculate the deflection at the x location. Note that the x value
-        given is the global x-value along the length of the beam.
+        """Calculate deflection of the beam at location x
+
+        Parameters:
+            x (:obj:`float | int`): location along the length of the beam where
+                           deflection should be calculated.
+
+        Returns:
+            :obj:`float`: deflection of the beam in the units of the beam length
+
+        Raises:
+            ValueError: when the :math:`0\\leq x \\leq length` is False
+            TypeError: when x cannot be converted to a float
         """
 
         # TODO: store the lengths/node locations in the class so they only have
@@ -33,12 +74,15 @@ class Beam(BeamElement):
         try:
             x = float(x)
         except ValueError:
-            raise TypeError(f'Cannot calculate deflection with location of'
-                            f'type {type(x)}')
+            raise TypeError(
+                f"Cannot calculate deflection with location of type: {type(x)}"
+            )
 
         if x < 0 or self.length < x:
-            raise ValueError(f'cannot calculate deflection at location {x} as '
-                             f'it is outside of the beam!')
+            raise ValueError(
+                f"cannot calculate deflection at location {x} as "
+                f"it is outside of the beam!"
+            )
 
         # Using the given global x-value, determine the local x-value, length
         # of active element, and the nodal displacements (vertical, angular)
@@ -53,10 +97,28 @@ class Beam(BeamElement):
                 return self.shape(x_local, L).dot(d)[0]
 
     def moment(self, x, dx=1e-5, order=9):
-        """calculate the moment in the beam at the global x value by taking
+        """Calculate the moment at location x
+
+        Calculate the moment in the beam at the global x value by taking
         the second derivative of the deflection curve.
 
-        M(x) = E * Ixx * d^2 v(x) / dx^2
+        .. centered::
+            :math:`M(x) = E \\cdot Ixx \\cdot \\frac{d^2 v(x)}{dx^2}`
+
+        where M is the moment, E is Young's modulus and Ixx is the area
+        moment of inertia.
+
+        .. note: When calculating the moment near the beginning of the beam
+                 the moment calculation may be unreliable.
+
+        Parameters:
+            x (:obj:`int`): location along the beam where the moment is calculated
+            dx (:obj:`float`, optional): spacing. Default is 1e-5
+            order (:obj:`int`, optional): number of points to use, must be odd.
+                Default is 9
+
+        For more information on the parameters, see the scipy.misc.derivative
+        documentation.
         """
 
         # TODO: Update so that moment can be calculated at both ends of beam
@@ -77,7 +139,6 @@ class Beam(BeamElement):
             # beam. Determine whether the desired position is near the start
             # or end of the beam, and use the forward/backward difference
             # method accordingly
-            #
 
             if x <= self.length / 2:
                 # the desired moment is near the beginning of the beam, use the
@@ -153,11 +214,14 @@ class Beam(BeamElement):
 
     @staticmethod
     def show(*args, **kwargs):
-        """Show figure
+        """Wrapper function for showing matplotlib figure
 
-        This method gives direct access to show the figure after it has been
-        created. This is to make it easier to show a plot after creating a
-        beam. This is so the calling code does not have to import matplotlib
+        This method gives direct access to the matplot.pyplot.show function
+        so the calling code is not required to import matplotlib directly
+        just to show the plots
+
+        Parameters:
+             args/kwargs: args and kwargs are passed directly to matplotlib.pyplot.show
         """
         plt.show(*args, **kwargs)  # pragma: no cover
 

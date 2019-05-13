@@ -1,28 +1,13 @@
 """
 The reactions module defines different reaction classes
 
-A reaction is required to support a Beam element to resist any input forces.
+A reaction is required to support an element to resist any input forces.
 
 There are two types of reactions that are defined.
 
-    * PinnedReaction
-    * FixedReaction
+    * PinnedReaction, allows rotational displacement only
+    * FixedReaction, does not allow any displacement
 
-PinnedReaction
-+++++++++++++++
-
-A PinnedReaction represents a pinned, frictionless pivot that can
-resist motion in two directions. Normal and axially to the beam.
-A PinnedReaction does not have any ability to resist moments.
-The deflection of a beam at the PinnedReaction is always zero, but
-the angle is free to change
-
-FixedReaction
-+++++++++++++++
-
-A FixedReaction resists both force and moments. The displacement and the
-angle are both constrained and must be zero at the reaction point.
-FixedReactions are typically applied at the ends of a Beam.
 """
 
 from ._common import Forces, Validator
@@ -31,18 +16,21 @@ from ._common import Forces, Validator
 class Reaction(Forces):
     """Base class for all reactions
 
-    This class will define general properties related to a reaction
+    The Reaction class defines general properties related to all reaction
+    types.
 
     Parameters:
-        location (float): the axial location of the reaction along the length of the beam.
+        location (:obj:`float`): the axial location of the reaction along the
+                                 length of the beam.
 
     .. note:: Any force or moment values that where calculated values are
-             invalidated (set to None) any time the location is set.
+             invalidated (set to :obj:`None`) any time the location is set.
 
     Attributes:
-        force (float | None): the force of the reaction after it has been
-                              calculated
-        moment (float | None): The moment of the reaction after it has been calculated
+        force (:obj:`float | None`): the force of the reaction after it has
+                                     been calculated
+        moment (:obj:`float | None`): The moment of the reaction after it has
+                                      been calculated
     """
 
     name = None
@@ -57,8 +45,14 @@ class Reaction(Forces):
         """
         Location of the reaction along the length of the beam
 
-        .. note:: Any force or moment values that where calculated values are
-         invalidated (set to None) any time the location is set.
+        The units of the length property is the same as the units of the beam
+        length.
+
+        The value of the location must be a positive value that is less than
+        or equal to the length of the beam, or it will raise a ValueError.
+
+        .. note:: The force and moment values are set to :obj:`None` any time
+                  the location is set.
         """
         return self._location
 
@@ -75,17 +69,18 @@ class Reaction(Forces):
         """
         Simple tuple of force and moment
 
-        Returns (force, moment)
+        Returns:
+            :obj:`tuple` (force, moment)
         """
         return self.force, self.moment
 
     def invalidate(self):
         """Invalidate the reaction values
 
-        This will set the force and moment values to None
+        This will set the force and moment values to :obj:`None`
 
         To be used whenever the parameters change and the reaction values are
-        no longer valid
+        no longer valid.
         """
         self.force, self.moment = (None, None)
 
@@ -119,12 +114,18 @@ class PinnedReaction(Reaction):
     """
     A PinnedReaction allows rotation while restraining normal and axial displacements
 
+    A PinnedReaction represents a pinned, frictionless pivot that can
+    resist motion both normal and axial directions to the beam. It will not
+    resist moments.
+    The deflection of a beam at the PinnedReaction is always zero, but
+    the angle is free to change
+
     Parameters:
-        location (float): the axial location of the reaction along the length
-                          of the beam
+        location (:obj:`float`): the axial location of the reaction along the length
+                                 of the beam
 
     Attributes:
-        name (str): short name of the reaction (pinned). Used internally
+        name (:obj:`str`): short name of the reaction (pinned). Used internally
 
     .. warning:: The **name** attribute is for internal use only.
                  Do not change this value.
@@ -142,14 +143,16 @@ class FixedReaction(Reaction):
     """
     A FixedReaction does not allow any displacement or change in angle
 
-    Parameters:
+    A FixedReaction resists both force and moments. The displacement and the
+    angle are both constrained and must be zero at the reaction point.
+    FixedReactions are typically applied at the ends of a Beam.
 
-        location (float): the axial location of the reaction along the length
-                          of the beam
-    .. note:: FixedReactions are normally located at the end(s) of a Beam
+    Parameters:
+        location (:obj:`float`): the axial location of the reaction along the length
+                                 of the beam
 
     Attributes:
-        name (str): short name of the reaction (fixed). Used internally
+        name (:obj:`str`): short name of the reaction (fixed). Used internally
 
     .. warning:: The **name** attribute is for internal use only.
                  Do not change this value.
