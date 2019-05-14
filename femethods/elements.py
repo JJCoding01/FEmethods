@@ -3,12 +3,6 @@ The elements module contains finite element classes
 
 Currently the only element that is defined is a beam element.
 
-Beam Element
--------------
-
-A beam element is a slender member that is subjected to transverse loading.
-It is assumed to have homogeneous properties, with a constant cross-section.
-
 """
 
 from warnings import warn
@@ -24,6 +18,10 @@ from ._common import derivative as comm_derivative
 
 class Beam(BeamElement):
     """A Beam defines a beam element for analysis
+
+    A beam element is a slender member that is subjected to transverse loading.
+    It is assumed to have homogeneous properties, with a constant cross-section.
+
 
     Parameters:
         length (:obj:`float`): the length of a beam. This is the total length
