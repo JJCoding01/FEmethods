@@ -1,4 +1,4 @@
-# FEMethods
+# FEmethods
 
 [![PyPI version](https://badge.fury.io/py/femethods.svg)](https://badge.fury.io/py/femethods)
 [![Build Status](https://travis-ci.org/josephjcontreras/FEMethods.svg?branch=master)](https://travis-ci.org/josephjcontreras/FEMethods)
@@ -6,7 +6,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/josephjcontreras/FEMethods/badge.svg?branch=master)](https://coveralls.io/github/josephjcontreras/FEMethods?branch=master)
 
 ## Introduction
-_FEMethods_ is a python module that uses Finite Element Methods to determine the
+_FEmethods_ is a python module that uses Finite Element Methods to determine the
 reactions, and plot the shear, moment, and deflection along the length of a beam.
 
 Using Finite elements has the advantage over using exact solutions because it 
