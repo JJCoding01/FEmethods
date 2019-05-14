@@ -1,15 +1,14 @@
-femethods package
+FEmethods Package
 =================
 
-Submodules
-----------
+This section will go into details on how each module should be called.
 
 .. toctree::
 
-   femethods.elements
-   femethods.loads
-   femethods.mesh
-   femethods.reactions
+   Elements <femethods.elements>
+   Loads <femethods.loads>
+   Mesh <femethods.mesh>
+   Reactions <femethods.reactions>
 
 Module contents
 ---------------
