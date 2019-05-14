@@ -1,6 +1,8 @@
-## Change Log
+Change Log
+==========
 
-### v0.1.4dev
+v0.1.4dev
+---------
 
  - Adding unit tests to validate results for multiple cases
  - Formatting improvements
