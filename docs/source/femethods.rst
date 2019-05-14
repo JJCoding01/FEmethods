@@ -10,9 +10,6 @@ This section will go into details on how each module should be called.
    Mesh <femethods.mesh>
    Reactions <femethods.reactions>
 
-Module contents
----------------
-
 .. automodule:: femethods
     :members:
     :undoc-members:
