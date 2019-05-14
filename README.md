@@ -4,6 +4,8 @@
 [![Build Status](https://travis-ci.org/josephjcontreras/FEMethods.svg?branch=master)](https://travis-ci.org/josephjcontreras/FEMethods)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/josephjcontreras/FEMethods/blob/master/License.txt)
 [![Coverage Status](https://coveralls.io/repos/github/josephjcontreras/FEMethods/badge.svg?branch=master)](https://coveralls.io/github/josephjcontreras/FEMethods?branch=master)
+[![Documentation Status](https://readthedocs.org/projects/femethods/badge/?version=latest)](https://femethods.readthedocs.io/en/latest/?badge=latest)
+      
 
 ## Introduction
 _FEmethods_ is a python module that uses Finite Element Methods to determine the
@@ -236,3 +238,5 @@ Type: pinned
 
 ## Acknowledgements
 [Derivation of stiffness matrix for a beam](https://www.12000.org/my_notes/stiffness_matrix/stiffness_matrix_report.htm#x1-50002.1.1) by Nasser M. Abbasi
+[An idiot’s guide to Python documentation with Sphinx and ReadTheDocs](https://samnicholls.net/2016/06/15/how-to-sphinx-readthedocs) by [Sam Nicholls](https://samnicholls.net/about/) for
+ a very helpful guide on how to get sphinx set up
