@@ -1,16 +1,24 @@
-.. FEmethods documentation master file, created by
-sphinx-quickstart on Fri May 10 23:16:50 2019.
-You can adapt this file completely to your liking, but it should at least
-contain the root `toctree` directive.
+FEmethods documentation
+=======================
 
-Welcome to FEmethods documentation!
-=====================================
+FEmethods is a python package designed to analyse structural elements using
+Finite Element Methods to solve for element reaction forces and calculate
+the deflection of the element.
+
+Using FEM has the advantage over closed form
+(exact) equations because it uses numerical techniques that can easily be used
+on many different load cases, including statically indeterminate cases. The
+disadvantage of FEM is that it will have less accuracy then the exact equations
+derived for a particular case.
+
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Table of Contents:
 
-
+   intro
+   femethods
+   changelog_link
 
 Indices and tables
 ==================
