@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/josephjcontreras/FEMethods/blob/master/License.txt)
 [![Coverage Status](https://coveralls.io/repos/github/josephjcontreras/FEMethods/badge.svg?branch=master)](https://coveralls.io/github/josephjcontreras/FEMethods?branch=master)
 [![Documentation Status](https://readthedocs.org/projects/femethods/badge/?version=latest)](https://femethods.readthedocs.io/en/latest/?badge=latest)
-      
+
 
 ## Introduction
 _FEmethods_ is a python module that uses Finite Element Methods to determine the
@@ -16,6 +16,7 @@ can be used as a general analysis, and can analyze beams that are statically
 indeterminate. The downside of this numerical approach is it will be less 
 accurate than the exact approach.
 
+The official documentation is on [Read the Docs](https://femethods.readthedocs.io/en/latest/). 
 
 ## Installation
 
