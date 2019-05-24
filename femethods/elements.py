@@ -58,8 +58,8 @@ class Beam(BeamElement):
             :obj:`float`: deflection of the beam in the units of the beam length
 
         Raises:
-            ValueError: when the :math:`0\\leq x \\leq length` is False
-            TypeError: when x cannot be converted to a float
+            :obj:`ValueError`: when the :math:`0\\leq x \\leq length` is False
+            :obj:`TypeError`: when x cannot be converted to a float
         """
 
         # TODO: store the lengths/node locations in the class so they only have
@@ -103,8 +103,8 @@ class Beam(BeamElement):
         .. centered::
             :math:`M(x) = E \\cdot Ixx \\cdot \\frac{d^2 v(x)}{dx^2}`
 
-        where M is the moment, E is Young's modulus and Ixx is the area
-        moment of inertia.
+        where :math:`M` is the moment, :math:`E` is Young's modulus and
+        :math:`Ixx` is the area moment of inertia.
 
         .. note: When calculating the moment near the beginning of the beam
                  the moment calculation may be unreliable.
@@ -114,6 +114,13 @@ class Beam(BeamElement):
             dx (:obj:`float`, optional): spacing. Default is 1e-5
             order (:obj:`int`, optional): number of points to use, must be odd.
                 Default is 9
+
+        Returns:
+            :obj:`float`: moment in beam at location x
+
+        Raises:
+            :obj:`ValueError`: when the :math:`0\\leq x \\leq length` is False
+            :obj:`TypeError`: when x cannot be converted to a float
 
         For more information on the parameters, see the scipy.misc.derivative
         documentation.
@@ -153,10 +160,36 @@ class Beam(BeamElement):
             )
 
     def shear(self, x, dx=0.01, order=5):
-        """calculate the shear force at a given x location as the third
-        derivative of displacement with respect to x
+        """
+        Calculate the shear force in the beam at location x
 
-        V(x) = E * Ixx * d^3 v(x) / dx^3
+        Calculate the shear in the beam at the global x value by taking
+        the third derivative of the deflection curve.
+
+        .. centered::
+            :math:`V(x) = E \\cdot Ixx \\cdot \\frac{d^3 v(x)}{dx^3}`
+
+        where :math:`V` is the shear force, :math:`E` is Young's modulus and
+        :math:`Ixx` is the area moment of inertia.
+
+        .. note: When calculating the shear near the beginning of the beam
+                 the shear calculation may be unreliable.
+
+        Parameters:
+            x (:obj:`int`): location along the beam where the moment is calculated
+            dx (:obj:`float`, optional): spacing. Default is 0.01
+            order (:obj:`int`, optional): number of points to use, must be odd.
+                Default is 5
+
+        Returns:
+            :obj:`float`: moment in beam at location x
+
+        Raises:
+            :obj:`ValueError`: when the :math:`0\\leq x \\leq length` is False
+            :obj:`TypeError`: when x cannot be converted to a float
+
+        For more information on the parameters, see the scipy.misc.derivative
+        documentation.
         """
         return (
                 self.E * self.Ixx * derivative(self.deflection, x, dx=dx, n=3, order=order)
