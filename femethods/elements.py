@@ -200,7 +200,22 @@ class Beam(BeamElement):
         return self.moment(x, dx=dx) * c / self.Ixx
 
     def plot(self, n=250, plot_stress=True, title="Beam Analysis"):  # pragma: no cover
-        """plot the deflection, moment, and shear along the length of the beam
+        """
+        plot the deflection, moment, and shear along the length of the beam
+
+        The plot method will create a matplotlib.pyplot figure with the
+        deflection, moment, shear, and optionally stress along the length of
+        the beam element.
+
+        Returns:
+             :obj:`tuple`: Tuple of matplitlib.pyplot figure and list of axes
+                           in the form (figure, axes)
+
+        .. note:: The plot method will create the figure handle, but will not
+                  automatically show the figure.
+                  To show the figure use :obj:`Beam.show()` or
+                  :obj:`matplotlib.pyplot.show()`
+
         """
         rows = 4 if plot_stress else 3
         fig, axes = plt.subplots(rows, 1, sharex="all")
