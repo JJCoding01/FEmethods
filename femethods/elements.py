@@ -134,9 +134,9 @@ class Beam(BeamElement):
 
         try:
             return (
-                    self.E
-                    * self.Ixx
-                    * derivative(self.deflection, x, dx=dx, n=2, order=order)
+                self.E
+                * self.Ixx
+                * derivative(self.deflection, x, dx=dx, n=2, order=order)
             )
         except ValueError:
             # there was an error, probably due to the central difference
@@ -154,9 +154,9 @@ class Beam(BeamElement):
                 # backward difference method
                 method = "backward"
             return (
-                    self.E
-                    * self.Ixx
-                    * comm_derivative(self.deflection, x, method=method, n=2)
+                self.E
+                * self.Ixx
+                * comm_derivative(self.deflection, x, method=method, n=2)
             )
 
     def shear(self, x, dx=0.01, order=5):
@@ -192,7 +192,7 @@ class Beam(BeamElement):
         documentation.
         """
         return (
-                self.E * self.Ixx * derivative(self.deflection, x, dx=dx, n=3, order=order)
+            self.E * self.Ixx * derivative(self.deflection, x, dx=dx, n=3, order=order)
         )
 
     def bending_stress(self, x, dx=1, c=1):
