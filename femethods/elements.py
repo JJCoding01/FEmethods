@@ -58,8 +58,8 @@ class Beam(BeamElement):
             :obj:`float`: deflection of the beam in the units of the beam length
 
         Raises:
-            ValueError: when the :math:`0\\leq x \\leq length` is False
-            TypeError: when x cannot be converted to a float
+            :obj:`ValueError`: when the :math:`0\\leq x \\leq length` is False
+            :obj:`TypeError`: when x cannot be converted to a float
         """
 
         # TODO: store the lengths/node locations in the class so they only have
@@ -103,8 +103,8 @@ class Beam(BeamElement):
         .. centered::
             :math:`M(x) = E \\cdot Ixx \\cdot \\frac{d^2 v(x)}{dx^2}`
 
-        where M is the moment, E is Young's modulus and Ixx is the area
-        moment of inertia.
+        where :math:`M` is the moment, :math:`E` is Young's modulus and
+        :math:`Ixx` is the area moment of inertia.
 
         .. note: When calculating the moment near the beginning of the beam
                  the moment calculation may be unreliable.
@@ -114,6 +114,13 @@ class Beam(BeamElement):
             dx (:obj:`float`, optional): spacing. Default is 1e-5
             order (:obj:`int`, optional): number of points to use, must be odd.
                 Default is 9
+
+        Returns:
+            :obj:`float`: moment in beam at location x
+
+        Raises:
+            :obj:`ValueError`: when the :math:`0\\leq x \\leq length` is False
+            :obj:`TypeError`: when x cannot be converted to a float
 
         For more information on the parameters, see the scipy.misc.derivative
         documentation.
@@ -127,9 +134,9 @@ class Beam(BeamElement):
 
         try:
             return (
-                    self.E
-                    * self.Ixx
-                    * derivative(self.deflection, x, dx=dx, n=2, order=order)
+                self.E
+                * self.Ixx
+                * derivative(self.deflection, x, dx=dx, n=2, order=order)
             )
         except ValueError:
             # there was an error, probably due to the central difference
@@ -147,27 +154,68 @@ class Beam(BeamElement):
                 # backward difference method
                 method = "backward"
             return (
-                    self.E
-                    * self.Ixx
-                    * comm_derivative(self.deflection, x, method=method, n=2)
+                self.E
+                * self.Ixx
+                * comm_derivative(self.deflection, x, method=method, n=2)
             )
 
     def shear(self, x, dx=0.01, order=5):
-        """calculate the shear force at a given x location as the third
-        derivative of displacement with respect to x
+        """
+        Calculate the shear force in the beam at location x
 
-        V(x) = E * Ixx * d^3 v(x) / dx^3
+        Calculate the shear in the beam at the global x value by taking
+        the third derivative of the deflection curve.
+
+        .. centered::
+            :math:`V(x) = E \\cdot Ixx \\cdot \\frac{d^3 v(x)}{dx^3}`
+
+        where :math:`V` is the shear force, :math:`E` is Young's modulus and
+        :math:`Ixx` is the area moment of inertia.
+
+        .. note: When calculating the shear near the beginning of the beam
+                 the shear calculation may be unreliable.
+
+        Parameters:
+            x (:obj:`int`): location along the beam where the moment is calculated
+            dx (:obj:`float`, optional): spacing. Default is 0.01
+            order (:obj:`int`, optional): number of points to use, must be odd.
+                Default is 5
+
+        Returns:
+            :obj:`float`: moment in beam at location x
+
+        Raises:
+            :obj:`ValueError`: when the :math:`0\\leq x \\leq length` is False
+            :obj:`TypeError`: when x cannot be converted to a float
+
+        For more information on the parameters, see the scipy.misc.derivative
+        documentation.
         """
         return (
-                self.E * self.Ixx * derivative(self.deflection, x, dx=dx, n=3, order=order)
+            self.E * self.Ixx * derivative(self.deflection, x, dx=dx, n=3, order=order)
         )
 
     def bending_stress(self, x, dx=1, c=1):
         """returns the bending stress at global coordinate x"""
         return self.moment(x, dx=dx) * c / self.Ixx
 
-    def plot(self, n=250, plot_stress=True, title="Beam Analysis"):  # pragma: no cover
-        """plot the deflection, moment, and shear along the length of the beam
+    def plot(self, n=250, plot_stress=False, title="Beam Analysis"):  # pragma: no cover
+        """
+        plot the deflection, moment, and shear along the length of the beam
+
+        The plot method will create a matplotlib.pyplot figure with the
+        deflection, moment, shear, and optionally stress along the length of
+        the beam element.
+
+        Returns:
+             :obj:`tuple`: Tuple of matplitlib.pyplot figure and list of axes
+                           in the form (figure, axes)
+
+        .. note:: The plot method will create the figure handle, but will not
+                  automatically show the figure.
+                  To show the figure use :obj:`Beam.show()` or
+                  :obj:`matplotlib.pyplot.show()`
+
         """
         rows = 4 if plot_stress else 3
         fig, axes = plt.subplots(rows, 1, sharex="all")
@@ -208,7 +256,7 @@ class Beam(BeamElement):
 
         fig.subplots_adjust(hspace=0.25)
         fig.suptitle(title)
-        return fig
+        return fig, axes
 
     @staticmethod
     def show(*args, **kwargs):
