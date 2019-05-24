@@ -256,7 +256,7 @@ class Beam(BeamElement):
 
         fig.subplots_adjust(hspace=0.25)
         fig.suptitle(title)
-        return fig
+        return fig, axes
 
     @staticmethod
     def show(*args, **kwargs):
