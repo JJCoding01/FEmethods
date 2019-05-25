@@ -112,7 +112,7 @@ class Reaction(Forces):
 
 class PinnedReaction(Reaction):
     """
-    A PinnedReaction allows rotation while restraining normal and axial displacements
+    A PinnedReaction allows rotation displacements only
 
     A PinnedReaction represents a pinned, frictionless pivot that can
     resist motion both normal and axial directions to the beam. It will not
@@ -121,8 +121,8 @@ class PinnedReaction(Reaction):
     the angle is free to change
 
     Parameters:
-        location (:obj:`float`): the axial location of the reaction along the length
-                                 of the beam
+        location (:obj:`float`): the axial location of the reaction along the
+                                 length of the beam
 
     Attributes:
         name (:obj:`str`): short name of the reaction (pinned). Used internally
@@ -148,8 +148,8 @@ class FixedReaction(Reaction):
     FixedReactions are typically applied at the ends of a Beam.
 
     Parameters:
-        location (:obj:`float`): the axial location of the reaction along the length
-                                 of the beam
+        location (:obj:`float`): the axial location of the reaction along the
+                                 length of the beam
 
     Attributes:
         name (:obj:`str`): short name of the reaction (fixed). Used internally

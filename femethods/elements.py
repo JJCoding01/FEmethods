@@ -20,7 +20,8 @@ class Beam(BeamElement):
     """A Beam defines a beam element for analysis
 
     A beam element is a slender member that is subjected to transverse loading.
-    It is assumed to have homogeneous properties, with a constant cross-section.
+    It is assumed to have homogeneous properties, with a constant
+    cross-section.
 
 
     Parameters:
@@ -55,7 +56,7 @@ class Beam(BeamElement):
                            deflection should be calculated.
 
         Returns:
-            :obj:`float`: deflection of the beam in the units of the beam length
+            :obj:`float`: deflection of the beam in units of the beam length
 
         Raises:
             :obj:`ValueError`: when the :math:`0\\leq x \\leq length` is False
@@ -110,7 +111,7 @@ class Beam(BeamElement):
                  the moment calculation may be unreliable.
 
         Parameters:
-            x (:obj:`int`): location along the beam where the moment is calculated
+            x (:obj:`int`): location along the beam where moment is calculated
             dx (:obj:`float`, optional): spacing. Default is 1e-5
             order (:obj:`int`, optional): number of points to use, must be odd.
                 Default is 9
@@ -176,7 +177,7 @@ class Beam(BeamElement):
                  the shear calculation may be unreliable.
 
         Parameters:
-            x (:obj:`int`): location along the beam where the moment is calculated
+            x (:obj:`int`): location along the beam where moment is calculated
             dx (:obj:`float`, optional): spacing. Default is 0.01
             order (:obj:`int`, optional): number of points to use, must be odd.
                 Default is 5
@@ -192,14 +193,18 @@ class Beam(BeamElement):
         documentation.
         """
         return (
-            self.E * self.Ixx * derivative(self.deflection, x, dx=dx, n=3, order=order)
+                self.E
+                * self.Ixx
+                * derivative(self.deflection, x, dx=dx, n=3, order=order)
         )
 
     def bending_stress(self, x, dx=1, c=1):
         """returns the bending stress at global coordinate x"""
         return self.moment(x, dx=dx) * c / self.Ixx
 
-    def plot(self, n=250, plot_stress=False, title="Beam Analysis"):  # pragma: no cover
+    def plot(
+            self, n=250, plot_stress=False, title="Beam Analysis"
+    ):  # pragma: no cover
         """
         plot the deflection, moment, and shear along the length of the beam
 
@@ -267,7 +272,8 @@ class Beam(BeamElement):
         just to show the plots
 
         Parameters:
-             args/kwargs: args and kwargs are passed directly to matplotlib.pyplot.show
+             args/kwargs: args and kwargs are passed directly to
+                          matplotlib.pyplot.show
         """
         plt.show(*args, **kwargs)  # pragma: no cover
 

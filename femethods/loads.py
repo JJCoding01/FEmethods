@@ -10,6 +10,7 @@ class Load(Forces):
 
     Used primarily for type checking the loads on input
     """
+
     pass
 
 

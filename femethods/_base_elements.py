@@ -72,7 +72,7 @@ class Element(Base):
         # validate that loads is a list of valid Loads
         for load in loads:
             if not isinstance(load, Load):
-                raise TypeError(f'type {type(load)} is not of type Load')
+                raise TypeError(f"type {type(load)} is not of type Load")
 
         self.invalidate()
         self._loads = loads
@@ -100,12 +100,16 @@ class Element(Base):
                     # the new load position is located on the beam.
                     if reaction.location == 0:
                         load.location += 1e-8
-                        warn(f'load location moved by 1e-8 to avoid reaction '
-                             f'at {reaction.location}')
+                        warn(
+                            f"load location moved by 1e-8 to avoid reaction "
+                            f"at {reaction.location}"
+                        )
                     else:
                         load.location -= 1e-8
-                        warn(f'load location moved by -1e-8 to avoid reaction'
-                             f' at {reaction.location}')
+                        warn(
+                            f"load location moved by -1e-8 to avoid reaction"
+                            f" at {reaction.location}"
+                        )
         return True
 
     @property
@@ -117,7 +121,8 @@ class Element(Base):
     def reactions(self, reactions):
         for reaction in reactions:
             if not isinstance(reaction, Reaction):
-                raise TypeError(f'type {type(reaction)} is not of type Reaction')
+                msg = f"type {type(reaction)} is not of type Reaction"
+                raise TypeError(msg)
         self.invalidate()
         self._reactions = reactions
 

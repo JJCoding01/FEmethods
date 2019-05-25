@@ -112,7 +112,7 @@ class Forces(object):
         return self.__class__(f1 + f2, x)
 
     def __eq__(self, other):
-        return self.magnitude * self.location == other.magnitude * other.location
+        return self.magnitude * self.location == other.magnitude * other.location  # noqa: E501
 
     def __sub__(self, force2):
         f1 = self.magnitude
