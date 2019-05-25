@@ -2,7 +2,7 @@ FEmethods documentation
 =======================
 
 FEmethods is a python package designed to analyse structural elements using
-Finite Element Methods to solve for element reaction forces and calculate
+Finite Element Methods (FEM) to solve for element reaction forces and calculate
 the deflection of the element.
 
 Using FEM has the advantage over closed form
@@ -12,10 +12,7 @@ disadvantage of FEM is that it will have less accuracy then the exact equations
 derived for a particular case.
 
     .. note::
-
-        This module (and documentation) are currently a work-in-progress.
-        The documentation in particular is not comprehensive.
-
+        This package is currently a work-in-progress.
 
 .. toctree::
    :maxdepth: 2
@@ -23,7 +20,6 @@ derived for a particular case.
 
    intro
    femethods
-   changelog_link
 
 Indices and tables
 ==================
