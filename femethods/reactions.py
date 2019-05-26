@@ -127,8 +127,8 @@ class PinnedReaction(Reaction):
     Attributes:
         name (:obj:`str`): short name of the reaction (pinned). Used internally
 
-    .. warning:: The **name** attribute is for internal use only.
-                 Do not change this value.
+    .. warning:: The **name** attribute is used internally.
+                 **Do not change this value!**
     """
 
     name = "pinned"
@@ -154,8 +154,8 @@ class FixedReaction(Reaction):
     Attributes:
         name (:obj:`str`): short name of the reaction (fixed). Used internally
 
-    .. warning:: The **name** attribute is for internal use only.
-                 Do not change this value.
+    .. warning:: The **name** attribute is used internally.
+                 **Do not change this value!**
     """
 
     name = "fixed"
