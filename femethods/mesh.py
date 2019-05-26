@@ -23,14 +23,34 @@ class Mesh(object):
 
     @property
     def dof(self):
+        """
+        Degrees of freedom of the entire beam
+
+        Returns:
+            :obj:`int`: Read-only. Number of degrees of freedom of the beam
+        """
         return self._dof
 
     @property
     def lengths(self):
+        """
+        List of lengths of mesh elements
+
+        Returns:
+            :obj:`list`: Read-only. List of lengths of local mesh elements
+        """
         return self._lengths
 
     @property
     def num_elements(self):
+        """
+        Number of mesh elements
+
+        Returns:
+            :obj:`int`: Read-only. Number of elements in mesh
+
+        """
+
         return self._num_elements
 
     def __get_lengths(self):
