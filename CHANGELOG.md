@@ -1,5 +1,14 @@
 # Change Log
 
+## v0.1.6dev
+ - Add documentation on [Read The Docs](https://femethods.readthedocs.io/en/latest/index.html)
+ - Expand module and function documentation
+ - Rename module from FEMethods to FEmethods (lower case m)
+
+### Backwards Incompatible Changes
+ - `Beam.plot` now returns a tuple to give access to the axes directly instead of just the figure
+ - `Beam.plot` defaults changed to not automatically plot the beam stress
+
 ## v0.1.5dev
  - Add CI, coverage reports and expand unit tests
  - Rewrite existing tests using pytest
