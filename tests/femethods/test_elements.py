@@ -74,7 +74,7 @@ def test_invalid_reaction_errors():
 
 def test_shape_function():
     reactions = [PinnedReaction(x) for x in [0, 50, 100]]
-    loads = [PointLoad(-100, x) for x in [0, 50, 100]]
+    loads = [PointLoad(-100, x) for x in [5, 45, 90]]
     beam = Beam(100, loads, reactions, 29e6, 345)
 
     assert beam.shape(0).shape == (4,), "unexpected shape of shape functions"

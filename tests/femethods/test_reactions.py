@@ -49,6 +49,10 @@ def test_reaction_parameters():
     r = Reaction(5)
     r.force = 15
     r.moment = 25
+    assert r.value == (15, 25), "Reaction values do not match expected"
+    r.invalidate()
+    assert r.value == (None, None), "Reaction values where not invalidated"
+
 
 
 def test_reaction_types():
