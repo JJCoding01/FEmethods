@@ -4,6 +4,8 @@ Introduction
 This is the introduction to FEmethods. It will introduce Finite Element Methods
 in general, and then give a few examples of how to use FEmethods.
 
+The code can be found on `github.com <https://github.com/josephjcontreras/FEmethods>`_
+
 Installation
 ------------
 
@@ -11,6 +13,12 @@ FEmethods is hosted on PyPi, so installation is straightforward.
     .. code-block:: python
 
         >>>pip install femethods
+
+It can also be installed from source.
+    .. code-block:: python
+
+        >>>git clone https://github.com/josephjcontreras/FEmethods.git
+
 
 Then to test that the installation worked properly, you can try this simple
 example case of a simply supported beam with a single, centered point load.
@@ -44,15 +52,4 @@ example case of a simply supported beam with a single, centered point load.
                Force: 50.0
               Moment: 0.0
 
-Platform
---------
 
-FEmethods has only been tested on Windows 10, with python 3.7. Further testing
-with some linux distros is planned.
-
-
-Finite Element Methods
-----------------------
-
-Include a brief intro to general finite element methods. Generally, how it works
-what are some advantages and disadvantages, etc.
