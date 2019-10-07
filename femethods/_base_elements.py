@@ -8,7 +8,6 @@ from warnings import warn
 import matplotlib.pyplot as plt
 import numpy as np
 
-from ._common import Validator
 # Importing loads is only used for checking the type. Find a better way to do
 # this without needing to import loads
 from .loads import Load, PointLoad
@@ -29,8 +28,10 @@ class Base(object):
         return self._length
 
     @length.setter
-    @Validator.positive("length")
     def length(self, length):
+        if length <= 0:
+            # length must be a positive number
+            raise ValueError("length must be positive!")
         self._length = length
 
     @property
@@ -38,8 +39,9 @@ class Base(object):
         return self._E
 
     @E.setter
-    @Validator.positive("Young's modulus")
     def E(self, E):
+        if E <= 0:
+            raise ValueError("Young's modulus must be positive!")
         self._E = E
 
     @property
@@ -47,8 +49,9 @@ class Base(object):
         return self._Ixx
 
     @Ixx.setter
-    @Validator.positive("Area moment of inertia")
     def Ixx(self, Ixx):
+        if Ixx <= 0:
+            raise ValueError("Area moment of inertia must be positive!")
         self._Ixx = Ixx
 
 
@@ -67,7 +70,6 @@ class Element(Base):
         return self._loads
 
     @loads.setter
-    @Validator.islist("loads")
     def loads(self, loads):
         # validate that loads is a list of valid Loads
         for load in loads:
@@ -117,7 +119,6 @@ class Element(Base):
         return self._reactions
 
     @reactions.setter
-    @Validator.islist("reactions")
     def reactions(self, reactions):
         for reaction in reactions:
             if not isinstance(reaction, Reaction):

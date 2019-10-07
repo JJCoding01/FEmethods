@@ -3,69 +3,6 @@ Base module that contains base classes to be used by other modules
 """
 
 
-class Validator(object):
-    """Decorator class used to validate parameters"""
-
-    @staticmethod
-    def positive(param_name="parameter"):
-        """Function decorator to handle validating input parameters to ensure
-        parameters are positive values.
-
-        The input, param_name, is the parameter name that will show up in the
-        call-stack when an invalid parameter is entered.
-        """
-
-        def decorator(func):
-            def wrapper(*args, **kwargs):
-                if type(args[1]) not in (int, float):
-                    raise TypeError(param_name + " must be a positive number!")
-                if args[1] <= 0:
-                    raise ValueError(param_name + " must be positive!")
-                func(*args, **kwargs)
-
-            return wrapper
-
-        return decorator
-
-    @staticmethod
-    def non_negative(param_name="parameter"):
-        """Function decorator to handle validating input parameters to ensure
-        parameters are non-negative (positive or zero values).
-
-        The input, param_name, is the parameter name that will show up in the
-        call-stack when an invalid parameter is entered.
-        """
-
-        def decorator(func):
-            def wrapper(*args, **kwargs):
-                if type(args[1]) not in (int, float):
-                    raise TypeError(param_name + " must be a positive number!")
-                if args[1] < 0:
-                    raise ValueError(param_name + " must be non-negative!")
-                func(*args, **kwargs)
-
-            return wrapper
-
-        return decorator
-
-    @staticmethod
-    def islist(param_name="parameter"):
-        """Function decorator to handle validating input parameters to ensure
-        parameters are a list.
-
-        The input, param_name, is the parameter name that will show up in the
-        call-stack when an invalid parameter is entered.
-        """
-
-        def decorator(func):
-            def wrapper(*args, **kwargs):
-                if not isinstance(args[1], list):
-                    raise TypeError(param_name + " must be a list!")
-                func(*args, **kwargs)
-
-            return wrapper
-
-        return decorator
 
 
 class Forces(object):
@@ -91,8 +28,10 @@ class Forces(object):
         return self._location
 
     @location.setter
-    @Validator.non_negative("location")
     def location(self, location):
+        if location < 0:
+            # location must be positive to be a valid length/position
+            raise ValueError("location must be positive!")
         self._location = location
 
     def __repr__(self):
