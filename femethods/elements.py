@@ -193,18 +193,14 @@ class Beam(BeamElement):
         documentation.
         """
         return (
-                self.E
-                * self.Ixx
-                * derivative(self.deflection, x, dx=dx, n=3, order=order)
+                self.E * self.Ixx * derivative(self.deflection, x, dx=dx, n=3, order=order)
         )
 
     def bending_stress(self, x, dx=1, c=1):
         """returns the bending stress at global coordinate x"""
         return self.moment(x, dx=dx) * c / self.Ixx
 
-    def plot(
-            self, n=250, plot_stress=False, title="Beam Analysis"
-    ):  # pragma: no cover
+    def plot(self, n=250, plot_stress=False, title="Beam Analysis"):  # pragma: no cover
         """
         plot the deflection, moment, and shear along the length of the beam
 
@@ -277,7 +273,10 @@ class Beam(BeamElement):
         """
         plt.show(*args, **kwargs)  # pragma: no cover
 
-    def __str__(self):
+    def __str__(self) -> str:
+        assert self.loads is not None
+        assert self.reactions is not None
+
         L = ""
         for load in self.loads:
             L += "Type: {}\n".format(load.name)

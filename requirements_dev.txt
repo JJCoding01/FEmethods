@@ -7,3 +7,4 @@ pytest-remotedata==0.3.1
 pytest==4.02
 sphinx==1.7.9
 flake8==3.7.7
+mypy==0.730
