@@ -5,6 +5,7 @@ Currently the only element that is defined is a beam element.
 
 """
 
+from typing import Any, List, TYPE_CHECKING, Tuple
 from warnings import warn
 
 import matplotlib.pyplot as plt
@@ -14,6 +15,10 @@ from scipy.misc import derivative
 # local imports
 from ._base_elements import BeamElement
 from ._common import derivative as comm_derivative
+
+if TYPE_CHECKING:  # pragma: no cover
+    from femethods.loads import Load  # noqa: F401 (unused import)
+    from femethods.reactions import Reaction  # noqa: F401 (unused import)
 
 
 class Beam(BeamElement):
@@ -45,10 +50,12 @@ class Beam(BeamElement):
 
     """
 
-    def __init__(self, length, loads, reactions, E=1, Ixx=1):
+    def __init__(self, length: float, loads: List["Load"], reactions: List["Reaction"],
+                 E: float = 1,
+                 Ixx: float = 1):
         super().__init__(length, loads, reactions, E=E, Ixx=Ixx)
 
-    def deflection(self, x):
+    def deflection(self, x: float) -> np.float64:
         """Calculate deflection of the beam at location x
 
         Parameters:
@@ -95,7 +102,7 @@ class Beam(BeamElement):
                 d = self.node_deflections[i * 2: i * 2 + 4]
                 return self.shape(x_local, L).dot(d)[0]
 
-    def moment(self, x, dx=1e-5, order=9):
+    def moment(self, x: float, dx: float = 1e-5, order: int = 9) -> np.float64:
         """Calculate the moment at location x
 
         Calculate the moment in the beam at the global x value by taking
@@ -160,7 +167,7 @@ class Beam(BeamElement):
                 * comm_derivative(self.deflection, x, method=method, n=2)
             )
 
-    def shear(self, x, dx=0.01, order=5):
+    def shear(self, x: float, dx: float = 0.01, order: int = 5) -> np.float64:
         """
         Calculate the shear force in the beam at location x
 
@@ -196,11 +203,13 @@ class Beam(BeamElement):
                 self.E * self.Ixx * derivative(self.deflection, x, dx=dx, n=3, order=order)
         )
 
-    def bending_stress(self, x, dx=1, c=1):
+    def bending_stress(self, x: float, dx: float = 1, c: int = 1) -> float:
         """returns the bending stress at global coordinate x"""
         return self.moment(x, dx=dx) * c / self.Ixx
 
-    def plot(self, n=250, plot_stress=False, title="Beam Analysis"):  # pragma: no cover
+    def plot(self, n: int = 250, plot_stress: bool = False,
+             title: str = "Beam Analysis") -> Tuple:  #
+        # pragma: no cover
         """
         plot the deflection, moment, and shear along the length of the beam
 
@@ -260,7 +269,7 @@ class Beam(BeamElement):
         return fig, axes
 
     @staticmethod
-    def show(*args, **kwargs):
+    def show(*args: Any, **kwargs: Any) -> None:
         """Wrapper function for showing matplotlib figure
 
         This method gives direct access to the matplot.pyplot.show function

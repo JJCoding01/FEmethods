@@ -42,7 +42,7 @@ class Forces(ABC):
                 + f"location={self.location})"
         )
 
-    def __add__(self, force2: "Forces") -> "Forces":
+    def __add__(self, force2: "Forces") -> Optional["Forces"]:
 
         # assert to validate type checking for mypy
         assert self.magnitude is not None
@@ -66,7 +66,7 @@ class Forces(ABC):
             return False
         return self.magnitude * self.location == other.magnitude * other.location
 
-    def __sub__(self, force2: "Forces") -> "Forces":
+    def __sub__(self, force2: "Forces") -> Optional["Forces"]:
 
         assert self.magnitude is not None
         assert force2.magnitude is not None

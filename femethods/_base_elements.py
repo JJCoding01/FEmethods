@@ -3,9 +3,9 @@ Module to define a general mesh element to be used for any FEM element, and
 the base element class that all FEM elements will be derived from
 """
 
-from typing import List, Optional
-from warnings import warn
 from abc import ABC, abstractmethod
+from typing import List, Optional, Tuple
+from warnings import warn
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,7 +16,9 @@ from .loads import Load, PointLoad
 from .mesh import Mesh
 from .reactions import Reaction
 
+BOUNDARY_CONDITIONS = List[Tuple[Optional[int], Optional[int]]]
 
+# noinspection PyPep8Naming
 class Base(ABC):
     """base object to be used as base for both FEM analysis"""
 
@@ -57,6 +59,7 @@ class Base(ABC):
         self._Ixx = Ixx
 
 
+# noinspection PyPep8Naming
 class Element(Base, ABC):
     """General element that will be inherited from for specific elements"""
 
@@ -145,7 +148,7 @@ class Element(Base, ABC):
                 reaction.invalidate()
 
     @property
-    def K(self):
+    def K(self) -> np.array:
         """global stiffness matrix"""
         if self._K is None:
             self._K = self.stiffness_global()
@@ -183,9 +186,11 @@ class Element(Base, ABC):
         raise NotImplementedError("Method must be overloaded!")
 
     @staticmethod
-    def apply_boundary_conditions(k, bcs):
+    def apply_boundary_conditions(
+            k: np.array, bcs: BOUNDARY_CONDITIONS
+    ) -> np.array:
         """
-        Given the stiffness matrix 'k', and the boundary conditions as a list
+        Given the stiffness matrix 'k_local', and the boundary conditions as a list
         of tuples, apply the boundary conditions to the stiffness matrix by
         setting the rows and columns that correspond to the boundary conditions
         to zeros, with ones on the diagonal.
@@ -204,16 +209,16 @@ class Element(Base, ABC):
         conditions are applied
         """
 
-        def apply(k, i):
+        def apply(k_local: np.array, i: int) -> np.array:
             """sub function to apply the boundary condition at row/col i to
-            stiffness matrix k
+            stiffness matrix k_local
 
-            return the stiffness matrix k with boundary conditions applied
+            return the stiffness matrix k_local with boundary conditions applied
             """
-            k[i] = 0  # set entire row to zeros
-            k[:, i] = 0  # set entire column to zeros
-            k[i][i] = 1  # set diagonal to 1
-            return k
+            k_local[i] = 0  # set entire row to zeros
+            k_local[:, i] = 0  # set entire column to zeros
+            k_local[i][i] = 1  # set diagonal to 1
+            return k_local
 
         # TODO: Check the sizes of the boundary conditions and stiffness matrix
 
@@ -249,23 +254,28 @@ class BeamElement(Element):
         self.invalidate()
 
     @property
-    def node_deflections(self):
+    def node_deflections(self) -> np.ndarray:
         if self._node_deflections is None:
             self._node_deflections = self._calc_node_deflections()
         return self._node_deflections
 
-    def __get_boundary_conditions(self):
+    def __get_boundary_conditions(self) -> BOUNDARY_CONDITIONS:
         # Initialize the  boundary conditions to None for each node, then
         # iterate over reactions and apply them to the boundary conditions
         # based on the reaction type.
-        bc = [(None, None) for _ in range(len(self.mesh.nodes))]
+        assert self.reactions is not None
+        bc: BOUNDARY_CONDITIONS = [
+            (None, None) for _ in range(len(self.mesh.nodes))
+        ]
         for r in self.reactions:
+            assert r is not None
             i = self.mesh.nodes.index(r.location)
             bc[i] = r.boundary
         return bc
 
-    def _calc_node_deflections(self):
+    def _calc_node_deflections(self) -> np.ndarray:
         """solve for vertical and angular displacement at each node"""
+        assert self.loads is not None
 
         # Get the boundary conditions from the reactions
         bc = self.__get_boundary_conditions()
@@ -297,7 +307,7 @@ class BeamElement(Element):
         self._node_deflections = np.linalg.solve(kg, p)
         return self._node_deflections
 
-    def _get_reaction_values(self):
+    def _get_reaction_values(self) -> np.ndarray:
         """Calculate the nodal forces acting on the beam. Note that the forces
         will also include the input forces.
 
@@ -312,6 +322,7 @@ class BeamElement(Element):
         K = self.K  # global stiffness matrix
         d = self.node_deflections  # force displacement vector
         r = np.matmul(K, d)
+        assert self.reactions is not None
 
         for ri in self.reactions:
             i = self.mesh.nodes.index(ri.location)
@@ -322,7 +333,7 @@ class BeamElement(Element):
             ri.moment = moment[0]
         return r
 
-    def shape(self, x: float, L: Optional[float] = None):
+    def shape(self, x: float, L: Optional[float] = None) -> np.ndarray:
         """return an array of the shape functions evaluated at x the local
         x-value
         """
@@ -334,7 +345,7 @@ class BeamElement(Element):
         N4 = 1 / L ** 2 * (-L * x ** 2 + x ** 3)
         return np.array([N1, N2, N3, N4])
 
-    def plot_shapes(self, n: int = 25):  # pragma: no cover
+    def plot_shapes(self, n: int = 25) -> None:  # pragma: no cover
         """plot shape functions for the with n data points"""
         x = np.linspace(0, self.length, n)
 
@@ -362,7 +373,7 @@ class BeamElement(Element):
         fig.subplots_adjust(wspace=0.25, hspace=0)
         plt.show()
 
-    def stiffness(self, L: float):
+    def stiffness(self, L: float) -> np.ndarray:
         """return local stiffness matrix, k, as numpy array evaluated with beam
         element length L"""
 
@@ -379,7 +390,7 @@ class BeamElement(Element):
         )
         return E * Ixx / L ** 3 * k
 
-    def stiffness_global(self):
+    def stiffness_global(self) -> np.array:
         # Initialize the global stiffness matrix, then iterate over the
         # elements, calculate a local stiffness matrix, and add it to the
         # global stiffness matrix.
