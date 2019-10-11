@@ -68,6 +68,7 @@ class Mesh(object):
             lengths.append(self.nodes[k + 1] - self.nodes[k])
         return lengths
 
+    @staticmethod
     def __get_nodes(
             self, length: float, loads: List["Load"], reactions: List["Reaction"]
     ) -> Sequence[float]:

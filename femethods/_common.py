@@ -2,12 +2,13 @@
 Base module that contains base classes to be used by other modules
 """
 
+from abc import ABC
 from typing import Callable, Optional
 
 from numpy import float64
 
 
-class Forces(object):
+class Forces(ABC):
     """Base class for all loads and reactions"""
 
     def __init__(self, magnitude: Optional[float], location: float = 0) -> None:

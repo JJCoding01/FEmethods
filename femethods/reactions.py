@@ -13,6 +13,8 @@ from typing import Optional, Tuple
 
 from ._common import Forces
 
+BOUNDARY_CONDITIONS = Tuple[Optional[int], Optional[int]]
+
 
 class Reaction(Forces):
     """Base class for all reactions
@@ -40,6 +42,11 @@ class Reaction(Forces):
         super().__init__(magnitude=None, location=location)
         self.force = None
         self.moment = None
+        self._boundary: BOUNDARY_CONDITIONS = (None, None)
+
+    @property
+    def boundary(self) -> BOUNDARY_CONDITIONS:
+        return self._boundary
 
     @property
     def location(self) -> float:
@@ -139,7 +146,7 @@ class PinnedReaction(Reaction):
     def __init__(self, location: float):
         super().__init__(location)
         # limit the vertical displacement but allow rotation
-        self.boundary = (0, None)
+        self._boundary: BOUNDARY_CONDITIONS = (0, None)
 
 
 class FixedReaction(Reaction):
@@ -166,4 +173,4 @@ class FixedReaction(Reaction):
     def __init__(self, location: float):
         super().__init__(location)
         # do not allow vertical or rotational displacement
-        self.boundary = (0, 0)
+        self._boundary: BOUNDARY_CONDITIONS = (0, 0)

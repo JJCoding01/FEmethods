@@ -5,6 +5,7 @@ the base element class that all FEM elements will be derived from
 
 from typing import List, Optional
 from warnings import warn
+from abc import ABC, abstractmethod
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,7 +17,7 @@ from .mesh import Mesh
 from .reactions import Reaction
 
 
-class Base(object):
+class Base(ABC):
     """base object to be used as base for both FEM analysis"""
 
     def __init__(self, length: float, E: float = 1, Ixx: float = 1) -> None:
@@ -56,7 +57,7 @@ class Base(object):
         self._Ixx = Ixx
 
 
-class Element(Base):
+class Element(Base, ABC):
     """General element that will be inherited from for specific elements"""
 
     def __init__(self, length: float, E: float = 1, Ixx: float = 1) -> None:
@@ -130,6 +131,7 @@ class Element(Base):
         self.invalidate()
         self._reactions = reactions
 
+    @abstractmethod
     def remesh(self) -> None:
         """force a remesh calculation and invalidate any calculation results"""
         raise NotImplementedError("method must be overloaded")
@@ -158,18 +160,22 @@ class Element(Base):
         self._calc_node_deflections()
         self._get_reaction_values()
 
+    @abstractmethod
     def _calc_node_deflections(self) -> None:
         raise NotImplementedError("must be overloaded!")
 
+    @abstractmethod
     def _get_reaction_values(self) -> None:
         raise NotImplementedError("must be overloaded!")
 
+    @abstractmethod
     def stiffness(self, L: float) -> None:
         """return local stiffness matrix, k, as numpy array evaluated with beam
         element length L, where L defaults to the length of the beam
         """
         raise NotImplementedError("Method must be overloaded!")
 
+    @abstractmethod
     def stiffness_global(self) -> None:
         # Initialize the global stiffness matrix, then iterate over the
         # elements, calculate a local stiffness matrix, and add it to the
