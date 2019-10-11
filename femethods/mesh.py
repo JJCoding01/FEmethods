@@ -4,7 +4,7 @@ Mesh module that will define the mesh.
 
 from typing import List, Sequence, TYPE_CHECKING
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from femethods.reactions import Reaction
     from femethods.loads import Load
 
