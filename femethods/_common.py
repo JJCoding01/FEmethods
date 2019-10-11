@@ -60,6 +60,8 @@ class Forces(ABC):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return False
+        if self.magnitude is None and other.magnitude is None:
+            return self.location == other.location
         if self.magnitude is None or other.magnitude is None:
             return False
         return self.magnitude * self.location == other.magnitude * other.location
