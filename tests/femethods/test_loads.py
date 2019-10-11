@@ -38,6 +38,24 @@ def check_load(load):
         load(magnitude="a string", location=10)  # magnitude must be a number
 
 
+def test_PointLoad_equality():
+    p1 = PointLoad(magnitude=10, location=30)
+    p2 = PointLoad(magnitude=10, location=30)
+    p3 = PointLoad(magnitude=12, location=20)
+    p4 = PointLoad(magnitude=None, location=20)
+
+    assert p1 == p1, "loads should equal itself"
+    assert p2 == p2, "loads should equal itself"
+    assert p3 == p3, "loads should equal itself"
+    assert p4 == p4, "loads should equal itself"
+
+    assert p1 == p2, "equivalent loads should be equal"
+    assert p1 != p3, "different loads should not be equal"
+    assert p1 != p4, "different loads should not be equal"
+
+    assert p1 != "not a load", "load should not equal something that is not a load"
+
+
 def test_loads():
     check_load(PointLoad)
     check_load(MomentLoad)

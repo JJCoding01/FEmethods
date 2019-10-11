@@ -44,6 +44,30 @@ def test_reaction_load_warnings():
         Beam("length is not a number", reactions=reactions, loads=loads)
 
 
+def test_invalid_properties_E():
+    invalid_E = [0, -5]
+
+    for e in invalid_E:
+        with pytest.raises(ValueError):
+            Beam(15,
+                 loads=[PointLoad(15, 8)],
+                 reactions=[FixedReaction(0)],
+                 E=e,
+                 Ixx=15)
+
+
+def test_invalid_properties_Ixx():
+    invalid_I = [0, -5]
+
+    for I in invalid_I:
+        with pytest.raises(ValueError):
+            Beam(15,
+                 loads=[PointLoad(15, 8)],
+                 reactions=[FixedReaction(0)],
+                 E=5,
+                 Ixx=I)
+
+
 def test_invalid_load_placement():
     reactions = [PinnedReaction(x) for x in [0, 50, 100]]
     loads = [PointLoad(-100, x) for x in [0, 50, 100]]
