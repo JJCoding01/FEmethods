@@ -11,7 +11,9 @@ from numpy import float64
 class Forces(ABC):
     """Base class for all loads and reactions"""
 
-    def __init__(self, magnitude: Optional[float], location: float = 0) -> None:
+    def __init__(
+        self, magnitude: Optional[float], location: float = 0
+    ) -> None:
         self.magnitude = magnitude
         self.location = location
 
@@ -38,8 +40,8 @@ class Forces(ABC):
 
     def __repr__(self) -> str:
         return (
-                f"{self.__class__.__name__}(magnitude={self.magnitude}, "
-                + f"location={self.location})"
+            f"{self.__class__.__name__}(magnitude={self.magnitude}, "
+            + f"location={self.location})"
         )
 
     def __add__(self, force2: "Forces") -> Optional["Forces"]:
@@ -64,7 +66,9 @@ class Forces(ABC):
             return self.location == other.location
         if self.magnitude is None or other.magnitude is None:
             return False
-        return self.magnitude * self.location == other.magnitude * other.location
+        return (
+            self.magnitude * self.location == other.magnitude * other.location
+        )
 
     def __sub__(self, force2: "Forces") -> Optional["Forces"]:
 
@@ -82,7 +86,7 @@ class Forces(ABC):
 
 
 def derivative(
-        func: Callable, x0: float, n: int = 1, method: str = "forward"
+    func: Callable, x0: float, n: int = 1, method: str = "forward"
 ) -> float64:
     """
     Calculate the nth derivative of function f at x0

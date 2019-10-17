@@ -5,8 +5,8 @@ Mesh module that will define the mesh.
 from typing import List, Sequence, TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from femethods.reactions import Reaction
-    from femethods.loads import Load
+    from femethods.reactions import Reaction  # noqa: F401 (unused import)
+    from femethods.loads import Load  # noqa: F401 (unused import)
 
 
 class Mesh(object):
@@ -18,7 +18,11 @@ class Mesh(object):
     """
 
     def __init__(
-            self, length: float, loads: List["Load"], reactions: List["Reaction"], dof: int
+        self,
+        length: float,
+        loads: List["Load"],
+        reactions: List["Reaction"],
+        dof: int,
     ):
         self._nodes = self.__get_nodes(length, loads, reactions)
         self._lengths = self.__get_lengths()
@@ -70,9 +74,15 @@ class Mesh(object):
 
     @staticmethod
     def __get_nodes(
-            self, length: float, loads: List["Load"], reactions: List["Reaction"]
+        length: float, loads: List["Load"], reactions: List["Reaction"]
     ) -> Sequence[float]:
         nodes: List[float] = [0]  # ensure first node is always at zero (0)
+
+        # Ignore the type checking for the for loop adding lists of loads and
+        # lists of reactions. There is no + operator defined for these, but it
+        # will combine the lists using the built in list addition. Which is the
+        # desired behavior
+        # noinspection PyTypeChecker,Mypy
         for item in loads + reactions:  # type: ignore
             nodes.append(item.location)
         nodes.append(length)  # ensure last node is at the end of the beam

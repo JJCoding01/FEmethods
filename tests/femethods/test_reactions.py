@@ -6,8 +6,8 @@ from femethods.reactions import FixedReaction, PinnedReaction, Reaction
 def test_reaction_parameters():
     r = Reaction(0)
 
-    assert r.force == None, "Reaction should not have force before solving"
-    assert r.moment == None, "Reaction should not have moment before solving"
+    assert r.force is None, "Reaction should not have force before solving"
+    assert r.moment is None, "Reaction should not have moment before solving"
     assert r.value == (None, None), "Reaction value initialized incorrectly"
 
     r.force = 10
@@ -52,7 +52,6 @@ def test_reaction_parameters():
     assert r.value == (15, 25), "Reaction values do not match expected"
     r.invalidate()
     assert r.value == (None, None), "Reaction values where not invalidated"
-
 
 
 def test_reaction_types():

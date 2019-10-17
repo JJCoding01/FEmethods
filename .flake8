@@ -1,0 +1,17 @@
+[flake8]
+ignore =
+    W503,  # line break before binary operator
+    E731,  # do not assign a lambda expression, use a def
+    E203,  # whitespace before ':'
+
+exclude =
+    .git
+    docs
+    __pycache__
+    .mypy_cache
+    .pytest_cache
+    env
+    htmlcov
+
+max-complexity = 10
+max-line-length = 88

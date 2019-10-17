@@ -21,6 +21,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from femethods.reactions import Reaction  # noqa: F401 (unused import)
 
 
+# noinspection PyPep8Naming
 class Beam(BeamElement):
     """A Beam defines a beam element for analysis
 
@@ -50,9 +51,14 @@ class Beam(BeamElement):
 
     """
 
-    def __init__(self, length: float, loads: List["Load"], reactions: List["Reaction"],
-                 E: float = 1,
-                 Ixx: float = 1):
+    def __init__(
+        self,
+        length: float,
+        loads: List["Load"],
+        reactions: List["Reaction"],
+        E: float = 1,
+        Ixx: float = 1,
+    ):
         super().__init__(length, loads, reactions, E=E, Ixx=Ixx)
 
     def deflection(self, x: float) -> np.float64:
@@ -99,7 +105,7 @@ class Beam(BeamElement):
                 # Get the parameters in the local system and exit the loop
                 x_local = x - nodes[i]
                 L = self.mesh.lengths[i]
-                d = self.node_deflections[i * 2: i * 2 + 4]
+                d = self.node_deflections[i * 2 : i * 2 + 4]
                 return self.shape(x_local, L).dot(d)[0]
 
     def moment(self, x: float, dx: float = 1e-5, order: int = 9) -> np.float64:
@@ -200,15 +206,23 @@ class Beam(BeamElement):
         documentation.
         """
         return (
-                self.E * self.Ixx * derivative(self.deflection, x, dx=dx, n=3, order=order)
+            self.E
+            * self.Ixx
+            * derivative(self.deflection, x, dx=dx, n=3, order=order)
         )
 
-    def bending_stress(self, x: float, dx: float = 1, c: int = 1) -> float:
+    def bending_stress(
+        self, x: float, dx: float = 1, c: int = 1
+    ) -> np.float64:
         """returns the bending stress at global coordinate x"""
         return self.moment(x, dx=dx) * c / self.Ixx
 
-    def plot(self, n: int = 250, plot_stress: bool = False,
-             title: str = "Beam Analysis") -> Tuple:  #
+    def plot(
+        self,
+        n: int = 250,
+        plot_stress: bool = False,
+        title: str = "Beam Analysis",
+    ) -> Tuple:  #
         # pragma: no cover
         """
         plot the deflection, moment, and shear along the length of the beam
@@ -272,7 +286,7 @@ class Beam(BeamElement):
     def show(*args: Any, **kwargs: Any) -> None:
         """Wrapper function for showing matplotlib figure
 
-        This method gives direct access to the matplot.pyplot.show function
+        This method gives direct access to the matplotlib.pyplot.show function
         so the calling code is not required to import matplotlib directly
         just to show the plots
 

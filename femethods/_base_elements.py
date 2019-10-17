@@ -18,6 +18,10 @@ from .reactions import Reaction
 
 BOUNDARY_CONDITIONS = List[Tuple[Optional[int], Optional[int]]]
 
+
+# Allow upper case letters for variable names to match engineering conventions
+# for variables, such as E for Young's modulus and I for the polar moment of
+# inertia
 # noinspection PyPep8Naming
 class Base(ABC):
     """base object to be used as base for both FEM analysis"""
@@ -59,6 +63,9 @@ class Base(ABC):
         self._Ixx = Ixx
 
 
+# Allow upper case letters for variable names to match engineering conventions
+# for variables, such as E for Young's modulus and I for the polar moment of
+# inertia
 # noinspection PyPep8Naming
 class Element(Base, ABC):
     """General element that will be inherited from for specific elements"""
@@ -187,7 +194,7 @@ class Element(Base, ABC):
 
     @staticmethod
     def apply_boundary_conditions(
-            k: np.array, bcs: BOUNDARY_CONDITIONS
+        k: np.array, bcs: BOUNDARY_CONDITIONS
     ) -> np.array:
         """
         Given the stiffness matrix 'k_local', and the boundary conditions as a list
@@ -231,16 +238,20 @@ class Element(Base, ABC):
         return k
 
 
+# Allow upper case letters for variable names to match engineering conventions
+# for variables, such as E for Young's modulus and I for the polar moment of
+# inertia
+# noinspection PyPep8Naming
 class BeamElement(Element):
     """base beam element"""
 
     def __init__(
-            self,
-            length: float,
-            loads: List[Load],
-            reactions: List[Reaction],
-            E: float = 1,
-            Ixx: float = 1,
+        self,
+        length: float,
+        loads: List[Load],
+        reactions: List[Reaction],
+        E: float = 1,
+        Ixx: float = 1,
     ):
         super().__init__(length, E, Ixx)
         self.reactions = reactions
@@ -291,6 +302,7 @@ class BeamElement(Element):
         # conditions. Start by initializing a numpy array to zero loads, then
         # iterate over the loads and add them to the appropriate index based on
         # the load type (force or moment)
+        # noinspection PyUnresolvedReferences
         p = np.zeros((self.mesh.dof, 1))
         for ld in self.loads:
             i = self.mesh.nodes.index(ld.location)
@@ -321,12 +333,14 @@ class BeamElement(Element):
         """
         K = self.K  # global stiffness matrix
         d = self.node_deflections  # force displacement vector
+
+        # noinspection PyUnresolvedReferences
         r = np.matmul(K, d)
         assert self.reactions is not None
 
         for ri in self.reactions:
             i = self.mesh.nodes.index(ri.location)
-            force, moment = r[i * 2: i * 2 + 2]
+            force, moment = r[i * 2 : i * 2 + 2]
 
             # set the values in the reaction objects
             ri.force = force[0]
@@ -375,7 +389,8 @@ class BeamElement(Element):
 
     def stiffness(self, L: float) -> np.ndarray:
         """return local stiffness matrix, k, as numpy array evaluated with beam
-        element length L"""
+        element length L
+        """
 
         E = self.E
         Ixx = self.Ixx
@@ -394,6 +409,7 @@ class BeamElement(Element):
         # Initialize the global stiffness matrix, then iterate over the
         # elements, calculate a local stiffness matrix, and add it to the
         # global stiffness matrix.
+        # noinspection PyUnresolvedReferences
         kg = np.zeros((self.mesh.dof, self.mesh.dof))
         for e in range(self.mesh.num_elements):
             # iterate over all the elements and add the local stiffness matrix
