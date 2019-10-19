@@ -11,7 +11,7 @@ There are two types of reactions that are defined.
 """
 from typing import Optional, Tuple
 
-from ._common import Forces
+from femethods.core._common import Forces
 
 BOUNDARY_CONDITIONS = Tuple[Optional[int], Optional[int]]
 

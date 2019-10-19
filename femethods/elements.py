@@ -13,8 +13,8 @@ import numpy as np
 from scipy.misc import derivative
 
 # local imports
-from ._base_elements import BeamElement
-from ._common import derivative as comm_derivative
+from femethods.core._base_elements import BeamElement
+from femethods.core._common import derivative as comm_derivative
 
 if TYPE_CHECKING:  # pragma: no cover
     from femethods.loads import Load  # noqa: F401 (unused import)

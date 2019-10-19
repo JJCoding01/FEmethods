@@ -4,7 +4,7 @@ Module to define different loads
 
 from typing import Optional
 
-from ._common import Forces
+from femethods.core._common import Forces
 
 
 class Load(Forces):
