@@ -1,6 +1,8 @@
 import pytest
 
-from femethods.loads import MomentLoad, PointLoad
+from femethods.loads import MomentLoad, PointLoad, ConstantDistributedLoad
+from femethods.elements import Beam
+from femethods.reactions import PinnedReaction
 
 
 def check_load(load):
@@ -54,6 +56,47 @@ def test_PointLoad_equality():
     assert p1 != p4, "different loads should not be equal"
 
     assert p1 != "not a load", "load should not equal something that is not a load"
+
+
+def test_ConstantDistributedLoad_properties():
+    ws = [-5, -4, 0, 3, 6]
+    starts = [0, 2, 4, 6, 8]
+    stops = [2, 4, 6, 8, 10]
+
+    for w, start, stop in zip(ws, starts, stops):
+        p = ConstantDistributedLoad(W=w, start=start, stop=stop)
+        assert p.W == w, "distributed load magnitude does not match expected"
+        assert p.start == start, "distributed load start point does not match expected"
+        assert p.stop == stop, "distributed load stop point does not match expected"
+
+def test_ConstatDistributedLoad_equivelants():
+
+    ws = [-25, -10, 15, 20]
+    starts = [0, 4, 8, 10]
+    stops = [8, 12, 16, 20]
+
+    for w, start, stop in zip(ws, starts, stops):
+        p = ConstantDistributedLoad(W=w, start=start, stop=stop)
+        magnitude = w * (stop - start) # area of distributed load
+        loc = (start + stop) / 2 # centroid of the distributed load
+        p_equiv = PointLoad(magnitude=magnitude, location=loc)
+
+        assert p.equivalent == p_equiv, "equivalent load not equivalent"
+        assert p.magnitude == magnitude, "distributed magnitude does not match expected"
+        assert p.location == loc, "distributed load location not at centroid"
+
+def test_beam_with_distributed_load():
+
+    load = [ConstantDistributedLoad(W=-25, start=0, stop=10)]
+    magnitude = -25 * 10
+    location = 10 / 2
+    p_equiv = PointLoad(magnitude=magnitude, location=location)
+
+    beam = Beam(10, loads=load, reactions=[PinnedReaction(x) for x in [0, 10]])
+    beam_load = beam.loads[0]
+
+    assert beam_load.location == location, "load not in expected location"
+    assert beam_load.magnitude == magnitude, "load magnitude is not expected value"
 
 
 def test_loads():
