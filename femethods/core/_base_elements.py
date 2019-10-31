@@ -12,7 +12,7 @@ import numpy as np
 
 # Importing loads is only used for checking the type. Find a better way to do
 # this without needing to import loads
-from femethods.loads import Load, PointLoad
+from femethods.loads import Load, MomentLoad
 from femethods.mesh import Mesh
 from femethods.reactions import Reaction
 
@@ -306,10 +306,10 @@ class BeamElement(Element):
         p = np.zeros((self.mesh.dof, 1))
         for ld in self.loads:
             i = self.mesh.nodes.index(ld.location)
-            if isinstance(ld, PointLoad):
-                p[i * 2][0] = ld.magnitude  # input force
-            else:
+            if isinstance(ld, MomentLoad):
                 p[i * 2 + 1][0] = ld.magnitude  # input moment
+            else:
+                p[i * 2][0] = ld.magnitude  # input force
 
         # Solve the global system of equations {p} = [K]*{d} for {d}
         # save the deflection vector for the beam, so the analysis can be
