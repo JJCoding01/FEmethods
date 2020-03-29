@@ -5,6 +5,12 @@ from femethods.loads import MomentLoad, PointLoad
 from femethods.reactions import FixedReaction, PinnedReaction
 
 
+def test_bending_stress_depreciation_warning():
+    with pytest.warns(DeprecationWarning):
+        b = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
+        b.bending_stress(x=5, c=1)
+
+
 def test_beam_params():
 
     reactions = [PinnedReaction(x) for x in [1, 120]]

@@ -199,7 +199,14 @@ class Beam(BeamElement):
         )
 
     def bending_stress(self, x, dx=1, c=1):
-        """returns the bending stress at global coordinate x"""
+        """
+        returns the bending stress at global coordinate x
+
+        .. deprecated:: 0.1.7a1
+            calculate bending stress as :obj:`Beam.moment(x) * c / Ixx`
+
+        """
+        warn("bending_stress will be removed soon", DeprecationWarning)
         return self.moment(x, dx=dx) * c / self.Ixx
 
     def plot(
