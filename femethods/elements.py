@@ -199,64 +199,133 @@ class Beam(BeamElement):
         )
 
     def bending_stress(self, x, dx=1, c=1):
-        """returns the bending stress at global coordinate x"""
+        """
+        returns the bending stress at global coordinate x
+
+        .. deprecated:: 0.1.7a1
+            calculate bending stress as :obj:`Beam.moment(x) * c / Ixx`
+
+        """
+        warn("bending_stress will be removed soon", DeprecationWarning)
         return self.moment(x, dx=dx) * c / self.Ixx
 
-    def plot(
-            self, n=250, plot_stress=False, title="Beam Analysis"
-    ):  # pragma: no cover
+    @staticmethod
+    def __validate_plot_diagrams(diagrams, diagram_labels):
         """
-        plot the deflection, moment, and shear along the length of the beam
+        Validate the parameters for the plot function
+        """
 
-        The plot method will create a matplotlib.pyplot figure with the
-        deflection, moment, shear, and optionally stress along the length of
-        the beam element.
+        # create default (and complete list of valid) diagrams that are
+        # implemented
+        default_diagrams = ("shear", "moment", "deflection")
+        if diagrams is None and diagram_labels is None:
+            # set both the diagrams and labels to their defaults
+            # no need for further validation of these values since they are
+            # set internally
+            return default_diagrams, default_diagrams
+
+        if diagrams is None and diagram_labels is not None:
+            raise ValueError("cannot set diagrams from labels")
+
+        if diagram_labels is None:
+            diagram_labels = diagrams
+
+        if len(diagrams) != len(diagram_labels):
+            raise ValueError(
+                "length of diagram_labels must match length of diagrams"
+            )
+        for diagram in diagrams:
+            if diagram not in default_diagrams:
+                raise ValueError(
+                    f"values of diagrams must be in {default_diagrams}"
+                )
+        return diagrams, diagram_labels
+
+    def plot(
+            self,
+            n=250,
+            title="Beam Analysis",
+            diagrams=None,
+            diagram_labels=None,
+            **kwargs,
+    ):
+        """
+        Plot the deflection, moment, and shear along the length of the beam
+
+        The plot method will create a :obj:`matplotlib.pyplot` figure with the
+        deflection, moment, and shear diagrams along the length of the beam
+        element. Which of these diagrams, and their order may be customized.
+
+        Parameters:
+            n (:obj:`int`): defaults to `250`:
+                number of data-points to use in plots
+            title (:obj:`str`) defaults to 'Beam Analysis`
+                title on top of plot
+            diagrams (:obj:`tuple`): defaults to
+                `('shear', 'moment', 'deflection')`
+                tuple of diagrams to plot. All values in tuple must be strings,
+                and one of the defaults.
+                Valid values are :obj:`('shear', 'moment', 'deflection')`
+            diagram_labels (:obj:`tuple`): y-axis labels for subplots.
+                Must have the same length as `diagrams`
 
         Returns:
-             :obj:`tuple`: Tuple of matplitlib.pyplot figure and list of axes
-                           in the form (figure, axes)
+             :obj:`tuple`:
+                Tuple of :obj:`matplotlib.pyplot` figure and list of axes in
+                the form :obj:`(figure, axes)`
 
         .. note:: The plot method will create the figure handle, but will not
                   automatically show the figure.
                   To show the figure use :obj:`Beam.show()` or
                   :obj:`matplotlib.pyplot.show()`
 
+        .. versionchanged:: 0.1.7a1 Removed :obj:`bending_stress` parameter
+        .. versionchanged:: 0.1.7a1
+            Added :obj:`diagrams` and :obj:`diagram_labels` parameters
+
         """
-        rows = 4 if plot_stress else 3
-        fig, axes = plt.subplots(rows, 1, sharex="all")
 
-        # locations of nodes in global coordinate system
-        locations = self.mesh.nodes
+        kwargs.setdefault("title", "Beam Analysis")
+        kwargs.setdefault("grid", True)
+        kwargs.setdefault("xlabel", "Beam position, x")
+        kwargs.setdefault("fill", True)
+        kwargs.setdefault("plot_kwargs", {})
+        kwargs.setdefault("fill_kwargs", {"color": "b", "alpha": 0.25})
 
-        # Get the global x values. Note that the x-values for the moment and
-        # shear do not contain the endpoints of the x values for the deflection
-        # curve. This is because differentiation technique used is the central
-        # difference formula, which cannot calculate the value at the
-        # endpoints
+        diagrams, diagram_labels = self.__validate_plot_diagrams(
+            diagrams, diagram_labels
+        )
+        fig, axes = plt.subplots(len(diagrams), 1, sharex="all")
+        if len(diagrams) == 1:
+            # make sure axes are iterable, even if there is only one
+            axes = [axes]
+
         xd = np.linspace(0, self.length, n)  # deflection
-        xm = xd[1:-2]  # moment (and stress)
-        xv = xm[2:-3]  # shear
-        v = [self.deflection(xi) for xi in xd]  # deflection
-        m = [self.moment(xi, dx=self.length / n) for xi in xm]  # moment
-        V = [self.shear(xi, dx=self.length / n) for xi in xv]  # shear
+        x, y = None, None
+        for ax, diagram, label in zip(axes, diagrams, diagram_labels):
+            if diagram == "deflection":
+                x = xd
+                y = [self.deflection(xi) for xi in x]
+            if diagram == "moment":
+                x = xd
+                y = [self.moment(xi, dx=self.length / (n + 3)) for xi in x]
+            if diagram == "shear":
+                x = np.linspace(0, self.length, n + 4)[2:-2]
+                y = [self.shear(xi, dx=self.length / (n + 4)) for xi in x]
 
-        # Set up plotting variables to be able to iterate over them more easily
-        xs = [xv, xm, xd]
-        y = [V, m, v]
-        labels = ["shear", "moment", "deflection"]
-        if plot_stress:
-            q = [self.bending_stress(xi, dx=self.length / n) for xi in xm]
-            xs.append(xm)
-            y.append(q)
-            labels.append("stress")
+            # regardless of the diagram that is being plotted, the number of
+            # data points should always equal the number specified by user
+            assert len(x) == n, "x does not match n"
+            assert len(y) == n, "y does not match n"
 
-        for ax, x, y, label in zip(axes, xs, y, labels):
-            ax.plot(x, y)
-            ax.fill_between(x, y, 0, color="b", alpha=0.25)
+            ax.plot(x, y, **kwargs["plot_kwargs"])
+            if kwargs["fill"]:
+                ax.fill_between(x, y, 0, **kwargs["fill_kwargs"])
             ax.set_ylabel(label)
-            ax.grid(True)
+            ax.grid(kwargs["grid"])
 
-        axes[-1].set_xlabel("Beam position, x")
+        locations = self.mesh.nodes  # in global coordinate system
+        axes[-1].set_xlabel(kwargs["xlabel"])
         axes[-1].set_xticks(locations)
 
         fig.subplots_adjust(hspace=0.25)

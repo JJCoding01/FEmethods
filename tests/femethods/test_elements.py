@@ -5,6 +5,12 @@ from femethods.loads import MomentLoad, PointLoad
 from femethods.reactions import FixedReaction, PinnedReaction
 
 
+def test_bending_stress_depreciation_warning():
+    with pytest.warns(DeprecationWarning):
+        b = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
+        b.bending_stress(x=5, c=1)
+
+
 def test_beam_params():
 
     reactions = [PinnedReaction(x) for x in [1, 120]]
@@ -248,3 +254,55 @@ def test_shear():
     for x in [-5, 0, 25, 35]:
         with pytest.raises(ValueError):
             beam.shear(x)
+
+
+def test_plot_diagrams_invalid_value():
+    with pytest.raises(ValueError):
+        b = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
+        b.plot(diagrams=("shear", "bad value"))
+
+
+def test_plot_diagrams_diagrams_label_mismatch():
+    with pytest.raises(ValueError):
+        b = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
+        b.plot(diagrams=("shear",), diagram_labels=("shear", "moment"))
+
+
+def test_plot_diagram_labels_without_diagrams():
+    with pytest.raises(ValueError):
+        b = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
+        b.plot(diagram_labels=("V, lb", "M, in/lb", "delta, in"))
+
+
+def test_plot_default_labels():
+    b = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
+    fig, axes = b.plot()
+    x_labels = ("", "", "Beam position, x")
+    y_labels = ("shear", "moment", "deflection")
+
+    assert len(axes) == len(x_labels), "wrong number of sub-plots"
+    for ax, x_label, y_label in zip(axes, x_labels, y_labels):
+        assert ax.get_xlabel() == x_label
+        assert ax.get_ylabel() == y_label
+
+
+def test_plot_custom_labels():
+    b = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
+    diagrams = ("deflection", "deflection", "moment", "shear")
+    labels = ("def1", "def2", "M", "V")
+    fig, axes = b.plot(diagrams=diagrams, diagram_labels=labels)
+    assert len(axes) == len(diagrams), "wrong number of sub-plots"
+
+    x_labels = ["" for _ in range(len(diagrams) - 1)]
+    x_labels.append("Beam position, x")
+    for ax, x_label, y_label in zip(axes, x_labels, labels):
+        assert ax.get_xlabel() == x_label
+        assert ax.get_ylabel() == y_label
+
+
+def test_plot_one_diagram():
+    b = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
+    fig, axes = b.plot(diagrams=("deflection",))
+    assert len(axes) == 1, "expected length of axes was 1"
+    for ax, y_label in zip(axes, ("deflection",)):
+        assert ax.get_ylabel() == y_label
