@@ -208,54 +208,7 @@ def test_invalid_deflection_location():
         beam.deflection(beam.length + 5)  # a value greater then the length
 
     with pytest.raises(TypeError):
-        beam.deflection('a string (not a number)')
-
-
-def test_deflection_for_fixed_cantilevered_beam_with_load_at_any_point():
-    P = -1000  # load in lbs down
-    a = 7  # position of load in inches
-    L = 25  # length of beam in inches
-    E = 29e6  # Young's modulus in psi
-    Ixx = 345  # area moment of inertia in in**4
-    b = L - a
-
-    # function to calculate deflection anywhere along the length of the beam
-    d1 = lambda x: P * b ** 2 / (6 * E * Ixx) * (3 * L - 3 * x - b)  # x < a
-    d2 = lambda x: P * (L - x) ** 2 / (6 * E * Ixx) * (3 * b - L + x)  # x > a
-    d3 = lambda x: P * b ** 3 / (3 * E * Ixx)  # x == a
-
-    beam = Beam(L, [PointLoad(P, a)], [FixedReaction(L)], E, Ixx)
-
-    for x in [0, 7, 12.5, 25]:
-        # check the deflection of the beam at both end points, and the center
-        if x < a:
-            exact = d1(x)
-        elif x > a:
-            exact = d2(x)
-        else:
-            exact = d3(x)
-        assert pytest.approx(beam.deflection(x), rel=1e-12) == exact, \
-            f"Calculated deflection does not match expected deflection at {x}"
-
-
-def test_moment_for_fixed_cantilevered_beam_with_load_at_end():
-    P = -1000  # load in lbs down
-    L = 25  # length of beam in inches
-    E = 29e6  # Young's modulus in psi
-    Ixx = 345  # area moment of inertia in in**4
-
-    # function to calculate moment anywhere along the length of the beam
-    m = lambda x: P * x
-
-    beam = Beam(L, [PointLoad(P, 0)], [FixedReaction(L)], E, Ixx)
-
-    for x in [7, 12.5, 25]:
-        # check the deflection of the beam at both end points, and the center
-        assert pytest.approx(beam.moment(x), rel=0.01) == m(x), \
-            f"Calculated moment does not match expected moment at {x}"
-
-    with pytest.warns(UserWarning):
-        beam.moment(0)
+        beam.deflection("a string (not a number)")
 
 
 def test_shear():
