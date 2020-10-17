@@ -1,6 +1,7 @@
 PACKAGE_NAME=femethods
 
 .PHONY: install docs lint-html tests
+.PHONY: build
 
 docs:
 	cd docs && make html
@@ -23,3 +24,10 @@ tests:
 
 tests-ci:
 	pytest --cov-report html --cov=$(PACKAGE_NAME) tests/$(PACKAGE_NAME) -v
+
+build:
+	python setup.py sdist
+	python setup.py bdist_wheel
+
+upload:
+	twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
