@@ -1,11 +1,17 @@
 # Change Log
 
+## v0.1.7a2
+- Move common/private functionality into core module
+- Add some type hints for mypy
+- Restructure tests to use pytest fixtures and parametrized tests
+- Add make commands for building and publishing to PyPi
+
 ## v0.1.7a1
 - Update `Beam.plot` method to allow customization of plots generated
 - Added tests for `Beam.plot`
 - Added depreciation warning to `Beam.bending_stress` method
 
-### Backwards Incompatible Changes
+### Backwards Incompatible Changes 
 - Removed `bending_stress` parameter from `Beam.plot` method
     
 
