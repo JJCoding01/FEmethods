@@ -255,12 +255,12 @@ class Beam(BeamElement):
         return diagrams, diagram_labels
 
     def plot(
-            self,
-            n=250,
-            title="Beam Analysis",
-            diagrams=None,
-            diagram_labels=None,
-            **kwargs,
+        self,
+        n=250,
+        title="Beam Analysis",
+        diagrams=None,
+        diagram_labels=None,
+        **kwargs,
     ):
         """
         Plot the deflection, moment, and shear along the length of the beam
