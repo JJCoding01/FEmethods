@@ -3,72 +3,86 @@ Module to define a general mesh element to be used for any FEM element, and
 the base element class that all FEM elements will be derived from
 """
 
+from abc import ABC, abstractmethod
+from typing import List, Optional, Tuple
 from warnings import warn
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-from ._common import Validator
 # Importing loads is only used for checking the type. Find a better way to do
 # this without needing to import loads
-from .loads import Load, PointLoad
-from .mesh import Mesh
-from .reactions import Reaction
+from femethods.loads import Load, PointLoad
+from femethods.mesh import Mesh
+from femethods.reactions import Reaction
+
+BOUNDARY_CONDITIONS = List[Tuple[Optional[int], Optional[int]]]
 
 
-class Base(object):
+# Allow upper case letters for variable names to match engineering conventions
+# for variables, such as E for Young's modulus and I for the polar moment of
+# inertia
+# noinspection PyPep8Naming
+class Base(ABC):
     """base object to be used as base for both FEM analysis"""
 
-    def __init__(self, length, E=1, Ixx=1):
+    def __init__(self, length: float, E: float = 1, Ixx: float = 1) -> None:
         self.length = length
         self.E = E  # Young's modulus
         self.Ixx = Ixx  # area moment of inertia
 
     @property
-    def length(self):
+    def length(self) -> float:
         return self._length
 
     @length.setter
-    @Validator.positive("length")
-    def length(self, length):
+    def length(self, length: float) -> None:
+        if length <= 0:
+            # length must be a positive number
+            raise ValueError("length must be positive!")
         self._length = length
 
     @property
-    def E(self):
+    def E(self) -> float:
         return self._E
 
     @E.setter
-    @Validator.positive("Young's modulus")
-    def E(self, E):
+    def E(self, E: float) -> None:
+        if E <= 0:
+            raise ValueError("Young's modulus must be positive!")
         self._E = E
 
     @property
-    def Ixx(self):
+    def Ixx(self) -> float:
         return self._Ixx
 
     @Ixx.setter
-    @Validator.positive("Area moment of inertia")
-    def Ixx(self, Ixx):
+    def Ixx(self, Ixx: float) -> None:
+        if Ixx <= 0:
+            raise ValueError("Area moment of inertia must be positive!")
         self._Ixx = Ixx
 
 
-class Element(Base):
+# Allow upper case letters for variable names to match engineering conventions
+# for variables, such as E for Young's modulus and I for the polar moment of
+# inertia
+# noinspection PyPep8Naming
+class Element(Base, ABC):
     """General element that will be inherited from for specific elements"""
 
-    def __init__(self, length, E=1, Ixx=1):
+    def __init__(self, length: float, E: float = 1, Ixx: float = 1) -> None:
         super().__init__(length, E, Ixx)
         self._node_deflections = None
         self._K = None  # global stiffness matrix
-        self._reactions = None
-        self._loads = None
+        self._reactions: Optional[List[Reaction]] = None
+        self._loads: Optional[List[Load]] = None
 
     @property
-    def loads(self):
+    def loads(self) -> Optional[List[Load]]:
         return self._loads
 
     @loads.setter
-    @Validator.islist("loads")
-    def loads(self, loads):
+    def loads(self, loads: List[Load]) -> None:
         # validate that loads is a list of valid Loads
         for load in loads:
             if not isinstance(load, Load):
@@ -78,7 +92,7 @@ class Element(Base):
         self._loads = loads
         self.__validate_load_locations()
 
-    def __validate_load_locations(self):
+    def __validate_load_locations(self) -> bool:
         """All loads and reactions must have unique locations
 
         This function will validate that all loads do not line up with any
@@ -86,6 +100,8 @@ class Element(Base):
         slight amount so it can be solved.
         :returns True if successful, False otherwise
         """
+        assert self.reactions is not None
+        assert self.loads is not None
 
         for reaction in self.reactions:
             for load in self.loads:
@@ -113,12 +129,11 @@ class Element(Base):
         return True
 
     @property
-    def reactions(self):
+    def reactions(self) -> Optional[List[Reaction]]:
         return self._reactions
 
     @reactions.setter
-    @Validator.islist("reactions")
-    def reactions(self, reactions):
+    def reactions(self, reactions: List[Reaction]) -> None:
         for reaction in reactions:
             if not isinstance(reaction, Reaction):
                 msg = f"type {type(reaction)} is not of type Reaction"
@@ -126,11 +141,12 @@ class Element(Base):
         self.invalidate()
         self._reactions = reactions
 
-    def remesh(self):
+    @abstractmethod
+    def remesh(self) -> None:
         """force a remesh calculation and invalidate any calculation results"""
         raise NotImplementedError("method must be overloaded")
 
-    def invalidate(self):
+    def invalidate(self) -> None:
         """invalidate the element to force resolving"""
         self._node_deflections = None
         self._K = None
@@ -139,13 +155,13 @@ class Element(Base):
                 reaction.invalidate()
 
     @property
-    def K(self):
+    def K(self) -> np.array:
         """global stiffness matrix"""
         if self._K is None:
             self._K = self.stiffness_global()
         return self._K
 
-    def solve(self):
+    def solve(self) -> None:
         """solve the system the FEM system to define the nodal displacements
         and reaction forces.
         """
@@ -154,28 +170,34 @@ class Element(Base):
         self._calc_node_deflections()
         self._get_reaction_values()
 
-    def _calc_node_deflections(self):
+    @abstractmethod
+    def _calc_node_deflections(self) -> None:
         raise NotImplementedError("must be overloaded!")
 
-    def _get_reaction_values(self):
+    @abstractmethod
+    def _get_reaction_values(self) -> None:
         raise NotImplementedError("must be overloaded!")
 
-    def stiffness(self, L):
+    @abstractmethod
+    def stiffness(self, L: float) -> None:
         """return local stiffness matrix, k, as numpy array evaluated with beam
         element length L, where L defaults to the length of the beam
         """
         raise NotImplementedError("Method must be overloaded!")
 
-    def stiffness_global(self):
+    @abstractmethod
+    def stiffness_global(self) -> None:
         # Initialize the global stiffness matrix, then iterate over the
         # elements, calculate a local stiffness matrix, and add it to the
         # global stiffness matrix.
         raise NotImplementedError("Method must be overloaded!")
 
     @staticmethod
-    def apply_boundary_conditions(k, bcs):
+    def apply_boundary_conditions(
+        k: np.array, bcs: BOUNDARY_CONDITIONS
+    ) -> np.array:
         """
-        Given the stiffness matrix 'k', and the boundary conditions as a list
+        Given the stiffness matrix 'k_local', and the boundary conditions as a list
         of tuples, apply the boundary conditions to the stiffness matrix by
         setting the rows and columns that correspond to the boundary conditions
         to zeros, with ones on the diagonal.
@@ -194,16 +216,16 @@ class Element(Base):
         conditions are applied
         """
 
-        def apply(k, i):
+        def apply(k_local: np.array, i: int) -> np.array:
             """sub function to apply the boundary condition at row/col i to
-            stiffness matrix k
+            stiffness matrix k_local
 
-            return the stiffness matrix k with boundary conditions applied
+            return the stiffness matrix k_local with boundary conditions applied
             """
-            k[i] = 0  # set entire row to zeros
-            k[:, i] = 0  # set entire column to zeros
-            k[i][i] = 1  # set diagonal to 1
-            return k
+            k_local[i] = 0  # set entire row to zeros
+            k_local[:, i] = 0  # set entire column to zeros
+            k_local[i][i] = 1  # set diagonal to 1
+            return k_local
 
         # TODO: Check the sizes of the boundary conditions and stiffness matrix
 
@@ -216,37 +238,55 @@ class Element(Base):
         return k
 
 
+# Allow upper case letters for variable names to match engineering conventions
+# for variables, such as E for Young's modulus and I for the polar moment of
+# inertia
+# noinspection PyPep8Naming
 class BeamElement(Element):
     """base beam element"""
 
-    def __init__(self, length, loads, reactions, E=1, Ixx=1):
+    def __init__(
+        self,
+        length: float,
+        loads: List[Load],
+        reactions: List[Reaction],
+        E: float = 1,
+        Ixx: float = 1,
+    ):
         super().__init__(length, E, Ixx)
         self.reactions = reactions
         self.loads = loads  # note loads are set after reactions
         self.mesh = Mesh(length, loads, reactions, 2)
 
-    def remesh(self):
+    def remesh(self) -> None:
+        assert self.loads is not None
+        assert self.reactions is not None
         self.mesh = Mesh(self.length, self.loads, self.reactions, 2)
         self.invalidate()
 
     @property
-    def node_deflections(self):
+    def node_deflections(self) -> np.ndarray:
         if self._node_deflections is None:
             self._node_deflections = self._calc_node_deflections()
         return self._node_deflections
 
-    def __get_boundary_conditions(self):
+    def __get_boundary_conditions(self) -> BOUNDARY_CONDITIONS:
         # Initialize the  boundary conditions to None for each node, then
         # iterate over reactions and apply them to the boundary conditions
         # based on the reaction type.
-        bc = [(None, None) for _ in range(len(self.mesh.nodes))]
+        assert self.reactions is not None
+        bc: BOUNDARY_CONDITIONS = [
+            (None, None) for _ in range(len(self.mesh.nodes))
+        ]
         for r in self.reactions:
+            assert r is not None
             i = self.mesh.nodes.index(r.location)
             bc[i] = r.boundary
         return bc
 
-    def _calc_node_deflections(self):
+    def _calc_node_deflections(self) -> np.ndarray:
         """solve for vertical and angular displacement at each node"""
+        assert self.loads is not None
 
         # Get the boundary conditions from the reactions
         bc = self.__get_boundary_conditions()
@@ -262,6 +302,7 @@ class BeamElement(Element):
         # conditions. Start by initializing a numpy array to zero loads, then
         # iterate over the loads and add them to the appropriate index based on
         # the load type (force or moment)
+        # noinspection PyUnresolvedReferences
         p = np.zeros((self.mesh.dof, 1))
         for ld in self.loads:
             i = self.mesh.nodes.index(ld.location)
@@ -278,7 +319,7 @@ class BeamElement(Element):
         self._node_deflections = np.linalg.solve(kg, p)
         return self._node_deflections
 
-    def _get_reaction_values(self):
+    def _get_reaction_values(self) -> np.ndarray:
         """Calculate the nodal forces acting on the beam. Note that the forces
         will also include the input forces.
 
@@ -292,18 +333,21 @@ class BeamElement(Element):
         """
         K = self.K  # global stiffness matrix
         d = self.node_deflections  # force displacement vector
+
+        # noinspection PyUnresolvedReferences
         r = np.matmul(K, d)
+        assert self.reactions is not None
 
         for ri in self.reactions:
             i = self.mesh.nodes.index(ri.location)
-            force, moment = r[i * 2: i * 2 + 2]
+            force, moment = r[i * 2 : i * 2 + 2]
 
             # set the values in the reaction objects
             ri.force = force[0]
             ri.moment = moment[0]
         return r
 
-    def shape(self, x, L=None):
+    def shape(self, x: float, L: Optional[float] = None) -> np.ndarray:
         """return an array of the shape functions evaluated at x the local
         x-value
         """
@@ -315,7 +359,7 @@ class BeamElement(Element):
         N4 = 1 / L ** 2 * (-L * x ** 2 + x ** 3)
         return np.array([N1, N2, N3, N4])
 
-    def plot_shapes(self, n=25):  # pragma: no cover
+    def plot_shapes(self, n: int = 25) -> None:  # pragma: no cover
         """plot shape functions for the with n data points"""
         x = np.linspace(0, self.length, n)
 
@@ -328,11 +372,11 @@ class BeamElement(Element):
         axes.append(fig.add_subplot(223, sharex=axes[0]))
         axes.append(fig.add_subplot(224, sharex=axes[1]))
 
-        N = [[], [], [], []]
+        N: List[List[int]] = [[], [], [], []]
         for xi in x:
-            n = self.shape(xi)
+            n_local = self.shape(xi)
             for i in range(4):
-                N[i].append(n[i])
+                N[i].append(n_local[i])
 
         for k in range(4):
             ax = axes[k]
@@ -343,9 +387,10 @@ class BeamElement(Element):
         fig.subplots_adjust(wspace=0.25, hspace=0)
         plt.show()
 
-    def stiffness(self, L):
+    def stiffness(self, L: float) -> np.ndarray:
         """return local stiffness matrix, k, as numpy array evaluated with beam
-        element length L"""
+        element length L
+        """
 
         E = self.E
         Ixx = self.Ixx
@@ -360,10 +405,11 @@ class BeamElement(Element):
         )
         return E * Ixx / L ** 3 * k
 
-    def stiffness_global(self):
+    def stiffness_global(self) -> np.array:
         # Initialize the global stiffness matrix, then iterate over the
         # elements, calculate a local stiffness matrix, and add it to the
         # global stiffness matrix.
+        # noinspection PyUnresolvedReferences
         kg = np.zeros((self.mesh.dof, self.mesh.dof))
         for e in range(self.mesh.num_elements):
             # iterate over all the elements and add the local stiffness matrix

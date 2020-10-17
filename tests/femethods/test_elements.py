@@ -5,49 +5,87 @@ from femethods.loads import MomentLoad, PointLoad
 from femethods.reactions import FixedReaction, PinnedReaction
 
 
+@pytest.mark.parametrize("length", [100, 250])
+def test_beam_length_input(length, reaction_simple, load_centered):
+    beam = Beam(length=length, reactions=reaction_simple, loads=load_centered)
+    assert beam.length == length, "beam length does not match input"
+
+
+@pytest.mark.parametrize("length", [100, 250])
+def test_beam_length_update(beam_simply_supported, length):
+    beam_simply_supported.length = length
+    assert (
+        beam_simply_supported.length == length
+    ), "updated beam length does not match input"
+
+
+@pytest.mark.parametrize("invalid_length", [-5, 0])
+def test_beam_invalid_lengths(invalid_length, load_centered, reaction_simple):
+    with pytest.raises(ValueError):
+        Beam(length=invalid_length, reactions=reaction_simple, loads=load_centered)
+
+
+def test_beam_E_default(beam_simply_supported):
+    assert beam_simply_supported.E == 1, "Check default Youngs modulus"
+
+
+@pytest.mark.parametrize("E", [15e6, 30e6])
+def test_beam_E_input(length, reaction_simple, load_centered, E):
+    beam = Beam(length=length, reactions=reaction_simple, loads=load_centered, E=E)
+    assert beam.E == E, "beam modulus of elasticity does not match input"
+
 def test_bending_stress_depreciation_warning():
     with pytest.warns(DeprecationWarning):
         b = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
         b.bending_stress(x=5, c=1)
 
 
-def test_beam_params():
-
-    reactions = [PinnedReaction(x) for x in [1, 120]]
-    loads = [PointLoad(magnitude=-120, location=50)]
-    beam = Beam(length=120, loads=loads, reactions=reactions, E=29e6, Ixx=350)
-
-    # check parameters of the beam to ensure they match the input
-    assert beam.length == 120, "beam length does not match input"
-    assert beam.E == 29e6, "Young's modulus does not match input"
-    assert beam.Ixx == 350, "area moment of inertia does not match input"
-
-    # update parameters and verify update was successful
-    beam.length = 130
-    beam.E = 29.9e6
-    beam.Ixx = 345
-    assert beam.length == 130, "beam length does not match input"
-    assert beam.E == 29.9e6, "Young's modulus does not match input"
-    assert beam.Ixx == 345, "area moment of inertia does not match input"
-
-
-def test_reaction_load_warnings():
-    reactions = [PinnedReaction(x) for x in [0, 120]]
-    loads = [PointLoad(magnitude=-120, location=50)]
-    #
-    with pytest.raises(TypeError):
-        # create a beam where the reactions are not a list
-        Beam(120, reactions=PinnedReaction(0), loads=loads)
-    with pytest.raises(TypeError):
-        # create a beam where the loads are not a list
-        Beam(120, reactions=reactions, loads=PointLoad(-10, 5))
-
+@pytest.mark.parametrize("E", [0, -1])
+def test_beam_E_input_errors(length, reaction_simple, load_centered, E):
     with pytest.raises(ValueError):
-        # beam length must be positive
-        Beam(-10, reactions=reactions, loads=loads)
+        Beam(length=length, reactions=reaction_simple, loads=load_centered, E=E)
+
+
+@pytest.mark.parametrize("E", [15e6, 30e6])
+def test_beam_E_update(beam_simply_supported, E):
+    beam_simply_supported.E = E
+    assert beam_simply_supported.E == E, "updated beam length does not match input"
+
+
+def test_beam_Ixx_default(beam_simply_supported):
+    assert beam_simply_supported.Ixx == 1, "Check default moment of inertia"
+
+
+@pytest.mark.parametrize("Ixx", [10, 20])
+def test_beam_Ixx_input(length, reaction_simple, load_centered, Ixx):
+    beam = Beam(length=length, reactions=reaction_simple, loads=load_centered, Ixx=Ixx)
+    assert beam.Ixx == Ixx, "beam moment of inertia does not match input"
+
+
+@pytest.mark.parametrize("Ixx", [0, -1])
+def test_beam_Ixx_input_errors(length, reaction_simple, load_centered, Ixx):
+    with pytest.raises(ValueError):
+        Beam(length=length, reactions=reaction_simple, loads=load_centered, Ixx=Ixx)
+
+
+@pytest.mark.parametrize("Ixx", [10, 20])
+def test_beam_Ixx_update(beam_simply_supported, Ixx):
+    beam_simply_supported.Ixx = Ixx
+    assert (
+        beam_simply_supported.Ixx == Ixx
+    ), "beam moment of inertia does not match input"
+
+
+@pytest.mark.parametrize("invalid_reaction", [[], "string", 10, PointLoad(10, 2)])
+def test_invalid_reactions(invalid_reaction, length, load_centered):
     with pytest.raises(TypeError):
-        # beam length must be a number
-        Beam("length is not a number", reactions=reactions, loads=loads)
+        Beam(length=length, reactions=[invalid_reaction], loads=load_centered)
+
+
+@pytest.mark.parametrize("invalid_load", [[], "string", 10, PinnedReaction(0)])
+def test_invalid_loads(invalid_load, length, reaction_simple):
+    with pytest.raises(TypeError):
+        Beam(length=length, reactions=reaction_simple, loads=[invalid_load])
 
 
 def test_invalid_load_placement():
@@ -60,27 +98,28 @@ def test_invalid_load_placement():
         beam = Beam(100, loads=loads, reactions=reactions)
 
     for load, reaction in zip(beam.loads, beam.reactions):
-        assert load.location != reaction.location, \
-            'moved load is still the same as a reaction'
+        assert (
+            load.location != reaction.location
+        ), "moved load is still the same as a reaction"
 
 
-def test_invalid_load_errors():
+@pytest.mark.parametrize("invalid_load", ["a string", FixedReaction(0), [], 10])
+def test_invalid_load_errors(invalid_load):
     # Check for a TypeError for a variety of invalid loads
-    for invalid_load in ['a string', FixedReaction(0), [], 10]:
-        with pytest.raises(TypeError):
-            Beam(25, loads=[invalid_load], reactions=[FixedReaction(0)])
+    with pytest.raises(TypeError):
+        Beam(25, loads=[invalid_load], reactions=[FixedReaction(0)])
 
 
-def test_invalid_reaction_errors():
+@pytest.mark.parametrize("invalid_reaction", ["a string", PointLoad(25, 15), [], 10])
+def test_invalid_reaction_errors(invalid_reaction):
     # Check for an TypeError for a variety of invalid reactions
-    for invalid_reaction in ['a string', PointLoad(25, 15), [], 10]:
-        with pytest.raises(TypeError):
-            Beam(25, loads=[PointLoad(-100, 15)], reactions=[invalid_reaction])
+    with pytest.raises(TypeError):
+        Beam(25, loads=[PointLoad(-100, 15)], reactions=[invalid_reaction])
 
 
 def test_shape_function():
     reactions = [PinnedReaction(x) for x in [0, 50, 100]]
-    loads = [PointLoad(-100, x) for x in [0, 50, 100]]
+    loads = [PointLoad(-100, x) for x in [5, 45, 90]]
     beam = Beam(100, loads, reactions, 29e6, 345)
 
     assert beam.shape(0).shape == (4,), "unexpected shape of shape functions"
@@ -99,13 +138,14 @@ def test_shape_function():
     # TODO: Add more tests to verify shape functions
 
 
-def test_stiffness_matrix_k():
-    beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], 29e6, 345)
+def test_stiffness_matrix_k(beam_fixed, length):
+    # beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], 29e6, 345)
+    beam = beam_fixed
     assert beam.K.shape == (4, 4), "stiffness matrix is not expected size"
 
     # add another point load and verify the stiffness matrix changes size
     # accordingly
-    beam.loads.append(PointLoad(-500, 12))
+    beam.loads.append(PointLoad(-500, length / 2))
     beam.remesh()
     assert beam.K.shape == (6, 6), "stiffness matrix size did not update"
 
@@ -167,17 +207,15 @@ def test_solve_method():
     beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], 29e6, 345)
 
     reaction = beam.reactions[0]
-    assert reaction.force is None, \
-        "Reaction force was not None before being solved"
-    assert reaction.moment is None, \
-        "Reaction moment was not None before being solved"
+    assert reaction.force is None, "Reaction force was not None before being solved"
+    assert reaction.moment is None, "Reaction moment was not None before being solved"
 
     beam.solve()
     reaction = beam.reactions[0]
-    assert reaction.force == 100, \
-        "Reaction force must be equal to and opposite load"
-    assert reaction.moment == 100 * 25, \
-        "Reaction moment must be equal to the load times the moment arm"
+    assert reaction.force == 100, "Reaction force must be equal to and opposite load"
+    assert (
+        reaction.moment == 100 * 25
+    ), "Reaction moment must be equal to the load times the moment arm"
 
 
 def test_invalid_deflection_location():
@@ -190,62 +228,16 @@ def test_invalid_deflection_location():
         beam.deflection(beam.length + 5)  # a value greater then the length
 
     with pytest.raises(TypeError):
-        beam.deflection('a string (not a number)')
-
-
-def test_deflection_for_fixed_cantilevered_beam_with_load_at_any_point():
-    P = -1000  # load in lbs down
-    a = 7  # position of load in inches
-    L = 25  # length of beam in inches
-    E = 29e6  # Young's modulus in psi
-    Ixx = 345  # area moment of inertia in in**4
-    b = L - a
-
-    # function to calculate deflection anywhere along the length of the beam
-    d1 = lambda x: P * b ** 2 / (6 * E * Ixx) * (3 * L - 3 * x - b)  # x < a
-    d2 = lambda x: P * (L - x) ** 2 / (6 * E * Ixx) * (3 * b - L + x)  # x > a
-    d3 = lambda x: P * b ** 3 / (3 * E * Ixx)  # x == a
-
-    beam = Beam(L, [PointLoad(P, a)], [FixedReaction(L)], E, Ixx)
-
-    for x in [0, 7, 12.5, 25]:
-        # check the deflection of the beam at both end points, and the center
-        if x < a:
-            exact = d1(x)
-        elif x > a:
-            exact = d2(x)
-        else:
-            exact = d3(x)
-        assert pytest.approx(beam.deflection(x), rel=1e-12) == exact, \
-            f"Calculated deflection does not match expected deflection at {x}"
-
-
-def test_moment_for_fixed_cantilevered_beam_with_load_at_end():
-    P = -1000  # load in lbs down
-    L = 25  # length of beam in inches
-    E = 29e6  # Young's modulus in psi
-    Ixx = 345  # area moment of inertia in in**4
-
-    # function to calculate moment anywhere along the length of the beam
-    m = lambda x: P * x
-
-    beam = Beam(L, [PointLoad(P, 0)], [FixedReaction(L)], E, Ixx)
-
-    for x in [7, 12.5, 25]:
-        # check the deflection of the beam at both end points, and the center
-        assert pytest.approx(beam.moment(x), rel=0.01) == m(x), \
-            f"Calculated moment does not match expected moment at {x}"
-
-    with pytest.warns(UserWarning):
-        beam.moment(0)
+        beam.deflection("a string (not a number)")
 
 
 def test_shear():
     beam = Beam(25, [PointLoad(-1000, 25)], [FixedReaction(0)])
 
     for x in [0.5, 5, 13, 20, 24.5]:
-        assert pytest.approx(beam.shear(x), rel=1e-5) == 1000, \
-            f"shear does not equal load at location {x}"
+        assert (
+            pytest.approx(beam.shear(x), rel=1e-5) == 1000
+        ), f"shear does not equal load at location {x}"
 
     # right now, the derivative function will try to calculate shear outside
     # of the beam when calculating shear at or near endpoints. Verify that

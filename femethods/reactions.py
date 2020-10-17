@@ -9,8 +9,11 @@ There are two types of reactions that are defined.
     * FixedReaction, does not allow any displacement
 
 """
+from typing import Optional, Tuple
 
-from ._common import Forces, Validator
+from femethods.core._common import Forces
+
+BOUNDARY_CONDITIONS = Tuple[Optional[int], Optional[int]]
 
 
 class Reaction(Forces):
@@ -33,15 +36,20 @@ class Reaction(Forces):
                                       been calculated
     """
 
-    name = None
+    name = ""
 
-    def __init__(self, location):
+    def __init__(self, location: float):
         super().__init__(magnitude=None, location=location)
         self.force = None
         self.moment = None
+        self._boundary: BOUNDARY_CONDITIONS = (None, None)
 
     @property
-    def location(self):
+    def boundary(self) -> BOUNDARY_CONDITIONS:
+        return self._boundary
+
+    @property
+    def location(self) -> float:
         """
         Location of the reaction along the length of the beam
 
@@ -57,15 +65,17 @@ class Reaction(Forces):
         return self._location
 
     @location.setter
-    @Validator.non_negative("location")
-    def location(self, location):
+    def location(self, location: float) -> None:
         # The location is overloading the location property in Forces so that
         # the reaction can be invalidated when the location is changed
+        if location < 0:
+            # location cannot be a negative number
+            raise ValueError("location must be positive!")
         self.invalidate()
         self._location = location
 
     @property
-    def value(self):
+    def value(self) -> Tuple[Optional[float], Optional[float]]:
         """
         Simple tuple of force and moment
 
@@ -74,7 +84,7 @@ class Reaction(Forces):
         """
         return self.force, self.moment
 
-    def invalidate(self):
+    def invalidate(self) -> None:
         """Invalidate the reaction values
 
         This will set the force and moment values to :obj:`None`
@@ -84,7 +94,7 @@ class Reaction(Forces):
         """
         self.force, self.moment = (None, None)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f"{self.__class__.__name__}\n"
             f"  Location: {self.location}\n"
@@ -92,12 +102,12 @@ class Reaction(Forces):
             f"    Moment: {self.moment}\n"
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.__class__.__name__}(location={self.location})"
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
 
-        if self.__class__ != other.__class__:
+        if not isinstance(other, self.__class__):
             return False
 
         if (
@@ -133,10 +143,10 @@ class PinnedReaction(Reaction):
 
     name = "pinned"
 
-    def __init__(self, location):
+    def __init__(self, location: float):
         super().__init__(location)
         # limit the vertical displacement but allow rotation
-        self.boundary = (0, None)
+        self._boundary: BOUNDARY_CONDITIONS = (0, None)
 
 
 class FixedReaction(Reaction):
@@ -160,7 +170,7 @@ class FixedReaction(Reaction):
 
     name = "fixed"
 
-    def __init__(self, location):
+    def __init__(self, location: float):
         super().__init__(location)
         # do not allow vertical or rotational displacement
-        self.boundary = (0, 0)
+        self._boundary: BOUNDARY_CONDITIONS = (0, 0)

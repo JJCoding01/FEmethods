@@ -5,6 +5,7 @@ Currently the only element that is defined is a beam element.
 
 """
 
+from typing import Any, List, TYPE_CHECKING, Tuple
 from warnings import warn
 
 import matplotlib.pyplot as plt
@@ -12,10 +13,15 @@ import numpy as np
 from scipy.misc import derivative
 
 # local imports
-from ._base_elements import BeamElement
-from ._common import derivative as comm_derivative
+from femethods.core._base_elements import BeamElement
+from femethods.core._common import derivative as comm_derivative
+
+if TYPE_CHECKING:  # pragma: no cover
+    from femethods.loads import Load  # noqa: F401 (unused import)
+    from femethods.reactions import Reaction  # noqa: F401 (unused import)
 
 
+# noinspection PyPep8Naming
 class Beam(BeamElement):
     """A Beam defines a beam element for analysis
 
@@ -45,10 +51,17 @@ class Beam(BeamElement):
 
     """
 
-    def __init__(self, length, loads, reactions, E=1, Ixx=1):
+    def __init__(
+        self,
+        length: float,
+        loads: List["Load"],
+        reactions: List["Reaction"],
+        E: float = 1,
+        Ixx: float = 1,
+    ):
         super().__init__(length, loads, reactions, E=E, Ixx=Ixx)
 
-    def deflection(self, x):
+    def deflection(self, x: float) -> np.float64:
         """Calculate deflection of the beam at location x
 
         Parameters:
@@ -92,10 +105,10 @@ class Beam(BeamElement):
                 # Get the parameters in the local system and exit the loop
                 x_local = x - nodes[i]
                 L = self.mesh.lengths[i]
-                d = self.node_deflections[i * 2: i * 2 + 4]
+                d = self.node_deflections[i * 2 : i * 2 + 4]
                 return self.shape(x_local, L).dot(d)[0]
 
-    def moment(self, x, dx=1e-5, order=9):
+    def moment(self, x: float, dx: float = 1e-5, order: int = 9) -> np.float64:
         """Calculate the moment at location x
 
         Calculate the moment in the beam at the global x value by taking
@@ -160,7 +173,7 @@ class Beam(BeamElement):
                 * comm_derivative(self.deflection, x, method=method, n=2)
             )
 
-    def shear(self, x, dx=0.01, order=5):
+    def shear(self, x: float, dx: float = 0.01, order: int = 5) -> np.float64:
         """
         Calculate the shear force in the beam at location x
 
@@ -193,9 +206,9 @@ class Beam(BeamElement):
         documentation.
         """
         return (
-                self.E
-                * self.Ixx
-                * derivative(self.deflection, x, dx=dx, n=3, order=order)
+            self.E
+            * self.Ixx
+            * derivative(self.deflection, x, dx=dx, n=3, order=order)
         )
 
     def bending_stress(self, x, dx=1, c=1):
@@ -242,12 +255,12 @@ class Beam(BeamElement):
         return diagrams, diagram_labels
 
     def plot(
-            self,
-            n=250,
-            title="Beam Analysis",
-            diagrams=None,
-            diagram_labels=None,
-            **kwargs,
+        self,
+        n=250,
+        title="Beam Analysis",
+        diagrams=None,
+        diagram_labels=None,
+        **kwargs,
     ):
         """
         Plot the deflection, moment, and shear along the length of the beam
@@ -333,10 +346,10 @@ class Beam(BeamElement):
         return fig, axes
 
     @staticmethod
-    def show(*args, **kwargs):
+    def show(*args: Any, **kwargs: Any) -> None:
         """Wrapper function for showing matplotlib figure
 
-        This method gives direct access to the matplot.pyplot.show function
+        This method gives direct access to the matplotlib.pyplot.show function
         so the calling code is not required to import matplotlib directly
         just to show the plots
 
@@ -346,7 +359,10 @@ class Beam(BeamElement):
         """
         plt.show(*args, **kwargs)  # pragma: no cover
 
-    def __str__(self):
+    def __str__(self) -> str:
+        assert self.loads is not None
+        assert self.reactions is not None
+
         L = ""
         for load in self.loads:
             L += "Type: {}\n".format(load.name)

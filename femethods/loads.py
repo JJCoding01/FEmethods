@@ -2,7 +2,9 @@
 Module to define different loads
 """
 
-from ._common import Forces
+from typing import Optional
+
+from femethods.core._common import Forces
 
 
 class Load(Forces):
@@ -11,7 +13,7 @@ class Load(Forces):
     Used primarily for type checking the loads on input
     """
 
-    pass
+    name = ""
 
 
 class PointLoad(Load):
@@ -21,7 +23,7 @@ class PointLoad(Load):
 
     name = "point load"
 
-    def __init__(self, magnitude, location):
+    def __init__(self, magnitude: Optional[float], location: float):
         super().__init__(magnitude, location)
 
 
@@ -32,5 +34,5 @@ class MomentLoad(Load):
 
     name = "moment load"
 
-    def __init__(self, magnitude, location):
+    def __init__(self, magnitude: float, location: float):
         super().__init__(magnitude, location)

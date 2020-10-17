@@ -23,3 +23,6 @@ htmlcov/*
 
 # ignore build files for docs
 docs/build/*
+
+# ignore type checking cache
+**/.mypy_cache/*
