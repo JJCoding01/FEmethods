@@ -1,5 +1,14 @@
 # Change Log
 
+## v0.1.7a1
+- Update `Beam.plot` method to allow customization of plots generated
+- Added tests for `Beam.plot`
+- Added depreciation warning to `Beam.bending_stress` method
+
+### Backwards Incompatible Changes
+- Removed `bending_stress` parameter from `Beam.plot` method
+    
+
 ## v0.1.6dev
  - Add documentation on [Read The Docs](https://femethods.readthedocs.io/en/latest/index.html)
  - Expand module and function documentation

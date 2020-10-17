@@ -1,1 +1,5 @@
-name = "femethods"
+__name__ = "femethods"
+__version__ = "0.1.7a1"
+__author__ = "Joseph Contreras Jr."
+__license__ = "MIT"
+__copyright__ = "Copyright 2019 Joseph Contreras Jr."
