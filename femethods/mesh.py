@@ -2,11 +2,11 @@
 Mesh module that will define the mesh.
 """
 
-from typing import List, Sequence, TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Sequence
 
 if TYPE_CHECKING:  # pragma: no cover
-    from femethods.reactions import Reaction  # noqa: F401 (unused import)
     from femethods.loads import Load  # noqa: F401 (unused import)
+    from femethods.reactions import Reaction  # noqa: F401 (unused import)
 
 
 class Mesh(object):
