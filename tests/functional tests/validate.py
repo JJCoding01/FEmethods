@@ -3,7 +3,6 @@ Module to contain common verification code for functional tests
 """
 
 from pytest import approx
-
 from settings import TOL
 
 

@@ -1,7 +1,8 @@
 import pytest
+
+from femethods.elements import Beam
 from femethods.loads import PointLoad
 from femethods.reactions import FixedReaction, PinnedReaction
-from femethods.elements import Beam
 
 
 @pytest.fixture()
@@ -40,5 +41,7 @@ def beam_simply_supported(length, reaction_simple, load_centered):
 @pytest.fixture()
 def beam_fixed(length):
     yield Beam(
-        length=length, loads=[PointLoad(-100, length)], reactions=[FixedReaction(0)]
+        length=length,
+        loads=[PointLoad(-100, length)],
+        reactions=[FixedReaction(0)],
     )

@@ -19,7 +19,10 @@ def test_mesh_properties(mesh):
     # node for any loads
     assert mesh.nodes == [0, 15, 25], "Mesh nodes do not match expected"
     assert mesh.dof == 6, "Wrong number of global degrees-of-freedom"
-    assert mesh.lengths == [15, 10], "Mesh elements do not have expected lengths"
+    assert mesh.lengths == [
+        15,
+        10,
+    ], "Mesh elements do not have expected lengths"
     assert mesh.num_elements == 2, "Mesh element count does not match"
     assert mesh.num_elements == len(mesh.lengths)
 

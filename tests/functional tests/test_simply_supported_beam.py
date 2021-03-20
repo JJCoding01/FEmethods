@@ -4,7 +4,7 @@ Functional tests for simply supported beams (beams with two pinned reactions)
 https://www.awc.org/pdf/codes-standards/publications/design-aids/AWC-DA6-BeamFormulas-0710.pdf
 """
 
-from settings import E, EI, Ixx, L, P
+from settings import EI, E, Ixx, L, P
 from validate import validate
 
 from femethods.elements import Beam
@@ -60,7 +60,9 @@ def test_simply_supported_beam_offset_load():
         beam.solve()
 
         # verify reactions
-        validate(beam, loc=location, R=[(R1, 0), (R2, 0)], M_loc=M_loc, d_loc=d_loc)
+        validate(
+            beam, loc=location, R=[(R1, 0), (R2, 0)], M_loc=M_loc, d_loc=d_loc
+        )
 
 
 def test_simply_supported_beam_equal_symmetric_loads():
@@ -71,7 +73,9 @@ def test_simply_supported_beam_equal_symmetric_loads():
     R = -P  # both reactions are equal
     a = L / 4
     M_loc = -P * a  # max moment (at center between loads)
-    d_loc = P * a / (24 * EI) * (3 * L ** 2 - 4 * a ** 2)  # max deflection (at center)
+    d_loc = (
+        P * a / (24 * EI) * (3 * L ** 2 - 4 * a ** 2)
+    )  # max deflection (at center)
 
     p = [PointLoad(magnitude=P, location=x) for x in [a, L - a]]
     r = [PinnedReaction(x) for x in [0, L]]
@@ -125,7 +129,10 @@ def test_simply_supported_beam_unequal_non_symmetric_loads():
     Mx = R1 * x + P1 * (x - a)
     M2 = R2 * b
 
-    p = [PointLoad(magnitude=P1, location=a), PointLoad(magnitude=P2, location=L - b)]
+    p = [
+        PointLoad(magnitude=P1, location=a),
+        PointLoad(magnitude=P2, location=L - b),
+    ]
     r = [PinnedReaction(x) for x in [0, L]]
     beam = Beam(length=L, loads=p, reactions=r, E=E, Ixx=Ixx)
     beam.solve()

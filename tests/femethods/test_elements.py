@@ -22,7 +22,11 @@ def test_beam_length_update(beam_simply_supported, length):
 @pytest.mark.parametrize("invalid_length", [-5, 0])
 def test_beam_invalid_lengths(invalid_length, load_centered, reaction_simple):
     with pytest.raises(ValueError):
-        Beam(length=invalid_length, reactions=reaction_simple, loads=load_centered)
+        Beam(
+            length=invalid_length,
+            reactions=reaction_simple,
+            loads=load_centered,
+        )
 
 
 def test_beam_E_default(beam_simply_supported):
@@ -31,8 +35,11 @@ def test_beam_E_default(beam_simply_supported):
 
 @pytest.mark.parametrize("E", [15e6, 30e6])
 def test_beam_E_input(length, reaction_simple, load_centered, E):
-    beam = Beam(length=length, reactions=reaction_simple, loads=load_centered, E=E)
+    beam = Beam(
+        length=length, reactions=reaction_simple, loads=load_centered, E=E
+    )
     assert beam.E == E, "beam modulus of elasticity does not match input"
+
 
 def test_bending_stress_depreciation_warning():
     with pytest.warns(DeprecationWarning):
@@ -43,13 +50,17 @@ def test_bending_stress_depreciation_warning():
 @pytest.mark.parametrize("E", [0, -1])
 def test_beam_E_input_errors(length, reaction_simple, load_centered, E):
     with pytest.raises(ValueError):
-        Beam(length=length, reactions=reaction_simple, loads=load_centered, E=E)
+        Beam(
+            length=length, reactions=reaction_simple, loads=load_centered, E=E
+        )
 
 
 @pytest.mark.parametrize("E", [15e6, 30e6])
 def test_beam_E_update(beam_simply_supported, E):
     beam_simply_supported.E = E
-    assert beam_simply_supported.E == E, "updated beam length does not match input"
+    assert (
+        beam_simply_supported.E == E
+    ), "updated beam length does not match input"
 
 
 def test_beam_Ixx_default(beam_simply_supported):
@@ -58,14 +69,21 @@ def test_beam_Ixx_default(beam_simply_supported):
 
 @pytest.mark.parametrize("Ixx", [10, 20])
 def test_beam_Ixx_input(length, reaction_simple, load_centered, Ixx):
-    beam = Beam(length=length, reactions=reaction_simple, loads=load_centered, Ixx=Ixx)
+    beam = Beam(
+        length=length, reactions=reaction_simple, loads=load_centered, Ixx=Ixx
+    )
     assert beam.Ixx == Ixx, "beam moment of inertia does not match input"
 
 
 @pytest.mark.parametrize("Ixx", [0, -1])
 def test_beam_Ixx_input_errors(length, reaction_simple, load_centered, Ixx):
     with pytest.raises(ValueError):
-        Beam(length=length, reactions=reaction_simple, loads=load_centered, Ixx=Ixx)
+        Beam(
+            length=length,
+            reactions=reaction_simple,
+            loads=load_centered,
+            Ixx=Ixx,
+        )
 
 
 @pytest.mark.parametrize("Ixx", [10, 20])
@@ -76,7 +94,9 @@ def test_beam_Ixx_update(beam_simply_supported, Ixx):
     ), "beam moment of inertia does not match input"
 
 
-@pytest.mark.parametrize("invalid_reaction", [[], "string", 10, PointLoad(10, 2)])
+@pytest.mark.parametrize(
+    "invalid_reaction", [[], "string", 10, PointLoad(10, 2)]
+)
 def test_invalid_reactions(invalid_reaction, length, load_centered):
     with pytest.raises(TypeError):
         Beam(length=length, reactions=[invalid_reaction], loads=load_centered)
@@ -103,14 +123,18 @@ def test_invalid_load_placement():
         ), "moved load is still the same as a reaction"
 
 
-@pytest.mark.parametrize("invalid_load", ["a string", FixedReaction(0), [], 10])
+@pytest.mark.parametrize(
+    "invalid_load", ["a string", FixedReaction(0), [], 10]
+)
 def test_invalid_load_errors(invalid_load):
     # Check for a TypeError for a variety of invalid loads
     with pytest.raises(TypeError):
         Beam(25, loads=[invalid_load], reactions=[FixedReaction(0)])
 
 
-@pytest.mark.parametrize("invalid_reaction", ["a string", PointLoad(25, 15), [], 10])
+@pytest.mark.parametrize(
+    "invalid_reaction", ["a string", PointLoad(25, 15), [], 10]
+)
 def test_invalid_reaction_errors(invalid_reaction):
     # Check for an TypeError for a variety of invalid reactions
     with pytest.raises(TypeError):
@@ -154,13 +178,20 @@ def test_stiffness_matrix_k(beam_fixed, length):
 
 def test_apply_boundary_conditions():
     beam = Beam(
-        25, [PointLoad(-100, 25), PointLoad(-100, 12)], [FixedReaction(0)], 29e6, 345
+        25,
+        [PointLoad(-100, 25), PointLoad(-100, 12)],
+        [FixedReaction(0)],
+        29e6,
+        345,
     )
 
     k = beam.K
     bcs = [(None, None), (0, 0)]
     initial_shape = beam.K.shape
-    assert initial_shape == (6, 6), "stiffness matrix does not match expected size"
+    assert initial_shape == (
+        6,
+        6,
+    ), "stiffness matrix does not match expected size"
     ki = beam.apply_boundary_conditions(k, bcs)
     final_shape = ki.shape
     assert initial_shape == final_shape, (
@@ -175,8 +206,10 @@ def test_apply_boundary_conditions():
 
 def test_shape_of_node_deflections():
     beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], 29e6, 345)
-    assert beam.node_deflections.shape == (4, 1), \
-        "nodal deflections shape is not expected"
+    assert beam.node_deflections.shape == (
+        4,
+        1,
+    ), "nodal deflections shape is not expected"
 
 
 def test_node_deflections_at_fixed_end():
@@ -207,12 +240,18 @@ def test_solve_method():
     beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], 29e6, 345)
 
     reaction = beam.reactions[0]
-    assert reaction.force is None, "Reaction force was not None before being solved"
-    assert reaction.moment is None, "Reaction moment was not None before being solved"
+    assert (
+        reaction.force is None
+    ), "Reaction force was not None before being solved"
+    assert (
+        reaction.moment is None
+    ), "Reaction moment was not None before being solved"
 
     beam.solve()
     reaction = beam.reactions[0]
-    assert reaction.force == 100, "Reaction force must be equal to and opposite load"
+    assert (
+        reaction.force == 100
+    ), "Reaction force must be equal to and opposite load"
     assert (
         reaction.moment == 100 * 25
     ), "Reaction moment must be equal to the load times the moment arm"

@@ -29,7 +29,9 @@ def test_reaction_parameters():
     r2.moment = 20
     assert r1 == r2
     assert not r1 == Reaction(10)
-    assert not r1 == "10", "Reaction should never equal anything but a reaction"
+    assert (
+        not r1 == "10"
+    ), "Reaction should never equal anything but a reaction"
 
     # verify that changing the location of a calculated reaction,
     # it is automatically invalidated
@@ -58,5 +60,11 @@ def test_reaction_types():
     pr = PinnedReaction(0)
     fr = FixedReaction(0)
 
-    assert pr.boundary == (0, None), "PinnedReaction only has one degree of freedom"
-    assert fr.boundary == (0, 0), "FixedReaction does not have any degrees of freedom"
+    assert pr.boundary == (
+        0,
+        None,
+    ), "PinnedReaction only has one degree of freedom"
+    assert fr.boundary == (
+        0,
+        0,
+    ), "FixedReaction does not have any degrees of freedom"

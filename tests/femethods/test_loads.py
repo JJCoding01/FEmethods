@@ -53,7 +53,9 @@ def test_PointLoad_equality():
     assert p1 != p3, "different loads should not be equal"
     assert p1 != p4, "different loads should not be equal"
 
-    assert p1 != "not a load", "load should not equal something that is not a load"
+    assert (
+        p1 != "not a load"
+    ), "load should not equal something that is not a load"
 
 
 def test_loads():

@@ -6,7 +6,7 @@ https://www.awc.org/pdf/codes-standards/publications/design-aids/AWC-DA6-BeamFor
 """
 
 import pytest
-from settings import E, EI, Ixx, L, P, TOL
+from settings import EI, TOL, E, Ixx, L, P
 from validate import validate
 
 from femethods.elements import Beam
