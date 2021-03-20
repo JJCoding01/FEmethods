@@ -19,7 +19,10 @@ derived for a particular case.
    :caption: Table of Contents:
 
    intro
-   femethods
+   femethods/core/core
+   femethods/elements/elements
+   femethods/loads/loads
+   femethods/reactions/reactions
 
 Indices and tables
 ==================

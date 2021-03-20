@@ -51,5 +51,3 @@ example case of a simply supported beam with a single, centered point load.
             Location: 30
                Force: 50.0
               Moment: 0.0
-
-
