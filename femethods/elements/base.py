@@ -12,9 +12,9 @@ import numpy as np
 
 # Importing loads is only used for checking the type. Find a better way to do
 # this without needing to import loads
-from femethods.loads import Load, PointLoad
-from femethods.mesh import Mesh
-from femethods.reactions import Reaction
+from ..loads import Load, PointLoad
+from ..mesh import Mesh
+from ..reactions import Reaction
 
 BOUNDARY_CONDITIONS = List[Tuple[Optional[int], Optional[int]]]
 

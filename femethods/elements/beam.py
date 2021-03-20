@@ -5,7 +5,7 @@ Currently the only element that is defined is a beam element.
 
 """
 
-from typing import Any, List, TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING, Any, List
 from warnings import warn
 
 import matplotlib.pyplot as plt
@@ -13,8 +13,8 @@ import numpy as np
 from scipy.misc import derivative
 
 # local imports
-from femethods.core._base_elements import BeamElement
-from femethods.core._common import derivative as comm_derivative
+from ..core import derivative as comm_derivative
+from .base import BeamElement
 
 if TYPE_CHECKING:  # pragma: no cover
     from femethods.loads import Load  # noqa: F401 (unused import)
