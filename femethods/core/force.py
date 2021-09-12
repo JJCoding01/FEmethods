@@ -3,7 +3,7 @@ Base module that contains base classes to be used by other modules
 """
 
 
-class Forces:
+class Force:
     """Base class for all loads and reactions"""
 
     def __init__(self, magnitude, location=0):

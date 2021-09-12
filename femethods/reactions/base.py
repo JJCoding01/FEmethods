@@ -11,12 +11,12 @@ There are two types of reactions that are defined.
 """
 from typing import Optional, Tuple
 
-from ..core import Forces
+from ..core import Force
 
 BOUNDARY_CONDITIONS = Tuple[Optional[int], Optional[int]]
 
 
-class Reaction(Forces):
+class Reaction(Force):
     """Base class for all reactions
 
     The Reaction class defines general properties related to all reaction
