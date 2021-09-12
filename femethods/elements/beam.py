@@ -14,7 +14,7 @@ from scipy.misc import derivative
 
 # local imports
 from ..core import derivative as comm_derivative
-from .base import BeamElement
+from .__base import BeamElement
 
 if TYPE_CHECKING:  # pragma: no cover
     from femethods.loads import Load  # noqa: F401 (unused import)
