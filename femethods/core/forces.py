@@ -2,11 +2,10 @@
 Base module that contains base classes to be used by other modules
 """
 
-from abc import ABC
 from typing import Optional
 
 
-class Forces(ABC):
+class Forces:
     """Base class for all loads and reactions"""
 
     def __init__(
