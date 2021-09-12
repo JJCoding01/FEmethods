@@ -1,11 +1,4 @@
-from typing import Callable
-
-from numpy import float64
-
-
-def derivative(
-    func: Callable, x0: float, n: int = 1, method: str = "forward"
-) -> float64:
+def derivative(func, x0, n=1, method="forward"):
     """
     Calculate the nth derivative of function f at x0
 
