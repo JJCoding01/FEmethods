@@ -19,17 +19,20 @@ def derivative(
     # Note that the value for dx is set manually. This is because the ideal
     # values are not constant based on the method used.
     # TODO determine better method for choosing a more ideal dx value
+
+    if method not in ("forward", "backward"):
+        raise ValueError(f'invalid method parameter "{method}"')
+
     if method == "forward":
         dx = 1e-8
         if n == 1:
             return (func(x0 + dx) - func(x0)) / dx
-        elif n == 2:
-            return (func(x0 + 2 * dx) - 2 * func(x0 + dx) + func(x0)) / dx ** 2
-    elif method == "backward":
-        dx = 1e-5
-        if n == 1:
-            return (func(x0) - func(x0 - dx)) / dx
-        elif n == 2:
-            return (func(x0) - 2 * func(x0 - dx) + func(x0 - 2 * dx)) / dx ** 2
+        assert n == 2
+        return (func(x0 + 2 * dx) - 2 * func(x0 + dx) + func(x0)) / dx ** 2
 
-    raise ValueError(f'invalid method parameter "{method}"')
+    assert method == "backward"
+    dx = 1e-5
+    if n == 1:
+        return (func(x0) - func(x0 - dx)) / dx
+    assert n == 2
+    return (func(x0) - 2 * func(x0 - dx) + func(x0 - 2 * dx)) / dx ** 2
