@@ -241,15 +241,6 @@ def test_solve_method():
 
     reaction = beam.reactions[0]
     assert (
-        reaction.force is None
-    ), "Reaction force was not None before being solved"
-    assert (
-        reaction.moment is None
-    ), "Reaction moment was not None before being solved"
-
-    beam.solve()
-    reaction = beam.reactions[0]
-    assert (
         reaction.force == 100
     ), "Reaction force must be equal to and opposite load"
     assert (

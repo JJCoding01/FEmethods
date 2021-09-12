@@ -60,6 +60,7 @@ class Beam(BeamElement):
         Ixx: float = 1,
     ):
         super().__init__(length, loads, reactions, E=E, Ixx=Ixx)
+        self.solve()
 
     def deflection(self, x: float) -> np.float64:
         """Calculate deflection of the beam at location x
