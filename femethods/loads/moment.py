@@ -1,4 +1,4 @@
-from .base import Load
+from .__base import Load
 
 
 class MomentLoad(Load):

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from .base import Load
+from .__base import Load
 
 
 class PointLoad(Load):
