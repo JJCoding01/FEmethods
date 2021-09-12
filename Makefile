@@ -9,14 +9,18 @@ docs:
 install:
 	python setup.py install
 
-lint:
+format:
 	black $(PACKAGE_NAME) --line-length=79
-	isort -rc $(PACKAGE_NAME)
+	isort $(PACKAGE_NAME)
+
+format-tests:
+	black tests --line-length=79
+	isort tests
+
+lint:
 	pylint $(PACKAGE_NAME)
 
 lint-tests:
-	black tests --line-length=79
-	isort -rc tests
 	pylint tests
 
 tests:
