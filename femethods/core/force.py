@@ -24,9 +24,6 @@ class Force:
 
     @location.setter
     def location(self, location):
-        if location < 0:
-            # location must be positive to be a valid length/position
-            raise ValueError("location must be positive!")
         self._location = location
 
     def __repr__(self):

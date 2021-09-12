@@ -10,12 +10,6 @@ def test_init_force():
     assert force.location == 50
 
 
-@pytest.mark.parametrize("length", ("non-number", None, -5))
-def test_init_force_invalid_location(length):
-    # noinspection PyTypeChecker
-    with pytest.raises((ValueError, TypeError)):
-        Force(0, location=length)
-
 
 @pytest.mark.parametrize(
     "force",
