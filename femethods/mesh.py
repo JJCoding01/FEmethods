@@ -9,7 +9,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from femethods.reactions import Reaction  # noqa: F401 (unused import)
 
 
-class Mesh(object):
+class Mesh:
     """define a mesh that will handle degrees-of-freedom (dof), element lengths
     etc.
 
@@ -91,11 +91,11 @@ class Mesh(object):
         return nodes
 
     def __str__(self) -> str:
-        s = (
+        mesh_string = (
             "MESH PARAMETERS\n"
             f"Number of elements: {self.num_elements}\n"
             f"Node locations: {self.nodes}\n"
             f"Element Lengths: {self.lengths}\n"
             f"Total degrees of freedom: {self.dof}\n"
         )
-        return s
+        return mesh_string
