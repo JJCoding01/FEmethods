@@ -81,16 +81,7 @@ class Beam(BeamElement):
         #  to be assessed without recalculating
         nodes = self.mesh.nodes
 
-        # validate that x is a valid by ensuring that x is
-        # - x is a number
-        # - 0 <= x <= length of beam
-        try:
-            x = float(x)
-        except ValueError:
-            raise TypeError(
-                f"Cannot calculate deflection with location of type: {type(x)}"
-            )
-
+        # validate that x is valid by ensuring that x is in the allowed range
         if x < 0 or self.length < x:
             raise ValueError(
                 f"cannot calculate deflection at location {x} as "
