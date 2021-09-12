@@ -10,7 +10,6 @@ def test_init_force():
     assert force.location == 50
 
 
-
 @pytest.mark.parametrize(
     "force",
     [
