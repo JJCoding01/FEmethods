@@ -59,12 +59,4 @@ class Force:
         )
 
     def __sub__(self, force2):
-
-        f1 = self.magnitude
-        x1 = self.location
-
-        f2 = force2.magnitude
-        x2 = force2.location
-
-        x = (f1 * x1 - f2 * x2) / (f1 - f2)
-        return self.__class__(f1 - f2, x)
+        return self + self.__class__(-force2.magnitude, force2.location)

@@ -63,3 +63,23 @@ def test_force_add_invalid():
     with pytest.raises(TypeError):
         # noinspection PyTypeChecker
         Force(250, 25) + 50
+
+
+@pytest.mark.parametrize("force, location", [(500, 10), (100, 50)])
+def test_force_sub(force, location):
+    force1 = Force(250, 25)
+    force2 = Force(force, location)
+
+    force_net = force1 - force2
+
+    f1 = force1.magnitude
+    f2 = force2.magnitude
+
+    x1 = force1.location
+    x2 = force2.location
+
+    x = (f1 * x1 - f2 * x2) / (f1 - f2)
+
+    force_expected = Force(f1 - f2, x)
+
+    assert force_expected == force_net
