@@ -1,4 +1,4 @@
-from .base import BOUNDARY_CONDITIONS, Reaction
+from .__base import BOUNDARY_CONDITIONS, Reaction
 
 
 class FixedReaction(Reaction):
