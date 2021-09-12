@@ -2,7 +2,6 @@
 Module to define different loads
 """
 
-from typing import Optional
 
 from ..core import Forces
 
