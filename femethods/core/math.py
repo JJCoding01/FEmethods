@@ -4,6 +4,16 @@ def derivative(func, x0, n=1, method="forward"):
 
      Calculate the 1st or 2nd order derivative of a function using
      the forward or backward method.
+
+     Parameters:
+         func: callable: function to get the derivative of
+         x0: float: location where derivative is calculated
+         n: int: derivative order (must be either 1 for first derivative or 2 for
+            second derivative)
+        method: str: derivative method, either "forward" (default) or "backward"
+
+    Returns:
+        float: returns the derivative of func at x0
     """
 
     if n not in (1, 2):
