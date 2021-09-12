@@ -16,8 +16,6 @@ class Force:
 
     @magnitude.setter
     def magnitude(self, magnitude):
-        if not isinstance(magnitude, (int, float, type(None))):
-            raise TypeError("force value must be a number")
         self._magnitude = magnitude
 
     @property
