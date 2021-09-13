@@ -10,6 +10,15 @@ def test_init_force():
     assert force.location == 50
 
 
+def test_force_update():
+    p = Force(magnitude=-5, location=25)
+
+    p.magnitude = -100
+    p.location = 30
+    assert p.magnitude == -100
+    assert p.location == 30
+
+
 @pytest.mark.parametrize(
     "force",
     [
@@ -58,6 +67,12 @@ def test_force_add(force, location):
     assert force_expected == force_net
 
 
+def test_force_add_pair():
+    p1 = Force(magnitude=-2, location=10)
+    p2 = Force(magnitude=-8, location=20)
+    assert p1 + p2 == Force(magnitude=-10, location=18)
+
+
 def test_force_add_invalid():
     with pytest.raises(TypeError):
         # noinspection PyTypeChecker
@@ -82,3 +97,11 @@ def test_force_sub(force, location):
     force_expected = Force(f1 - f2, x)
 
     assert force_expected == force_net
+
+
+def test_force_arithmetic():
+    p1 = Force(magnitude=10, location=10)
+    p2 = Force(magnitude=5, location=20)
+    p3 = Force(magnitude=5, location=0)
+    assert p1 - p2 == p3
+    assert p3 + p2 == p1
