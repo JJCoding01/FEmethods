@@ -24,7 +24,22 @@ lint-tests:
 	pylint tests
 
 tests:
+	pytest tests
+
+tests-cov:
+	pytest --cov-report html --cov=$(PACKAGE_NAME) tests
+
+tests-unit:
+	pytest tests/$(PACKAGE_NAME)
+
+tests-unit-cov:
 	pytest --cov-report html --cov=$(PACKAGE_NAME) tests/$(PACKAGE_NAME)
+
+tests-core:
+	pytest tests/$(PACKAGE_NAME)/core
+
+tests-core-cov:
+	pytest --cov-report html --cov=$(PACKAGE_NAME) tests/$(PACKAGE_NAME)/core
 
 tests-ci:
 	pytest --cov-report html --cov=$(PACKAGE_NAME) tests/$(PACKAGE_NAME) -v
