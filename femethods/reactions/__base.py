@@ -110,11 +110,8 @@ class Reaction(Force):
         if not isinstance(other, self.__class__):
             return False
 
-        if (
+        return (
             self.location == other.location
             and self.force == other.force
             and self.moment == other.moment
-        ):
-            return True
-
-        return False
+        )
