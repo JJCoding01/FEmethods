@@ -68,14 +68,14 @@ class Mesh:
 
     @staticmethod
     def __get_nodes(length, loads, reactions):
-        nodes = [0]  # ensure first node is always at zero (0)
-
+        # create set of locations of each load and reaction, and the ends of the beam.
+        # ensure first node is always at zero (0) (start of beam)
+        nodes = {0}
         for item in loads + reactions:
-            nodes.append(item.location)
-        nodes.append(length)  # ensure last node is at the end of the beam
-        nodes = list(set(nodes))  # remove duplicates
-        nodes.sort()
-        return nodes
+            nodes.add(item.location)
+
+        nodes.add(length)  # ensure last node is at the end of the beam
+        return sorted(nodes)
 
     def __str__(self) -> str:
         mesh_string = (
