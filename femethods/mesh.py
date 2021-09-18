@@ -78,9 +78,7 @@ class Mesh:
 
         Returns:
             :obj:`int`: Read-only. Number of elements in mesh
-
         """
-
         return self.__num_elements
 
     def __get_lengths(self):
