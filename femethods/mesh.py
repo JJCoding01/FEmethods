@@ -24,7 +24,6 @@ class Mesh:
         reactions,
         element_dof,
     ):
-        self._dof = dof * self.num_elements + dof
         self.__nodes = self.__get_nodes(length, loads, reactions)
         self.__lengths = self.__get_lengths()
         self.__num_elements = len(self.lengths)
@@ -61,7 +60,7 @@ class Mesh:
         Returns:
             :obj:`int`: Read-only. Number of degrees of freedom of the beam
         """
-        return self._dof
+        return self.element_dof * self.num_elements - self.element_dof / 2
 
     @property
     def lengths(self):
