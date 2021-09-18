@@ -81,7 +81,7 @@ def test_reaction_eq(location, force, moment):
     assert r1 == r2
 
 
-@pytest.mark.parametrize("other", (None, 10, 'str'))
+@pytest.mark.parametrize("other", (None, 10, "str"))
 def test_reaction_not_eq_type(other):
     assert Reaction(0) != other
 
