@@ -2,12 +2,6 @@
 Mesh module that will define the mesh.
 """
 
-from typing import TYPE_CHECKING, List, Sequence
-
-if TYPE_CHECKING:  # pragma: no cover
-    from femethods.loads import Load  # noqa: F401 (unused import)
-    from femethods.reactions import Reaction  # noqa: F401 (unused import)
-
 
 class Mesh:
     """define a mesh that will handle degrees-of-freedom (dof), element lengths
@@ -19,10 +13,10 @@ class Mesh:
 
     def __init__(
         self,
-        length: float,
-        loads: List["Load"],
-        reactions: List["Reaction"],
-        dof: int,
+        length,
+        loads,
+        reactions,
+        dof,
     ):
         self._nodes = self.__get_nodes(length, loads, reactions)
         self._lengths = self.__get_lengths()
@@ -30,11 +24,11 @@ class Mesh:
         self._dof = dof * self.num_elements + dof
 
     @property
-    def nodes(self) -> Sequence[float]:
+    def nodes(self):
         return self._nodes
 
     @property
-    def dof(self) -> int:
+    def dof(self):
         """
         Degrees of freedom of the entire beam
 
@@ -44,7 +38,7 @@ class Mesh:
         return self._dof
 
     @property
-    def lengths(self) -> List[float]:
+    def lengths(self):
         """
         List of lengths of mesh elements
 
@@ -54,7 +48,7 @@ class Mesh:
         return self._lengths
 
     @property
-    def num_elements(self) -> int:
+    def num_elements(self):
         """
         Number of mesh elements
 
@@ -65,25 +59,18 @@ class Mesh:
 
         return self._num_elements
 
-    def __get_lengths(self) -> List[float]:
+    def __get_lengths(self):
         # Calculate the lengths of each element
-        lengths: List[float] = []
+        lengths = []
         for k in range(len(self.nodes) - 1):
             lengths.append(self.nodes[k + 1] - self.nodes[k])
         return lengths
 
     @staticmethod
-    def __get_nodes(
-        length: float, loads: List["Load"], reactions: List["Reaction"]
-    ) -> Sequence[float]:
-        nodes: List[float] = [0]  # ensure first node is always at zero (0)
+    def __get_nodes(length, loads, reactions):
+        nodes = [0]  # ensure first node is always at zero (0)
 
-        # Ignore the type checking for the for loop adding lists of loads and
-        # lists of reactions. There is no + operator defined for these, but it
-        # will combine the lists using the built in list addition. Which is the
-        # desired behavior
-        # noinspection PyTypeChecker,Mypy
-        for item in loads + reactions:  # type: ignore
+        for item in loads + reactions:
             nodes.append(item.location)
         nodes.append(length)  # ensure last node is at the end of the beam
         nodes = list(set(nodes))  # remove duplicates
