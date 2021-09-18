@@ -18,14 +18,16 @@ class Mesh:
         reactions,
         element_dof,
     ):
-        self._nodes = self.__get_nodes(length, loads, reactions)
-        self._lengths = self.__get_lengths()
-        self._num_elements = len(self.lengths)
         self._dof = dof * self.num_elements + dof
+        self.__nodes = self.__get_nodes(length, loads, reactions)
+        self.__lengths = self.__get_lengths()
+        self.__num_elements = len(self.lengths)
+
 
     @property
     def nodes(self):
-        return self._nodes
+        """location of nodes relative to base"""
+        return self.__nodes
 
     @property
     def dof(self):
@@ -45,7 +47,7 @@ class Mesh:
         Returns:
             :obj:`list`: Read-only. List of lengths of local mesh elements
         """
-        return self._lengths
+        return self.__lengths
 
     @property
     def num_elements(self):
@@ -57,7 +59,7 @@ class Mesh:
 
         """
 
-        return self._num_elements
+        return self.__num_elements
 
     def __get_lengths(self):
         # Calculate the lengths of each element
