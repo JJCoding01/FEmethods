@@ -14,6 +14,18 @@ def mesh():
     return Mesh(LENGTH, LOADS, REACTIONS, element_dof=2)
 
 
+@pytest.mark.parametrize("dof", (-5, -4, 0, 3.25))
+def test_mesh_element_dof_invalid_number(dof):
+    with pytest.raises(ValueError):
+        Mesh(LENGTH, LOADS, REACTIONS, element_dof=dof)
+
+
+@pytest.mark.parametrize("dof", (2, 4, 5))
+def test_mesh_element_dof_valid_number(dof):
+    mesh = Mesh(LENGTH, LOADS, REACTIONS, element_dof=dof)
+    assert mesh.element_dof == dof
+
+
 def test_mesh_nodes(mesh):
     expected_nodes = [0, 15, 25]
     assert expected_nodes == mesh.nodes

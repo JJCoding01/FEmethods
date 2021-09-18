@@ -22,7 +22,25 @@ class Mesh:
         self.__nodes = self.__get_nodes(length, loads, reactions)
         self.__lengths = self.__get_lengths()
         self.__num_elements = len(self.lengths)
+        self.element_dof = element_dof
 
+    @property
+    def element_dof(self):
+        """degrees of freedom for a single element"""
+        return self.__element_dof
+
+    @element_dof.setter
+    def element_dof(self, value):
+
+        if value != int(value):
+            raise ValueError(f"element_dof must be an integer, not {value}")
+
+        if value <= 0:
+            raise ValueError(
+                f"degrees of freedom must be a positive integer, not {value}"
+            )
+
+        self.__element_dof = value
 
     @property
     def nodes(self):
