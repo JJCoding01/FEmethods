@@ -11,7 +11,7 @@ LENGTH = 25
 
 @pytest.fixture
 def mesh():
-    return Mesh(LENGTH, LOADS, REACTIONS, element_dof=2)
+    return Mesh(LENGTH, LOADS, REACTIONS, element_dof=4)
 
 
 @pytest.mark.parametrize("dof", (-5, -4, 0, 3.25))
