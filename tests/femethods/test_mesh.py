@@ -11,7 +11,7 @@ LENGTH = 25
 
 @pytest.fixture
 def mesh():
-    return Mesh(LENGTH, LOADS, REACTIONS, dof=2)
+    return Mesh(LENGTH, LOADS, REACTIONS, element_dof=2)
 
 
 def test_mesh_nodes(mesh):

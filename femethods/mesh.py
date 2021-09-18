@@ -7,8 +7,8 @@ class Mesh:
     """define a mesh that will handle degrees-of-freedom (dof), element lengths
     etc.
 
-    the input degree-of-freedom (dof) parameter is the degrees-of-freedom for
-    a single element
+
+    .. versionchanged:: 0.1.8a1 renamed :obj:`dof` parameter to :obj:`element_dof`
     """
 
     def __init__(
@@ -16,7 +16,7 @@ class Mesh:
         length,
         loads,
         reactions,
-        dof,
+        element_dof,
     ):
         self._nodes = self.__get_nodes(length, loads, reactions)
         self._lengths = self.__get_lengths()
