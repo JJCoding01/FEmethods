@@ -13,7 +13,6 @@ class Mesh:
         reactions: list: reactions
         element_dof: int: degrees-of-freedom for a single element
 
-
     .. versionchanged:: 0.1.8a1 renamed :obj:`dof` parameter to :obj:`element_dof`
     """
 
