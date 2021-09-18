@@ -3,68 +3,128 @@ import pytest
 from femethods.reactions import FixedReaction, PinnedReaction, Reaction
 
 
-def test_reaction_parameters():
+@pytest.mark.parametrize(
+    "reaction, name", ((PinnedReaction, "pinned"), (FixedReaction, "fixed"))
+)
+def test_reaction_name(reaction, name):
+    r = reaction(0)
+    assert r.name == name
+
+
+@pytest.mark.parametrize("reaction", (PinnedReaction, FixedReaction))
+def test_reaction_init(reaction):
+    r = reaction(0)
+    assert r.force is None
+    assert r.moment is None
+
+
+@pytest.mark.parametrize("invalid_type", (None, "str", (0, 0)))
+def test_invalid_location_type(invalid_type):
+    with pytest.raises(TypeError):
+        Reaction(location=invalid_type)
+
+
+def test_negative_location():
+    with pytest.raises(ValueError):
+        Reaction(location=-5)
+
+
+@pytest.mark.parametrize("moment", (None, -100, 0, 100))
+@pytest.mark.parametrize("force", (None, -100, 0, 100))
+@pytest.mark.parametrize("location", (0, 10))
+def test_reaction_value(location, force, moment):
+    r = Reaction(location)
+    r.force = force
+    r.moment = moment
+    assert r.value == (force, moment)
+
+
+def test_reaction_value_invalidate():
     r = Reaction(0)
-
-    assert r.force is None, "Reaction should not have force before solving"
-    assert r.moment is None, "Reaction should not have moment before solving"
-    assert r.value == (None, None), "Reaction value initialized incorrectly"
-
-    r.force = 10
-    r.moment = 20
-    assert r.force == 10, "Reaction force not set properly"
-    assert r.moment == 20, "Reaction moment not set properly"
-    assert r.value == (10, 20), "value to returning (force, moment)"
-
-    # check that when the reaction is invalidated, all calculated values are removed
+    r.force = 100
+    r.moment = 15
     r.invalidate()
-    assert r.location == 0
     assert r.value == (None, None), "reaction not invalidated"
 
-    r1 = Reaction(0)
-    r1.force = 10
-    r1.moment = 20
-    r2 = Reaction(0)
-    r2.force = 10
-    r2.moment = 20
-    assert r1 == r2
-    assert not r1 == Reaction(10)
+
+def test_reaction_invalidated_when_moved():
+    r = Reaction(0)
+    r.force = 100
+    r.moment = 200
+
+    r.location = 10  # move reaction
+    assert r.value == (None, None), "reaction not invalided"
+
+
+@pytest.mark.parametrize(
+    "reaction, bc", ((PinnedReaction, (0, None)), (FixedReaction, (0, 0)))
+)
+def test_reaction_boundary_conditions(reaction, bc):
+    r = reaction(0)
     assert (
-        not r1 == "10"
-    ), "Reaction should never equal anything but a reaction"
-
-    # verify that changing the location of a calculated reaction,
-    # it is automatically invalidated
-    assert r1.value == (10, 20)
-    r1.location = 10
-    assert r1.location == 10, "location not updated"
-    assert r1.value == (None, None), "Reaction not invalidated when moved"
-    # check for bad input
-    with pytest.raises(ValueError):
-        Reaction(-5)
-
-    with pytest.raises(TypeError):
-        Reaction("some value")
-
-    # check that invalidating a reaction removes calculated
-    # values
-    r = Reaction(5)
-    r.force = 15
-    r.moment = 25
-    assert r.value == (15, 25), "Reaction values do not match expected"
-    r.invalidate()
-    assert r.value == (None, None), "Reaction values where not invalidated"
+        r.boundary == bc
+    ), "boundary conditions does not match expected value"
 
 
-def test_reaction_types():
-    pr = PinnedReaction(0)
-    fr = FixedReaction(0)
+@pytest.mark.parametrize("location", (0, 10))
+@pytest.mark.parametrize("force", (None, -10, 0, 10))
+@pytest.mark.parametrize("moment", (None, -10, 0, 10))
+def test_reaction_eq(location, force, moment):
+    r1 = Reaction(location)
+    r2 = Reaction(location)
 
-    assert pr.boundary == (
-        0,
-        None,
-    ), "PinnedReaction only has one degree of freedom"
-    assert fr.boundary == (
-        0,
-        0,
-    ), "FixedReaction does not have any degrees of freedom"
+    r1.force = force
+    r1.moment = moment
+
+    r2.force = force
+    r2.moment = moment
+    assert r1 == r2
+
+
+@pytest.mark.parametrize("other", (None, 10, 'str'))
+def test_reaction_not_eq_type(other):
+    assert Reaction(0) != other
+
+
+@pytest.mark.parametrize("force", (None, -100, 0, 100))
+@pytest.mark.parametrize("moment", (None, -100, 0, 100))
+def test_reaction_not_eq_location(force, moment):
+    r1 = Reaction(0)
+    r2 = Reaction(10)
+
+    r1.force = force
+    r1.moment = moment
+
+    r2.force = force
+    r2.moment = moment
+    assert r1 != r2
+
+
+@pytest.mark.parametrize("location", (0, 100))
+@pytest.mark.parametrize("moment", (None, -100, 0, 100))
+def test_reaction_not_eq_force(location, moment):
+    r1 = Reaction(location)
+    r2 = Reaction(location)
+
+    r1.force = 0
+    r2.force = 10
+
+    r1.moment = moment
+    r2.moment = moment
+
+    assert r1 != r2
+
+
+@pytest.mark.parametrize("location", (0, 100))
+@pytest.mark.parametrize("force", (None, -100, 0, 100))
+def test_reaction_not_eq_moment(location, force):
+    r1 = Reaction(location)
+    r2 = Reaction(location)
+
+    r1.force = force
+    r2.force = force
+
+    r1.moment = 0
+    r2.moment = 10
+
+    assert r1 != r2
