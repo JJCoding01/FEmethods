@@ -4,8 +4,14 @@ Mesh module that will define the mesh.
 
 
 class Mesh:
-    """define a mesh that will handle degrees-of-freedom (dof), element lengths
-    etc.
+    """
+    Mesh to handle degrees-of-freedom (dof) and element lengths
+
+    Parameters:
+        length: float: overall length of beam
+        loads: list: loads
+        reactions: list: reactions
+        element_dof: int: degrees-of-freedom for a single element
 
 
     .. versionchanged:: 0.1.8a1 renamed :obj:`dof` parameter to :obj:`element_dof`
