@@ -77,7 +77,7 @@ class Mesh:
         nodes.add(length)  # ensure last node is at the end of the beam
         return sorted(nodes)
 
-    def __str__(self) -> str:
+    def __str__(self):
         mesh_string = (
             "MESH PARAMETERS\n"
             f"Number of elements: {self.num_elements}\n"
