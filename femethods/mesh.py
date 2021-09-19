@@ -59,7 +59,7 @@ class Mesh:
         Returns:
             :obj:`int`: Read-only. Number of degrees of freedom of the beam
         """
-        return self.element_dof * self.num_elements - self.element_dof / 2
+        return self.node_dof * len(self.nodes)
 
     @property
     def lengths(self):
