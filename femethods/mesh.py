@@ -11,9 +11,9 @@ class Mesh:
         length: float: overall length of beam
         loads: list: loads
         reactions: list: reactions
-        element_dof: int: degrees-of-freedom for a single element
+        node_dof: int: degrees-of-freedom for a single node
 
-    .. versionchanged:: 0.1.8a1 renamed :obj:`dof` parameter to :obj:`element_dof`
+    .. versionchanged:: 0.1.8a1 renamed :obj:`dof` parameter to :obj:`node_dof`
     """
 
     def __init__(
@@ -21,30 +21,30 @@ class Mesh:
         length,
         loads,
         reactions,
-        element_dof,
+        node_dof,
     ):
         self.__nodes = self.__get_nodes(length, loads, reactions)
         self.__lengths = self.__get_lengths()
         self.__num_elements = len(self.lengths)
-        self.element_dof = element_dof
+        self.node_dof = node_dof
 
     @property
-    def element_dof(self):
-        """degrees of freedom for a single element"""
-        return self.__element_dof
+    def node_dof(self):
+        """degrees of freedom for a single node"""
+        return self.__node_dof
 
-    @element_dof.setter
-    def element_dof(self, value):
+    @node_dof.setter
+    def node_dof(self, value):
 
         if value != int(value):
-            raise ValueError(f"element_dof must be an integer, not {value}")
+            raise ValueError(f"node_dof must be an integer, not {value}")
 
         if value <= 0:
             raise ValueError(
                 f"degrees of freedom must be a positive integer, not {value}"
             )
 
-        self.__element_dof = value
+        self.__node_dof = value
 
     @property
     def nodes(self):
