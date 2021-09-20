@@ -5,7 +5,6 @@ Currently the only element that is defined is a beam element.
 
 """
 
-from typing import TYPE_CHECKING, Any, List
 from warnings import warn
 
 import matplotlib.pyplot as plt
@@ -15,10 +14,6 @@ from scipy.misc import derivative
 # local imports
 from ..core import derivative as comm_derivative
 from .__base import BeamElement
-
-if TYPE_CHECKING:  # pragma: no cover
-    from femethods.loads import Load  # noqa: F401 (unused import)
-    from femethods.reactions import Reaction  # noqa: F401 (unused import)
 
 
 # noinspection PyPep8Naming
@@ -53,16 +48,16 @@ class Beam(BeamElement):
 
     def __init__(
         self,
-        length: float,
-        loads: List["Load"],
-        reactions: List["Reaction"],
-        E: float = 1,
-        Ixx: float = 1,
+        length,
+        loads,
+        reactions,
+        E=1,
+        Ixx=1,
     ):
         super().__init__(length, loads, reactions, E=E, Ixx=Ixx)
         self.solve()
 
-    def deflection(self, x: float) -> np.float64:
+    def deflection(self, x):
         """Calculate deflection of the beam at location x
 
         Parameters:
@@ -100,7 +95,7 @@ class Beam(BeamElement):
                 d = self.node_deflections[i * 2 : i * 2 + 4]
                 return self.shape(x_local, L).dot(d)[0]
 
-    def moment(self, x: float, dx: float = 1e-5, order: int = 9) -> np.float64:
+    def moment(self, x, dx=1e-5, order=9):
         """Calculate the moment at location x
 
         Calculate the moment in the beam at the global x value by taking
@@ -165,7 +160,7 @@ class Beam(BeamElement):
                 * comm_derivative(self.deflection, x, method=method, n=2)
             )
 
-    def shear(self, x: float, dx: float = 0.01, order: int = 5) -> np.float64:
+    def shear(self, x, dx=0.01, order=5):
         """
         Calculate the shear force in the beam at location x
 
@@ -338,7 +333,7 @@ class Beam(BeamElement):
         return fig, axes
 
     @staticmethod
-    def show(*args: Any, **kwargs: Any) -> None:
+    def show(*args, **kwargs):
         """Wrapper function for showing matplotlib figure
 
         This method gives direct access to the matplotlib.pyplot.show function
@@ -351,9 +346,7 @@ class Beam(BeamElement):
         """
         plt.show(*args, **kwargs)  # pragma: no cover
 
-    def __str__(self) -> str:
-        assert self.loads is not None
-        assert self.reactions is not None
+    def __str__(self):
 
         L = ""
         for load in self.loads:
