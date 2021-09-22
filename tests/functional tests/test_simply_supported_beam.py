@@ -4,8 +4,8 @@ Functional tests for simply supported beams (beams with two pinned reactions)
 https://www.awc.org/pdf/codes-standards/publications/design-aids/AWC-DA6-BeamFormulas-0710.pdf
 """
 
-from settings import EI, E, Ixx, L, P
-from validate import validate
+import pytest
+from settings import EI, TOL, E, Ixx, L, P
 
 from femethods.elements import Beam
 from femethods.loads import PointLoad
@@ -30,39 +30,45 @@ def test_simply_supported_beam_center_load():
         E=E,
         Ixx=Ixx,
     )
-    beam.solve()
 
-    validate(beam, loc=L / 2, R=[(R, 0), (R, 0)], M_loc=M_max, d_loc=d_max)
+    assert pytest.approx(beam.moment(L / 2), rel=TOL) == M_max
+    assert pytest.approx(beam.deflection(L / 2), rel=TOL) == d_max
+
+    for r in beam.reactions:
+        assert pytest.approx(r.moment, abs=1e-6) == 0
+        assert pytest.approx(r.force, rel=TOL) == R
 
 
-def test_simply_supported_beam_offset_load():
+@pytest.mark.parametrize("location", [2, 3, 5, 7, 8])
+def test_simply_supported_beam_offset_load(location):
     """simple beam - concentrated load at arbitrary points
     Load case 8
     """
-    locations = [2, 3, 5, 7, 8]
-    for location in locations:
-        # Exact setup
-        a = location
-        b = L - a
-        R1 = -P * b / L
-        R2 = -P * a / L
-        M_loc = -P * a * b / L  # moment at load
-        d_loc = P * a ** 2 * b ** 2 / (3 * EI * L)  # deflection at load
+    # Exact setup
+    a = location
+    b = L - a
+    R1 = -P * b / L
+    R2 = -P * a / L
+    M_loc = -P * a * b / L  # moment at load
+    d_loc = P * a ** 2 * b ** 2 / (3 * EI * L)  # deflection at load
 
-        # numerical result
-        beam = Beam(
-            L,
-            loads=[PointLoad(P, location)],
-            reactions=[PinnedReaction(x) for x in [0, L]],
-            E=E,
-            Ixx=Ixx,
-        )
-        beam.solve()
+    # numerical result
+    beam = Beam(
+        L,
+        loads=[PointLoad(P, location)],
+        reactions=[PinnedReaction(x) for x in [0, L]],
+        E=E,
+        Ixx=Ixx,
+    )
 
-        # verify reactions
-        validate(
-            beam, loc=location, R=[(R1, 0), (R2, 0)], M_loc=M_loc, d_loc=d_loc
-        )
+    assert pytest.approx(beam.moment(location), rel=TOL) == M_loc
+    assert pytest.approx(beam.deflection(location), rel=TOL) == d_loc
+
+    assert pytest.approx(beam.reactions[0].force, rel=TOL) == R1
+    assert pytest.approx(beam.reactions[1].force, rel=TOL) == R2
+
+    assert pytest.approx(beam.reactions[0].moment, abs=1e-6) == 0
+    assert pytest.approx(beam.reactions[1].moment, abs=1e-6) == 0
 
 
 def test_simply_supported_beam_equal_symmetric_loads():
@@ -80,10 +86,13 @@ def test_simply_supported_beam_equal_symmetric_loads():
     p = [PointLoad(magnitude=P, location=x) for x in [a, L - a]]
     r = [PinnedReaction(x) for x in [0, L]]
     beam = Beam(length=L, loads=p, reactions=r, E=E, Ixx=Ixx)
-    beam.solve()
 
-    # verify reactions
-    validate(beam, loc=L / 2, R=[(R, 0), (R, 0)], M_loc=M_loc, d_loc=d_loc)
+    assert pytest.approx(beam.moment(L / 2), rel=TOL) == M_loc
+    assert pytest.approx(beam.deflection(L / 2), rel=TOL) == d_loc
+
+    for r in beam.reactions:
+        assert r.moment == 0
+        assert pytest.approx(r.force, rel=TOL) == R
 
 
 def test_simply_supported_beam_equal_non_symmetric_loads():
@@ -104,11 +113,16 @@ def test_simply_supported_beam_equal_non_symmetric_loads():
     p = [PointLoad(magnitude=P, location=x) for x in [a, L - b]]
     r = [PinnedReaction(x) for x in [0, L]]
     beam = Beam(length=L, loads=p, reactions=r, E=E, Ixx=Ixx)
-    beam.solve()
 
-    # verify reactions
-    for m, loc in zip((M1, Mx, M2), (a, L / 2, L - b)):
-        validate(beam, loc=loc, R=[(R1, 0), (R2, 0)], M_loc=m, d_loc=None)
+    assert pytest.approx(beam.moment(a), rel=TOL) == M1
+    assert pytest.approx(beam.moment(x), rel=TOL) == Mx
+    assert pytest.approx(beam.moment(L - b), rel=TOL) == M2
+
+    assert pytest.approx(beam.reactions[0].force, rel=TOL) == R1
+    assert pytest.approx(beam.reactions[1].force, rel=TOL) == R2
+
+    for r in beam.reactions:
+        assert r.moment == 0
 
 
 def test_simply_supported_beam_unequal_non_symmetric_loads():
@@ -135,9 +149,13 @@ def test_simply_supported_beam_unequal_non_symmetric_loads():
     ]
     r = [PinnedReaction(x) for x in [0, L]]
     beam = Beam(length=L, loads=p, reactions=r, E=E, Ixx=Ixx)
-    beam.solve()
 
-    # verify reactions
-    for m, loc in zip((M1, Mx, M2), (a, L / 2, L - b)):
-        # assert approx(beam.reactions[0].value[0], rel=1e-4) == R1*1.25
-        validate(beam, loc=loc, R=[(R1, 0), (R2, 0)], M_loc=m, d_loc=None)
+    assert pytest.approx(beam.moment(a), rel=TOL) == M1
+    assert pytest.approx(beam.moment(x), rel=TOL) == Mx
+    assert pytest.approx(beam.moment(L - b), rel=TOL) == M2
+
+    assert pytest.approx(beam.reactions[0].force, rel=TOL) == R1
+    assert pytest.approx(beam.reactions[1].force, rel=TOL) == R2
+
+    for r in beam.reactions:
+        assert r.moment == 0
