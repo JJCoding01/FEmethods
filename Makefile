@@ -17,6 +17,12 @@ format-tests:
 	black tests --line-length=79
 	isort tests
 
+format-all:
+	black $(PACKAGE_NAME) --line-length=79
+	isort $(PACKAGE_NAME)
+	black tests --line-length=79
+	isort tests
+
 lint:
 	pylint $(PACKAGE_NAME)
 
