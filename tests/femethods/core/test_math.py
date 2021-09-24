@@ -31,7 +31,7 @@ def test_derivative_1_poly(method, x):
     expected_derivative = 2 * x + 5
     assert derivative(
         lambda x: x ** 2 + 5 * x + 3, x, n=1, method=method
-    ) == pytest.approx(expected_derivative, abs=1e-3)
+    ) == pytest.approx(expected_derivative, abs=0.005)
 
 
 @pytest.mark.parametrize("method", ("forward", "backward"))
