@@ -33,7 +33,7 @@ def derivative(func, x0, n=1, method="forward"):
             method=method,
         )
 
-    dx = 1e-4
+    dx = 1e-3
 
     if method == "forward":
         return (func(x0 + dx) - func(x0)) / dx
