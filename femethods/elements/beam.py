@@ -127,12 +127,6 @@ class Beam(BeamElement):
         documentation.
         """
 
-        # TODO: Update so that moment can be calculated at both ends of beam
-        if x < 0.75:
-            # this cut-off was found experimentally. Anything less than this,
-            # and calculating the derivative is unreliable
-            warn("Calculated moments below 0.75 may be unreliable")
-
         try:
             return (
                 self.E
