@@ -23,6 +23,7 @@ def beam():
     yield beam
 
 
+# noinspection PyPep8Naming
 def test_simply_supported_eq_non_symmetric_reaction_force(beam):
     a = L / 4  # location of first load from right
     b = L / 5  # location of second load from left
@@ -39,6 +40,7 @@ def test_simply_supported_eq_non_symmetric_reaction_moment_0(
     assert pytest.approx(beam.reactions[reaction_index].moment, abs=1) == 0
 
 
+# noinspection PyPep8Naming
 @pytest.mark.parametrize("location", ("load1", "center", "load2"))
 def test_simply_supported_eq_non_symmetric_moment(location, beam):
     a = L / 4  # location of first load from right

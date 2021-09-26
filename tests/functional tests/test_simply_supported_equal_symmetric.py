@@ -23,6 +23,7 @@ def beam():
 
 @pytest.mark.parametrize("reaction_index", [0, 1])
 def test_simply_supported_eq_symmetric_reaction_force(reaction_index, beam):
+    # noinspection PyPep8Naming
     R = -P  # both reactions are equal
     assert pytest.approx(beam.reactions[reaction_index].force, rel=TOL) == R
 
@@ -34,6 +35,7 @@ def test_simply_supported_eq_symmetric_reaction_moment_0(reaction_index, beam):
 
 def test_simply_supported_eq_symmetric_moment(beam):
     a = L / 4
+    # noinspection PyPep8Naming
     M_loc = -P * a  # max moment (at center between loads)
     assert pytest.approx(beam.moment(a), rel=TOL) == M_loc
 

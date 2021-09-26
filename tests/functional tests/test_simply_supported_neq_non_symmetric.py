@@ -5,13 +5,14 @@ https://www.awc.org/pdf/codes-standards/publications/design-aids/AWC-DA6-BeamFor
 """
 
 import pytest
-from settings import TOL, E, Ixx, L, P
+from settings import TOL, E, Ixx, L
 
 from femethods.elements import Beam
 from femethods.loads import PointLoad
 from femethods.reactions import PinnedReaction
 
 
+# noinspection PyPep8Naming
 @pytest.fixture()
 def beam():
     P1 = -900
@@ -28,6 +29,7 @@ def beam():
     yield beam
 
 
+# noinspection PyPep8Naming
 def test_simply_supported_neq_non_symmetric_reaction_force(beam):
     P1 = -900
     P2 = -1200
@@ -47,6 +49,7 @@ def test_simply_supported_neq_non_symmetric_reaction_moment_0(
     assert pytest.approx(beam.reactions[reaction_index].moment, abs=1) == 0
 
 
+# noinspection PyPep8Naming
 @pytest.mark.parametrize("location", ("load1", "center", "load2"))
 def test_simply_supported_eq_non_symmetric_moment(location, beam):
     P1 = -900

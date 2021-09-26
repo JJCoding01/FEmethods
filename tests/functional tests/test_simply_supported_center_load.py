@@ -27,6 +27,7 @@ def beam():
 
 @pytest.mark.parametrize("reaction_index", [0, 1])
 def test_simply_supported_center_reaction_force(reaction_index, beam):
+    # noinspection PyPep8Naming
     R = -P / 2  # lbs, reactions
     assert pytest.approx(beam.reactions[reaction_index].force, rel=TOL) == R
 
@@ -37,6 +38,7 @@ def test_simply_supported_center_reaction_moment_0(reaction_index, beam):
 
 
 def test_simply_supported_center_max_moment(beam):
+    # noinspection PyPep8Naming
     M_max = -P * L / 4  # psi, maximum moment
     assert pytest.approx(beam.moment(L / 2), rel=TOL) == M_max
 

@@ -25,6 +25,7 @@ def beam_setup(request):
     yield beam, request.param
 
 
+# noinspection PyPep8Naming
 def test_simply_supported_offset_reaction_force(beam_setup):
     beam, location = beam_setup
 
@@ -43,6 +44,7 @@ def test_simply_supported_offset_reaction_moment_0(reaction_index, beam_setup):
     assert pytest.approx(beam.reactions[reaction_index].moment, abs=1) == 0
 
 
+# noinspection PyPep8Naming
 def test_simply_supported_offset_moment(beam_setup):
     beam, location = beam_setup
 

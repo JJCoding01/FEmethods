@@ -30,6 +30,7 @@ def test_cantilevered_beam_max_moment(beam):
     """fixed beam with concentrated load at free end
     case 13
     """
+    # noinspection PyPep8Naming
     M_max = P * L  # at fixed end
     assert pytest.approx(beam.moment(L), rel=TOL) == M_max
 
