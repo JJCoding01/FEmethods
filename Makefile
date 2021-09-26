@@ -10,17 +10,17 @@ install:
 	python setup.py install
 
 format:
-	black $(PACKAGE_NAME) --line-length=79
+	black $(PACKAGE_NAME)
 	isort $(PACKAGE_NAME)
 
 format-tests:
-	black tests --line-length=79
+	black tests
 	isort tests
 
 format-all:
-	black $(PACKAGE_NAME) --line-length=79
+	black $(PACKAGE_NAME)
 	isort $(PACKAGE_NAME)
-	black tests --line-length=79
+	black tests
 	isort tests
 
 lint:
