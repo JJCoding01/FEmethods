@@ -1,0 +1,13 @@
+[tool.pytest.ini_options]
+addopts = "--maxfail=3 -ra -q"
+testpaths = ["tests"]
+filterwarnings = "ignore::UserWarning:femethods.*:"
+
+[tool.isort]
+force_alphabetical_sort_within_sections = true
+group_by_package = true
+lines_between_sections = 1
+lines_between_types = 1
+multi_line_output = 3
+profile = "black"
+src_paths = ["femethods", "tests", "docs"]
