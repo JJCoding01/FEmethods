@@ -9,6 +9,7 @@ from warnings import warn
 
 import matplotlib.pyplot as plt
 import numpy as np
+
 from scipy.misc import derivative
 
 # local imports
