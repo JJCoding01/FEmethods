@@ -9,6 +9,8 @@ from warnings import warn
 import matplotlib.pyplot as plt
 import numpy as np
 
+from .. import validation
+
 # Importing loads is only used for checking the type. Find a better way to do
 # this without needing to import loads
 from ..loads import Load, PointLoad
@@ -33,10 +35,8 @@ class Base(ABC):
         return self._length
 
     @length.setter
+    @validation.positive
     def length(self, length):
-        if length <= 0:
-            # length must be a positive number
-            raise ValueError("length must be positive!")
         self._length = length
 
     @property
@@ -44,9 +44,8 @@ class Base(ABC):
         return self._E
 
     @E.setter
+    @validation.positive
     def E(self, E):
-        if E <= 0:
-            raise ValueError("Young's modulus must be positive!")
         self._E = E
 
     @property
@@ -54,9 +53,8 @@ class Base(ABC):
         return self._Ixx
 
     @Ixx.setter
+    @validation.positive
     def Ixx(self, Ixx):
-        if Ixx <= 0:
-            raise ValueError("Area moment of inertia must be positive!")
         self._Ixx = Ixx
 
 
