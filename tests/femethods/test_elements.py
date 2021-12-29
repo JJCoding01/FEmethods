@@ -136,15 +136,15 @@ def test_shape_function():
     beam = Beam(100, loads, reactions, 29e6, 345)
 
     assert beam.shape(0).shape == (4,), "unexpected shape of shape functions"
-    n1, n2, n3, n4 = beam.shape(0)
+    n1, _, n3, _ = beam.shape(0)
     assert n1 == 1, "N1(x=0) != 1"
     assert n3 == 0, "N3(x=0) != 0"
     # verify changing the length will not change the end points
-    n1, n2, n3, n4 = beam.shape(0, L=15)
+    n1, _, n3, _ = beam.shape(0, L=15)
     assert n1 == 1, "N1(x=0) != 1"
     assert n3 == 0, "N3(x=0) != 0"
 
-    n1, n2, n3, n4 = beam.shape(100, L=100)  # at x==L
+    n1, _, n3, _ = beam.shape(100, L=100)  # at x==L
     assert n1 == 0, "N1(x=L) != 0"
     assert n3 == 1, "N3(x=L) != 1"
 
