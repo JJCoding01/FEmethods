@@ -9,11 +9,7 @@ There are two types of reactions that are defined.
     * FixedReaction, does not allow any displacement
 
 """
-from typing import Optional, Tuple
-
 from ..core import Force
-
-BOUNDARY_CONDITIONS = Tuple[Optional[int], Optional[int]]
 
 
 class Reaction(Force):
@@ -38,18 +34,18 @@ class Reaction(Force):
 
     name = ""
 
-    def __init__(self, location: float):
+    def __init__(self, location):
         super().__init__(magnitude=None, location=location)
         self.force = None
         self.moment = None
-        self._boundary: BOUNDARY_CONDITIONS = (None, None)
+        self._boundary = (None, None)
 
     @property
-    def boundary(self) -> BOUNDARY_CONDITIONS:
+    def boundary(self):
         return self._boundary
 
     @property
-    def location(self) -> float:
+    def location(self):
         """
         Location of the reaction along the length of the beam
 
@@ -65,7 +61,7 @@ class Reaction(Force):
         return self._location
 
     @location.setter
-    def location(self, location: float) -> None:
+    def location(self, location):
         # The location is overloading the location property in Forces so that
         # the reaction can be invalidated when the location is changed
         if location < 0:
@@ -75,7 +71,7 @@ class Reaction(Force):
         self._location = location
 
     @property
-    def value(self) -> Tuple[Optional[float], Optional[float]]:
+    def value(self):
         """
         Simple tuple of force and moment
 
@@ -84,7 +80,7 @@ class Reaction(Force):
         """
         return self.force, self.moment
 
-    def invalidate(self) -> None:
+    def invalidate(self):
         """Invalidate the reaction values
 
         This will set the force and moment values to :obj:`None`
@@ -94,7 +90,7 @@ class Reaction(Force):
         """
         self.force, self.moment = (None, None)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return (
             f"{self.__class__.__name__}\n"
             f"  Location: {self.location}\n"
@@ -102,10 +98,10 @@ class Reaction(Force):
             f"    Moment: {self.moment}\n"
         )
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         return f"{self.__class__.__name__}(location={self.location})"
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other):
 
         if not isinstance(other, self.__class__):
             return False

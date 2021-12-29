@@ -47,7 +47,7 @@ class Force:
         x = (f1 * x1 + f2 * x2) / (f1 + f2)
         return self.__class__(f1 + f2, x)
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other):
         if not isinstance(other, self.__class__):
             return False
         if self.magnitude is None and other.magnitude is None:

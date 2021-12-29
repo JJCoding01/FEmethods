@@ -1,5 +1,3 @@
-from typing import Optional
-
 from .__base import Load
 
 
@@ -10,5 +8,5 @@ class PointLoad(Load):
 
     name = "point load"
 
-    def __init__(self, magnitude: Optional[float], location: float):
+    def __init__(self, magnitude, location):
         super().__init__(magnitude, location)

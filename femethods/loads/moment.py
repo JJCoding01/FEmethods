@@ -8,5 +8,5 @@ class MomentLoad(Load):
 
     name = "moment load"
 
-    def __init__(self, magnitude: float, location: float):
+    def __init__(self, magnitude, location):
         super().__init__(magnitude, location)

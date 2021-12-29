@@ -1,4 +1,4 @@
-from .__base import BOUNDARY_CONDITIONS, Reaction
+from .__base import Reaction
 
 
 class PinnedReaction(Reaction):
@@ -27,4 +27,4 @@ class PinnedReaction(Reaction):
     def __init__(self, location: float):
         super().__init__(location)
         # limit the vertical displacement but allow rotation
-        self._boundary: BOUNDARY_CONDITIONS = (0, None)
+        self._boundary = (0, None)

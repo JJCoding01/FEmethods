@@ -1,4 +1,4 @@
-from .__base import BOUNDARY_CONDITIONS, Reaction
+from .__base import Reaction
 
 
 class FixedReaction(Reaction):
@@ -25,4 +25,4 @@ class FixedReaction(Reaction):
     def __init__(self, location: float):
         super().__init__(location)
         # do not allow vertical or rotational displacement
-        self._boundary: BOUNDARY_CONDITIONS = (0, 0)
+        self._boundary = (0, 0)
