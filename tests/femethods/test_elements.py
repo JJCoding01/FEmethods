@@ -33,7 +33,7 @@ def test_beam_invalid_lengths(invalid_length, load_centered, reaction_simple):
 
 
 def test_beam_E_default(beam_simply_supported):
-    assert beam_simply_supported.E == 1, "Check default Youngs modulus"
+    assert beam_simply_supported.E == 1, "Check default Young's modulus"
 
 
 @pytest.mark.parametrize("E", [15e6, 30e6])
