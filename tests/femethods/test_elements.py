@@ -235,15 +235,15 @@ def test_solve_method():
     ), "Reaction moment must be equal to the load times the moment arm"
 
 
-def test_invalid_deflection_location():
+@pytest.mark.parametrize("invalid_location", [-4, 30])
+def test_invalid_deflection_location_value(invalid_location):
     beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], 29e6, 345)
-
     with pytest.raises(ValueError):
-        beam.deflection(-4)  # a value less than 0
+        beam.deflection(invalid_location)
 
-    with pytest.raises(ValueError):
-        beam.deflection(beam.length + 5)  # a value greater then the length
 
+def test_invalid_deflection_location_type():
+    beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], 29e6, 345)
     with pytest.raises(TypeError):
         beam.deflection("a string (not a number)")
 
