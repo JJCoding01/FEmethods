@@ -1,5 +1,11 @@
 # pylint: disable=missing-module-docstring
 # pylint: disable=missing-function-docstring
+# pylint: disable=invalid-name
+
+# Note:
+#   There are numerous tests with E and Ixx (upper case) names, invalid-name error
+#   is disabled here to allow engineering conventions to be followed.
+
 
 import pytest
 
@@ -32,10 +38,12 @@ def test_beam_invalid_lengths(invalid_length, load_centered, reaction_simple):
         )
 
 
+# noinspection PyPep8Naming
 def test_beam_E_default(beam_simply_supported):
     assert beam_simply_supported.E == 1, "Check default Young's modulus"
 
 
+# noinspection PyPep8Naming
 @pytest.mark.parametrize("E", [15e6, 30e6])
 def test_beam_E_input(length, reaction_simple, load_centered, E):
     beam = Beam(length=length, reactions=reaction_simple, loads=load_centered, E=E)
@@ -48,28 +56,33 @@ def test_bending_stress_depreciation_warning():
         b.bending_stress(x=5, c=1)
 
 
+# noinspection PyPep8Naming
 @pytest.mark.parametrize("E", [0, -1])
 def test_beam_E_input_errors(length, reaction_simple, load_centered, E):
     with pytest.raises(ValueError):
         Beam(length=length, reactions=reaction_simple, loads=load_centered, E=E)
 
 
+# noinspection PyPep8Naming
 @pytest.mark.parametrize("E", [15e6, 30e6])
 def test_beam_E_update(beam_simply_supported, E):
     beam_simply_supported.E = E
     assert beam_simply_supported.E == E, "updated beam length does not match input"
 
 
+# noinspection PyPep8Naming
 def test_beam_Ixx_default(beam_simply_supported):
     assert beam_simply_supported.Ixx == 1, "Check default moment of inertia"
 
 
+# noinspection PyPep8Naming
 @pytest.mark.parametrize("Ixx", [10, 20])
 def test_beam_Ixx_input(length, reaction_simple, load_centered, Ixx):
     beam = Beam(length=length, reactions=reaction_simple, loads=load_centered, Ixx=Ixx)
     assert beam.Ixx == Ixx, "beam moment of inertia does not match input"
 
 
+# noinspection PyPep8Naming
 @pytest.mark.parametrize("Ixx", [0, -1])
 def test_beam_Ixx_input_errors(length, reaction_simple, load_centered, Ixx):
     with pytest.raises(ValueError):
@@ -81,6 +94,7 @@ def test_beam_Ixx_input_errors(length, reaction_simple, load_centered, Ixx):
         )
 
 
+# noinspection PyPep8Naming
 @pytest.mark.parametrize("Ixx", [10, 20])
 def test_beam_Ixx_update(beam_simply_supported, Ixx):
     beam_simply_supported.Ixx = Ixx
