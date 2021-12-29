@@ -270,25 +270,25 @@ def test_shear_cantilevered_error(location):
 
 def test_plot_diagrams_invalid_value():
     with pytest.raises(ValueError):
-        b = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
-        b.plot(diagrams=("shear", "bad value"))
+        beam = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
+        beam.plot(diagrams=("shear", "bad value"))
 
 
 def test_plot_diagrams_diagrams_label_mismatch():
     with pytest.raises(ValueError):
-        b = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
-        b.plot(diagrams=("shear",), diagram_labels=("shear", "moment"))
+        beam = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
+        beam.plot(diagrams=("shear",), diagram_labels=("shear", "moment"))
 
 
 def test_plot_diagram_labels_without_diagrams():
     with pytest.raises(ValueError):
-        b = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
-        b.plot(diagram_labels=("V, lb", "M, in/lb", "delta, in"))
+        beam = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
+        beam.plot(diagram_labels=("V, lb", "M, in/lb", "delta, in"))
 
 
 def test_plot_default_labels():
-    b = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
-    fig, axes = b.plot()
+    beam = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
+    _, axes = beam.plot()
     x_labels = ("", "", "Beam position, x")
     y_labels = ("shear", "moment", "deflection")
 
@@ -299,10 +299,10 @@ def test_plot_default_labels():
 
 
 def test_plot_custom_labels():
-    b = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
+    beam = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
     diagrams = ("deflection", "deflection", "moment", "shear")
     labels = ("def1", "def2", "M", "V")
-    fig, axes = b.plot(diagrams=diagrams, diagram_labels=labels)
+    _, axes = beam.plot(diagrams=diagrams, diagram_labels=labels)
     assert len(axes) == len(diagrams), "wrong number of sub-plots"
 
     x_labels = ["" for _ in range(len(diagrams) - 1)]
@@ -313,8 +313,8 @@ def test_plot_custom_labels():
 
 
 def test_plot_one_diagram():
-    b = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
-    fig, axes = b.plot(diagrams=("deflection",))
+    beam = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
+    _, axes = beam.plot(diagrams=("deflection",))
     assert len(axes) == 1, "expected length of axes was 1"
     for ax, y_label in zip(axes, ("deflection",)):
         assert ax.get_ylabel() == y_label
