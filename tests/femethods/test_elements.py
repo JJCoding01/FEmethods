@@ -248,21 +248,24 @@ def test_invalid_deflection_location_type():
         beam.deflection("a string (not a number)")
 
 
-def test_shear():
+@pytest.mark.parametrize("location", [0.5, 5.0, 13.0, 20, 24.5])
+def test_shear_cantilevered(location):
     beam = Beam(25, [PointLoad(-1000, 25)], [FixedReaction(0)])
 
-    for x in [0.5, 5, 13, 20, 24.5]:
-        assert (
-            pytest.approx(beam.shear(x), rel=1e-5) == 1000
-        ), f"shear does not equal load at location {x}"
+    assert (
+        pytest.approx(beam.shear(location), rel=1e-5) == 1000
+    ), f"shear does not equal load at location {location}"
 
-    # right now, the derivative function will try to calculate shear outside
-    # of the beam when calculating shear at or near endpoints. Verify that
-    # calculating shear at ends raises a ValueError. It should also raise a
-    # ValueError when the input is outside the beam
-    for x in [-5, 0, 25, 35]:
-        with pytest.raises(ValueError):
-            beam.shear(x)
+
+@pytest.mark.parametrize("location", [-5, 0, 25, 35])
+def test_shear_cantilevered_error(location):
+    # right now, the derivative function will try to calculate shear outside the beam
+    # when calculating shear at or near endpoints. Verify that calculating shear at ends
+    # raises a ValueError. It should also raise a ValueError when the input is outside
+    # the beam
+    beam = Beam(25, [PointLoad(-1000, 25)], [FixedReaction(0)])
+    with pytest.raises(ValueError):
+        beam.shear(location)
 
 
 def test_plot_diagrams_invalid_value():
