@@ -1,3 +1,8 @@
+# pylint: disable=missing-function-docstring
+# pylint: disable=redefined-outer-name
+
+# disable pylint "redefined-outer-name" error as this is triggered by using pytest
+# fixtures
 import pytest
 
 from femethods.elements import Beam
