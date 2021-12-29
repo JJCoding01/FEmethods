@@ -38,9 +38,9 @@ def test_derivative_1_poly(method, x):
 @pytest.mark.parametrize("x", np.linspace(0, 10, 3))
 def test_derivative_1_line(method, x):
     expected_derivative = 5
-    assert derivative(
-        lambda x: 5 * x + 29, x, n=1, method=method
-    ) == pytest.approx(expected_derivative, abs=1e-3)
+    assert derivative(lambda x: 5 * x + 29, x, n=1, method=method) == pytest.approx(
+        expected_derivative, abs=1e-3
+    )
 
 
 @pytest.mark.parametrize("method", ("forward", "backward"))
@@ -65,6 +65,6 @@ def test_derivative_2_poly(method, x):
 @pytest.mark.parametrize("x", np.linspace(0, 10, 3))
 def test_derivative_2_line(method, x):
     expected_derivative = 0
-    assert derivative(
-        lambda x_: 5 * x_ + 29, x, n=2, method=method
-    ) == pytest.approx(expected_derivative, abs=1e-3)
+    assert derivative(lambda x_: 5 * x_ + 29, x, n=2, method=method) == pytest.approx(
+        expected_derivative, abs=1e-3
+    )

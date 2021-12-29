@@ -61,9 +61,7 @@ def test_reaction_invalidated_when_moved():
 )
 def test_reaction_boundary_conditions(reaction, bc):
     r = reaction(0)
-    assert (
-        r.boundary == bc
-    ), "boundary conditions does not match expected value"
+    assert r.boundary == bc, "boundary conditions does not match expected value"
 
 
 @pytest.mark.parametrize("location", (0, 10))

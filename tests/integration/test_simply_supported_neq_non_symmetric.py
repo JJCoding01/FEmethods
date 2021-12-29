@@ -34,9 +34,7 @@ def beam_setup(request, beam_length, load):
 
 # noinspection PyPep8Naming
 @pytest.mark.parametrize("reaction_index", (0, 1))
-def test_simply_supported_neq_non_symmetric_reaction_force(
-    reaction_index, beam_setup
-):
+def test_simply_supported_neq_non_symmetric_reaction_force(reaction_index, beam_setup):
     beam, beam_length, load, P1, P2, a, b = beam_setup
 
     R1 = -(P1 * (beam_length - a) + P2 * b) / beam_length

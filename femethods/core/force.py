@@ -54,9 +54,7 @@ class Force:
             return self.location == other.location
         if self.magnitude is None or other.magnitude is None:
             return False
-        return (
-            self.magnitude * self.location == other.magnitude * other.location
-        )
+        return self.magnitude * self.location == other.magnitude * other.location
 
     def __sub__(self, force2):
         return self + self.__class__(-force2.magnitude, force2.location)

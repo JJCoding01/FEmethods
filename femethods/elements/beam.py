@@ -188,9 +188,7 @@ class Beam(BeamElement):
         documentation.
         """
         return (
-            self.E
-            * self.Ixx
-            * derivative(self.deflection, x, dx=dx, n=3, order=order)
+            self.E * self.Ixx * derivative(self.deflection, x, dx=dx, n=3, order=order)
         )
 
     def bending_stress(self, x, dx=1, c=1):
@@ -226,14 +224,10 @@ class Beam(BeamElement):
             diagram_labels = diagrams
 
         if len(diagrams) != len(diagram_labels):
-            raise ValueError(
-                "length of diagram_labels must match length of diagrams"
-            )
+            raise ValueError("length of diagram_labels must match length of diagrams")
         for diagram in diagrams:
             if diagram not in default_diagrams:
-                raise ValueError(
-                    f"values of diagrams must be in {default_diagrams}"
-                )
+                raise ValueError(f"values of diagrams must be in {default_diagrams}")
         return diagrams, diagram_labels
 
     def plot(

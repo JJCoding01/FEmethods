@@ -23,9 +23,7 @@ def beam_setup(beam_length, load):
 
 
 @pytest.mark.parametrize("reaction_index", [0, 1])
-def test_simply_supported_eq_symmetric_reaction_force(
-    reaction_index, beam_setup
-):
+def test_simply_supported_eq_symmetric_reaction_force(reaction_index, beam_setup):
     beam, beam_length, load, a = beam_setup
 
     # noinspection PyPep8Naming
@@ -34,9 +32,7 @@ def test_simply_supported_eq_symmetric_reaction_force(
 
 
 @pytest.mark.parametrize("reaction_index", [0, 1])
-def test_simply_supported_eq_symmetric_reaction_moment_0(
-    reaction_index, beam_setup
-):
+def test_simply_supported_eq_symmetric_reaction_moment_0(reaction_index, beam_setup):
     beam = beam_setup[0]
     assert pytest.approx(beam.reactions[reaction_index].moment, abs=1) == 0
 
