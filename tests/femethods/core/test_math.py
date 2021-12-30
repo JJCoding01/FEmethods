@@ -33,7 +33,7 @@ def test_derivative_1_sine(method, angle):
 def test_derivative_1_poly(method, x):
     expected_derivative = 2 * x + 5
     assert derivative(
-        lambda x: x ** 2 + 5 * x + 3, x, n=1, method=method
+        lambda x_: x_ ** 2 + 5 * x_ + 3, x, n=1, method=method
     ) == pytest.approx(expected_derivative, abs=0.005)
 
 
@@ -41,7 +41,7 @@ def test_derivative_1_poly(method, x):
 @pytest.mark.parametrize("x", np.linspace(0, 10, 3))
 def test_derivative_1_line(method, x):
     expected_derivative = 5
-    assert derivative(lambda x: 5 * x + 29, x, n=1, method=method) == pytest.approx(
+    assert derivative(lambda x_: 5 * x_ + 29, x, n=1, method=method) == pytest.approx(
         expected_derivative, abs=1e-3
     )
 
@@ -60,7 +60,7 @@ def test_derivative_2_sine(method, angle):
 def test_derivative_2_poly(method, x):
     expected_derivative = 2
     assert derivative(
-        lambda x: x ** 2 + 5 * x + 3, x, n=2, method=method
+        lambda x_: x_ ** 2 + 5 * x_ + 3, x, n=2, method=method
     ) == pytest.approx(expected_derivative, abs=1e-3)
 
 
