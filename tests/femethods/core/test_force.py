@@ -38,7 +38,6 @@ def test_force_update_location():
 )
 def test_force_eq(force):
     base_force = ForceFactory(magnitude=250, location=15)
-
     assert base_force == force
 
 
