@@ -51,10 +51,10 @@ tests-cov:
 	pytest --cov-report html --cov=$(PACKAGE_NAME) tests
 
 tests-unit:
-	pytest tests/$(PACKAGE_NAME)
+	pytest tests/unit
 
 tests-unit-cov:
-	pytest --cov-report html --cov=$(PACKAGE_NAME) tests/$(PACKAGE_NAME)
+	pytest --cov-report html --cov=$(PACKAGE_NAME) tests/unit
 
 tests-int:
 	pytest tests/integration
