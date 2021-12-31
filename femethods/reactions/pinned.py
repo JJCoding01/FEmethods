@@ -25,6 +25,5 @@ class PinnedReaction(Reaction):
     name = "pinned"
 
     def __init__(self, location: float):
-        super().__init__(location)
         # limit the vertical displacement but allow rotation
-        self._boundary = (0, None)
+        super().__init__(location, boundary=(0, None))
