@@ -1,3 +1,4 @@
+# pylint: disable=missing-module-docstring
 # pylint: disable=F
 # flake8: noqa
 
