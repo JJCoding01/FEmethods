@@ -1,7 +1,6 @@
 [tool.pytest.ini_options]
 addopts = "--maxfail=3 -ra -q"
 testpaths = ["tests"]
-filterwarnings = "ignore::UserWarning:femethods.*:"
 
 [tool.isort]
 force_alphabetical_sort_within_sections = true
