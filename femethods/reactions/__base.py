@@ -8,6 +8,8 @@ There are two types of reactions that are defined.
     * PinnedReaction, allows rotational displacement only
     * FixedReaction, does not allow any displacement
 """
+
+from .. import validation
 from ..core import Force
 
 
@@ -56,16 +58,19 @@ class Reaction(Force):
 
         .. note:: The force and moment values are set to :obj:`None` any time
                   the location is set.
+
+        Raises:
+            ValueError: when location is less than 0
+            TypeError: when location is set to any non-numeric value
         """
         return self._location
 
     @location.setter
+    @validation.is_numeric
+    @validation.non_negative
     def location(self, location):
         # The location is overloading the location property in Forces so that
         # the reaction can be invalidated when the location is changed
-        if location < 0:
-            # location cannot be a negative number
-            raise ValueError("location must be positive!")
         self.invalidate()
         self._location = location
 
