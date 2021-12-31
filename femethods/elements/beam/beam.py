@@ -14,7 +14,8 @@ from scipy.misc import derivative
 
 # local imports
 from femethods.core import derivative as comm_derivative
-from ..__base import BeamElement
+
+from .__base import BeamElement
 
 
 # noinspection PyPep8Naming
