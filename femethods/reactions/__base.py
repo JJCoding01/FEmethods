@@ -9,6 +9,9 @@ There are two types of reactions that are defined.
     * FixedReaction, does not allow any displacement
 """
 
+from collections.abc import Iterable
+from warnings import warn
+
 from .. import validation
 from ..core import Force
 
@@ -20,8 +23,13 @@ class Reaction(Force):
     types.
 
     Parameters:
-        location (:obj:`float`): the axial location of the reaction along the
-                                 length of the beam.
+        location: numeric: the axial location of the reaction along the
+           length of the beam.
+        boundary: 0 | None | sequence: boundary conditions of reaction. This may be
+            either 0, None, or a sequence of 0 and/or None. The boundary conditions are
+            defined as:
+                * 0: this degree-of-freedom is fixed
+                * None: this degree-of-freedom is free
 
     .. note:: Any force or moment values that where calculated values are
              invalidated (set to :obj:`None`) any time the location is set.
@@ -31,19 +39,49 @@ class Reaction(Force):
                                      been calculated
         moment (:obj:`float | None`): The moment of the reaction after it has
                                       been calculated
+
+    Warns:
+        UserWarning: when the boundary condition does not fix any degrees of freedom
+            (ie, all boundary conditions are None)
     """
 
     name = ""
 
-    def __init__(self, location):
+    def __init__(self, location, boundary=(None, None)):
         super().__init__(magnitude=None, location=location)
         self.force = None
         self.moment = None
-        self._boundary = (None, None)
+        self.boundary = boundary
 
     @property
     def boundary(self):
+        """
+        boundary conditions for the reaction
+
+        The boundary conditions are a tuple where each degree of freedom is free to move
+        unless the boundary has a 0 in that position
+        """
+        if len(self._boundary) == 1:
+            return self._boundary[0]
         return self._boundary
+
+    @boundary.setter
+    def boundary(self, value):
+
+        if not isinstance(value, Iterable):
+            value = [value]
+
+        for dof in value:
+            if dof not in (0, None):
+                raise ValueError("invalid boundary condition, must be either None or 0")
+
+        if all(map(lambda e: e is None, value)):
+            # all boundary conditions for reaction are None
+            warn(
+                "Reaction with no restrictions does not effect results!",
+                UserWarning,
+            )
+        self._boundary = value
 
     @property
     def location(self):
