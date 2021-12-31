@@ -1,5 +1,6 @@
 [run]
     branch = True
+    dynamic_context = test_function
 
 [report]
     # Regexes for lines to exclude from consideration
@@ -15,3 +16,4 @@
 
 [html]
     directory = htmlcov
+    show_contexts = True
