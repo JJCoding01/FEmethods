@@ -1,5 +1,5 @@
 """
-The reactions module defines different reaction classes
+The Reaction's module defines different reaction classes
 
 A reaction is required to support an element to resist any input forces.
 
@@ -7,7 +7,6 @@ There are two types of reactions that are defined.
 
     * PinnedReaction, allows rotational displacement only
     * FixedReaction, does not allow any displacement
-
 """
 from ..core import Force
 
