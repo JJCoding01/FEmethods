@@ -269,7 +269,8 @@ good-names-rgxs=
             ^_?E,
             ^_?K,
             ^_?k,
-            ^p\d
+            ^p\d,
+            ^r\d
 
 # Include a hint for the correct naming format with invalid-name.
 include-naming-hint=no
