@@ -45,7 +45,7 @@ class Reaction(Force):
             (ie, all boundary conditions are None)
     """
 
-    name = ""
+    name = "reaction"
 
     def __init__(self, location, boundary=(None, None)):
         super().__init__(magnitude=None, location=location)
