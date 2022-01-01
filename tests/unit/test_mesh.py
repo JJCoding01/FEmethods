@@ -1,3 +1,6 @@
+# pylint: disable=missing-function-docstring
+# pylint: disable=redefined-outer-name
+
 import pytest
 
 from femethods.loads import PointLoad
