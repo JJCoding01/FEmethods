@@ -27,11 +27,15 @@ class BeamElement(Element):
         super().__init__(length, E, Ixx)
         self.reactions = reactions
         self.loads = loads  # note loads are set after reactions
-        self.mesh = Mesh(length, loads, reactions, 2)
+        self.mesh = self.remesh()
 
     def remesh(self):
-        self.mesh = Mesh(self.length, self.loads, self.reactions, 2)
         self.invalidate()
+
+        locations = [r.location for r in self.reactions]
+        locations.extend([load.location for load in self.loads])
+        self.mesh = Mesh(self.length, locations, 2)
+        return self.mesh
 
     @property
     def node_deflections(self):
@@ -44,7 +48,7 @@ class BeamElement(Element):
         # iterate over reactions and apply them to the boundary conditions
         # based on the reaction type.
         assert self.reactions is not None
-        bc = [(None, None) for _ in range(len(self.mesh.nodes))]
+        bc = [(None, None) for _ in self.mesh.nodes]
         for r in self.reactions:
             assert r is not None
             i = self.mesh.nodes.index(r.location)
@@ -175,11 +179,11 @@ class BeamElement(Element):
         # elements, calculate a local stiffness matrix, and add it to the
         # global stiffness matrix.
         kg = np.zeros((self.mesh.dof, self.mesh.dof))
-        for e in range(self.mesh.num_elements):
+        for i, element_length in enumerate(self.mesh.lengths):
             # iterate over all the elements and add the local stiffness matrix
             # to the global stiffness matrix at the proper index
-            k = self.stiffness(self.mesh.lengths[e])  # local stiffness matrix
-            i1, i2 = (e * 2, e * 2 + 4)  # global slicing index
+            k = self.stiffness(element_length)  # local stiffness matrix
+            i1, i2 = (i * 2, i * 2 + 4)  # global slicing index
             kg[i1:i2, i1:i2] = kg[i1:i2, i1:i2] + k  # current element
         self._K = kg
 
