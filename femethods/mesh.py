@@ -1,6 +1,4 @@
-"""
-Mesh module that will define the mesh.
-"""
+from . import validation
 
 
 class Mesh:
@@ -8,9 +6,8 @@ class Mesh:
     Mesh to handle degrees-of-freedom (dof) and element lengths
 
     Parameters:
-        length: float: overall length of beam
-        loads: list: loads
-        reactions: list: reactions
+        length: float: overall length of structure
+        locations: sequence: sequence of locations of nodes (loads and reactions)
         node_dof: int: degrees-of-freedom for a single node
 
     .. versionchanged:: 0.1.8a1 renamed :obj:`dof` parameter to :obj:`node_dof`
@@ -19,37 +16,45 @@ class Mesh:
     def __init__(
         self,
         length,
-        loads,
-        reactions,
+        locations,
         node_dof,
     ):
-        self.__nodes = self.__get_nodes(length, loads, reactions)
-        self.__lengths = self.__get_lengths()
-        self.__num_elements = len(self.lengths)
+        self.length = length
+        self.locations = locations
         self.node_dof = node_dof
+
+        self.__lengths = None  # this will be lazy calculated on-demand
 
     @property
     def node_dof(self):
-        """degrees of freedom for a single node"""
+        """
+        degrees of freedom for a single node
+
+        Raises:
+            TypeError: when not a number
+            ValueError: when not a positive integer
+        """
         return self.__node_dof
 
     @node_dof.setter
+    @validation.is_numeric
+    @validation.positive
     def node_dof(self, value):
-
         if value != int(value):
             raise ValueError(f"node_dof must be an integer, not {value}")
-
-        if value <= 0:
-            raise ValueError(
-                f"degrees of freedom must be a positive integer, not {value}"
-            )
-
         self.__node_dof = value
 
     @property
     def nodes(self):
-        """location of nodes relative to base"""
-        return self.__nodes
+        """location of nodes"""
+        # create set of locations of each load and reaction, and the ends of the beam.
+        # ensure first node is always at zero (0) (start of beam)
+        nodes__ = {0}
+        for location in self.locations:
+            nodes__.add(location)
+
+        nodes__.add(self.length)  # ensure last node is at the end of the beam
+        return sorted(nodes__)
 
     @property
     def dof(self):
@@ -69,40 +74,20 @@ class Mesh:
         Returns:
             :obj:`list`: Read-only. List of lengths of local mesh elements
         """
-        return self.__lengths
+        if self.__lengths is not None:  # pragma: no cover
+            return self.__lengths
 
-    @property
-    def num_elements(self):
-        """
-        Number of mesh elements
-
-        Returns:
-            :obj:`int`: Read-only. Number of elements in mesh
-        """
-        return self.__num_elements
-
-    def __get_lengths(self):
+        # the lengths have not been calculated yet.
         # Calculate the lengths of each element
-        lengths = []
+        self.__lengths = []
         for k in range(len(self.nodes) - 1):
-            lengths.append(self.nodes[k + 1] - self.nodes[k])
-        return lengths
-
-    @staticmethod
-    def __get_nodes(length, loads, reactions):
-        # create set of locations of each load and reaction, and the ends of the beam.
-        # ensure first node is always at zero (0) (start of beam)
-        nodes = {0}
-        for item in loads + reactions:
-            nodes.add(item.location)
-
-        nodes.add(length)  # ensure last node is at the end of the beam
-        return sorted(nodes)
+            self.__lengths.append(self.nodes[k + 1] - self.nodes[k])
+        return self.__lengths
 
     def __str__(self):
         mesh_string = (
             "MESH PARAMETERS\n"
-            f"Number of elements: {self.num_elements}\n"
+            f"Number of elements: {len(self.lengths)}\n"
             f"Node locations: {self.nodes}\n"
             f"Element Lengths: {self.lengths}\n"
             f"Total degrees of freedom: {self.dof}\n"
