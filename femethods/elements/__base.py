@@ -27,27 +27,62 @@ class Base(ABC):
 
     @property
     def length(self):
+        """
+        length of structure or element
+
+        The length must be given in units that are compatible with Young's modulus (E)
+        and the area moment of inertia (Ixx).
+
+        .. note:: this is not the length between nodes, this is the overall length
+
+        Raises:
+            TypeError: when non-numeric
+            ValueError: when value is less than or equal to 0, (non-positive)
+        """
         return self._length
 
     @length.setter
+    @validation.is_numeric
     @validation.positive
     def length(self, length):
         self._length = length
 
     @property
     def E(self):
+        """
+        Young's modulus of elasticity of structure or element
+
+        Young's modulus must be given in units that are compatible with the length (`length`)
+        and the area moment of inertia (`Ixx`).
+
+        Raises:
+            TypeError: when non-numeric
+            ValueError: when value is less than or equal to 0, (non-positive)
+        """
         return self._E
 
     @E.setter
+    @validation.is_numeric
     @validation.positive
     def E(self, E):
         self._E = E
 
     @property
     def Ixx(self):
+        """
+        Area moment of inertia in the key direction for the structure or element
+
+        The area moment of inertia must be given in units that are compatible with
+        Young's modulus (E) and the length.
+
+        Raises:
+            TypeError: when non-numeric
+            ValueError: when value is less than or equal to 0, (non-positive)
+        """
         return self._Ixx
 
     @Ixx.setter
+    @validation.is_numeric
     @validation.positive
     def Ixx(self, Ixx):
         self._Ixx = Ixx
