@@ -17,8 +17,21 @@ from ..reactions import Reaction
 # for variables, such as E for Young's modulus and I for the polar moment of
 # inertia
 # noinspection PyPep8Naming
-class Base(ABC):
-    """base object to be used as base for both FEM analysis"""
+class Properties:
+    """
+    Base class for handling geometric and material properties
+
+    Parameters:
+        length: numeric: length of overall structure
+        E: numeric: optional, Young's modulus of elasticity of structure. Must be in
+            compatible units to Ixx
+        Ixx: numeric: optional, area moment of inertia. Must be in compatible units to
+            Young's modulus
+
+    Raises:
+        TypeError: when length, E, or Ixx is not numeric
+        ValueError: when length, E, or Ixx is not positive
+    """
 
     def __init__(self, length, E=1, Ixx=1):
         self.length = length
@@ -92,7 +105,7 @@ class Base(ABC):
 # for variables, such as E for Young's modulus and I for the polar moment of
 # inertia
 # noinspection PyPep8Naming
-class Element(Base, ABC):
+class Element(Properties, ABC):
     """General element that will be inherited from for specific elements"""
 
     def __init__(self, length, E=1, Ixx=1):
