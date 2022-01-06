@@ -176,6 +176,9 @@ class BeamElement(Element):
         return self.E * self.Ixx / L ** 3 * k
 
     def stiffness_global(self):
+        """
+        Global stiffness matrix of entire structure
+        """
         # Initialize the global stiffness matrix, then iterate over the
         # elements, calculate a local stiffness matrix, and add it to the
         # global stiffness matrix.
