@@ -157,12 +157,13 @@ class BeamElement(Element):
         plt.show()
 
     def stiffness(self, L):
-        """return local stiffness matrix, k, as numpy array evaluated with beam
-        element length L
         """
+        local stiffness matrix as numpy array
 
-        E = self.E
-        Ixx = self.Ixx
+        Parameters:
+            L: numeric: optional: length of element.
+                Defaults to None (which means use the overall length of the structure)
+        """
 
         k = np.array(
             [
@@ -172,7 +173,7 @@ class BeamElement(Element):
                 [6 * L, 2 * L ** 2, -6 * L, 4 * L ** 2],
             ]
         )
-        return E * Ixx / L ** 3 * k
+        return self.E * self.Ixx / L ** 3 * k
 
     def stiffness_global(self):
         # Initialize the global stiffness matrix, then iterate over the
