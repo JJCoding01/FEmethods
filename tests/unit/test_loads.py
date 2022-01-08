@@ -3,7 +3,6 @@
 import numpy as np
 import pytest
 
-from femethods.loads import MomentLoad, PointLoad
 from tests.factories import LoadFactory, MomentLoadFactory, PointLoadFactory
 
 
@@ -54,11 +53,10 @@ def test_load_index_invalid(index):
 
 
 @pytest.mark.parametrize(
-    "load, name", ((PointLoad, "point load"), (MomentLoad, "moment load"))
+    "load, name", ((PointLoadFactory, "point load"), (MomentLoadFactory, "moment load"))
 )
 def test_load_name(load, name):
-    p = load(0, 0)
-    assert p.name == name
+    assert load().name == name
 
 
 @pytest.mark.parametrize("magnitude", [5, 75, 100])
