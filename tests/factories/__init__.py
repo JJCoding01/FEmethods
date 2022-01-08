@@ -3,5 +3,6 @@
 
 from .core import ForceFactory
 from .elements import PropertyFactory
+from .loads import LoadFactory
 from .mesh import MeshFactory
 from .reactions import ReactionFactory
