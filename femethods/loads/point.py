@@ -9,4 +9,4 @@ class PointLoad(Load):
     name = "point load"
 
     def __init__(self, magnitude, location):
-        super().__init__(magnitude, location)
+        super().__init__(magnitude, location, fm_factor=(1, 0))
