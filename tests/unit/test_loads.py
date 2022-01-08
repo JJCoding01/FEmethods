@@ -1,3 +1,5 @@
+# pylint: disable=missing-function-docstring
+
 import pytest
 
 from femethods.loads import MomentLoad, PointLoad
