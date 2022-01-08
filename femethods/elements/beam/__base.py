@@ -1,9 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Importing loads is only used for checking the type. Find a better way to do
-# this without needing to import loads
-from femethods.loads import PointLoad
 from femethods.mesh import Mesh
 
 from ..__base import Element
@@ -72,14 +69,11 @@ class BeamElement(Element):
         # conditions. Start by initializing a numpy array to zero loads, then
         # iterate over the loads and add them to the appropriate index based on
         # the load type (force or moment)
-        # noinspection PyUnresolvedReferences
         p = np.zeros((self.mesh.dof, 1))
         for ld in self.loads:
             i = self.mesh.nodes.index(ld.location)
-            if isinstance(ld, PointLoad):
-                p[i * 2][0] = ld.magnitude  # input force
-            else:
-                p[i * 2 + 1][0] = ld.magnitude  # input moment
+            p[i * 2][0] = ld[0]  # input force
+            p[i * 2 + 1][0] = ld[1]  # input moment
 
         # Solve the global system of equations {p} = [K]*{d} for {d}
         # save the deflection vector for the beam, so the analysis can be
