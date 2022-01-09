@@ -4,7 +4,7 @@ Examples for FEMethods showing how to use the module
 """
 
 from femethods.elements import Beam
-from femethods.loads import PointLoad
+from femethods.loads import PointLoad, MomentLoad
 from femethods.reactions import FixedReaction, PinnedReaction
 
 
@@ -53,6 +53,35 @@ def example_2():
     print(b)
 
 
+def example_3():
+    """
+    Cantilevered Beam with Fixed Support and Force and Moment at end
+    """
+    print("=" * 79)
+    print("Example 3")
+    print(
+        "Show an example with a cantilevered beam with a fixed support and "
+        "point load and moment load at the end\n"
+    )
+
+    beam_len = 10
+    # Note that both the reaction and load are both lists. They must always be
+    # given to Beam as a list,
+    r = [FixedReaction(0)]  # define reactions as list
+
+    p = [PointLoad(-2, beam_len), MomentLoad(-2, beam_len)]  # define loads as list
+
+    # since the force and moment are acting at the same location, it can also be applied
+    # using the base Load and defining the fm_factor, as shown below. Defining the loads
+    # this way will give the same results
+    # from femethods.loads import Load
+    # p = [Load(magnitude=1, location=beam_len, fm_factor=(-2, -2))]
+
+    b = Beam(beam_len, loads=p, reactions=r, E=29e6, Ixx=125)
+    print(b)
+
+
 if __name__ == "__main__":
     example_1()
     example_2()
+    example_3()
