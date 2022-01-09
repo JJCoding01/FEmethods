@@ -338,6 +338,11 @@ class Beam(BeamElement):
 
     def __str__(self):
 
+        # TODO: update string representation of Load
+        #   since a Load may have both force and moment components, which are scaled by
+        #   the magnitude, they both must be accounted for when printing. Currently,
+        #   only the standard specially loads are represented properly.
+
         L = ""
         for load in self.loads:
             L += "Type: {}\n".format(load.name)
