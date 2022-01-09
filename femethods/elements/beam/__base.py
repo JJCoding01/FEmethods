@@ -72,8 +72,11 @@ class BeamElement(Element):
         p = np.zeros((self.mesh.dof, 1))
         for ld in self.loads:
             i = self.mesh.nodes.index(ld.location)
-            p[i * 2][0] = ld[0]  # input force
-            p[i * 2 + 1][0] = ld[1]  # input moment
+            # add force and moment components of load to respective node. Load
+            # components must be added and not simply assigned to account for the
+            # special case where multiple loads are applied to the same node (location)
+            p[i * 2][0] += ld[0]  # input force
+            p[i * 2 + 1][0] += ld[1]  # input moment
 
         # Solve the global system of equations {p} = [K]*{d} for {d}
         # save the deflection vector for the beam, so the analysis can be
