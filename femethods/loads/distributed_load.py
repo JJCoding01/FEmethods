@@ -189,7 +189,6 @@ class DistributedLoad:
         if not np.all(np.diff(nodes) >= 0):
             # the nodes are not sorted in ascending order!
             raise ValueError("invalid nodes! They must be in ascending order!")
-
         if self.start not in nodes or self.stop not in nodes:
             raise ValueError("invalid nodes and distributed loads! Incompatible mesh.")
 
