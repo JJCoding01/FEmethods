@@ -122,6 +122,9 @@ class DistributedLoad:
         magnitudes = []
         for node, length in zip(nodes, lengths):
             if self.start <= node <= self.stop:
+                # ignore type check for self.func:
+                # Union[function, LowLevelCallable], got Callable instead
+                # noinspection PyTypeChecker
                 mag = integrate.quad(
                     self.func, a=node, b=node + length, args=self.args
                 )[0]
@@ -178,6 +181,7 @@ class DistributedLoad:
                 page 9 of this PDF defines the equation used to calculate the centroid
                 https://web.iit.edu/sites/web/files/departments/academic-affairs/academic-resource-center/pdfs/Distributed_Loading.pdf
             """
+            # pylint: disable=invalid-name
             wx = integrate.quad(lambda x: func(x, *args) * x, a, b)[0]
             w = integrate.quad(lambda x: func(x, *args), a, b)[0]
             return wx / w
