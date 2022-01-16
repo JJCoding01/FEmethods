@@ -1,4 +1,5 @@
 # pylint: disable=missing-function-docstring
+import numpy as np
 import pytest
 
 from tests.factories import DistributedLoadFactory
@@ -100,3 +101,110 @@ def test_distributed_load_magnitude(func, args, x):
     dload = DistributedLoadFactory(func=func, args=args)
     expected_magnitude = func(x, *args)
     assert expected_magnitude == dload.magnitude(x)
+
+
+@pytest.mark.parametrize("n", (2, 4, 16))
+@pytest.mark.parametrize("a", (0, 4, 6))
+@pytest.mark.parametrize("b", (8, 16, 20))
+@pytest.mark.parametrize("w", (100, 250))
+def test_distributed_load_equiv_mag_multi_node(n, a, b, w):
+
+    dload = DistributedLoadFactory(func=lambda x, *args: w, start=a, stop=b)
+
+    # get an array of nodes that includes 0, a, b, 20, where 0 and 20 are the start and
+    # end of the beam, and a and b are the start and end of the distributed load
+    nodes = np.linspace(a, b, num=n, endpoint=True)
+    nodes = np.append(nodes, [0, 20])
+    nodes = np.unique(nodes)
+    nodes.sort()
+
+    # note the verbose conditional is to simulate an exclusive or
+    if (a == 0 and not b == 20) or (not a == 0 and b == 20):
+        # case where one node (start or ending) is at either the start or end of beam
+        assert len(nodes) == n + 1
+    elif a == 0 and b == 20:
+        # case where load is applied to entire beam
+        assert len(nodes) == n
+    else:
+        # case where both the start and end of the beam are not loaded
+        assert len(nodes) == n + 2
+
+    # get the locations of the expected loads. They are going to be midway between each
+    # node where the load is applied
+    expected = []
+    lengths = np.diff(nodes)
+    for node, length in zip(nodes[:-1], lengths):
+        if a <= node <= b:
+            expected.append(w * length)
+        if node + length == b:
+            break
+    actual = dload.equivalent_magnitude(nodes)
+    if len(expected) == 1:
+        actual = [actual]
+    assert np.allclose(actual, expected, atol=1.0e-8)
+
+
+@pytest.mark.parametrize("n", (2, 4, 16))
+@pytest.mark.parametrize("a", (0, 4, 6))
+@pytest.mark.parametrize("b", (8, 16, 20))
+def test_distributed_load_centroid_loc_multi_node(n, a, b):
+    dload = DistributedLoadFactory(func=lambda x, *args: 100, start=a, stop=b)
+
+    # get an array of nodes that includes 0, a, b, 20, where 0 and 20 are the start and
+    # end of the beam, and a and b are the start and end of the distributed load
+    nodes = np.linspace(a, b, num=n, endpoint=True)
+    nodes = np.append(nodes, [0, 20])
+    nodes = np.unique(nodes)
+    nodes.sort()
+
+    # note the verbose conditional is to simulate an exclusive or
+    if (a == 0 and not b == 20) or (not a == 0 and b == 20):
+        # case where one node (start or ending) is at either the start or end of beam
+        assert len(nodes) == n + 1
+    elif a == 0 and b == 20:
+        # case where load is applied to entire beam
+        assert len(nodes) == n
+    else:
+        # case where both the start and end of the beam are not loaded
+        assert len(nodes) == n + 2
+
+    # get the locations of the expected loads. They are going to be midway between each
+    # node where the load is applied
+    expected = []
+    lengths = np.diff(nodes)
+    for node, length in zip(nodes[:-1], lengths):
+        if a <= node <= b:
+            expected.append(node + length / 2)
+        if node + length == b:
+            break
+    assert np.allclose(dload.centroid_location(nodes), expected, atol=1.0e-8)
+
+
+@pytest.mark.parametrize("nodes", ((0, 12), (0, 5, 9, 11), (1, 10), (1, 5, 10)))
+def test_distributed_load_invalid_mesh_magnitude(nodes):
+    dload = DistributedLoadFactory(start=0, stop=10)
+
+    with pytest.raises(ValueError):
+        dload.equivalent_magnitude(nodes)
+
+
+@pytest.mark.parametrize("nodes", ((0, 12), (0, 5, 9, 11), (1, 10), (1, 5, 10)))
+def test_distributed_load_invalid_mesh_location(nodes):
+    dload = DistributedLoadFactory(start=0, stop=10)
+
+    with pytest.raises(ValueError):
+        dload.centroid_location(nodes)
+
+
+def test_distributed_load_invalid_mesh_order_magnitude():
+    dload = DistributedLoadFactory(start=0, stop=10)
+
+    with pytest.raises(ValueError):
+        dload.equivalent_magnitude((10, 0))
+
+
+def test_distributed_load_invalid_mesh_order_location():
+    dload = DistributedLoadFactory(start=0, stop=10)
+
+    with pytest.raises(ValueError):
+        dload.centroid_location((10, 0))
