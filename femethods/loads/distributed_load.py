@@ -4,8 +4,6 @@ Module to define different loads
 
 from femethods import validation
 
-from .point import PointLoad
-
 
 class DistributedLoad:
     """
