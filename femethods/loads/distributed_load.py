@@ -13,10 +13,12 @@ class DistributedLoad:
     Base class for all distributed loads
 
     Parameters:
-        w: func: function defining the magnitude of the load distribution
+        func: function defining the magnitude of the load distribution.
+            Must be a function of x.
         start: numeric: numeric starting position of load distribution. Defaults to 0.
             Must be less than stop.
         stop: numeric: numeric ending position of load distribution. Defaults None.
+        args: tuple: additional arguments to func
 
     Raises:
         TypeError: if start or stop are not numeric
