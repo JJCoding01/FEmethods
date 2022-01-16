@@ -1,6 +1,9 @@
 """
 Module to define different loads
 """
+import numpy as np
+
+from scipy import integrate
 
 from femethods import validation
 
@@ -91,3 +94,123 @@ class DistributedLoad:
     def magnitude(self, x):
         """force magnitude at x"""
         return self.func(x, *self.args)
+
+    def __equivalent_magnitudes(self, nodes):
+        """
+        magnitude of distributed load acting on each element
+
+        Parameters:
+            nodes: sequence: locations of nodes. Must include the start and stop
+                location of the load
+
+        Raises:
+            ValueError: when nodes parameter does not include either start or stop
+                locations of the load
+            ValueError: when nodes are not sorted in ascending order
+        """
+
+        if not np.all(np.diff(nodes) >= 0):
+            # the nodes are not sorted in ascending order!
+            raise ValueError("invalid nodes! They must be in ascending order!")
+        if self.start not in nodes or self.stop not in nodes:
+            raise ValueError("invalid nodes and distributed loads! Incompatible mesh.")
+
+        # get the lengths of each element
+        lengths = np.diff(nodes)
+        magnitudes = []
+        for node, length in zip(nodes, lengths):
+            if self.start <= node <= self.stop:
+                mag = integrate.quad(
+                    self.func, a=node, b=node + length, args=self.args
+                )[0]
+                magnitudes.append(mag)
+                if self.stop == node + length:
+                    # the distributed loads stops at the end of the current element.
+                    # No further analysis is required
+                    break
+
+        return magnitudes
+
+    def equivalent_magnitude(self, nodes):
+        """
+        Magnitude of total force
+
+        The magnitude is equal to the integral of the force function from start to
+        stop
+        """
+        # return integrate.quad(self.func, a=self.start, b=self.stop, args=self.args)[0]
+        magnitude = self.__equivalent_magnitudes(nodes)
+        if len(magnitude) == 1:
+            return magnitude[0]
+        return magnitude
+
+    def __centroid_locations(self, nodes):
+        """
+        locations of centroid of distributed load acting on each element
+
+        There is a location for each element that has the load acting on it. The
+        location(s) returned are the centroid of the load acting over each element.
+
+        Parameters:
+            nodes: sequence: locations of nodes. Must include the start and stop
+                location of the load
+
+        Raises:
+            ValueError: when nodes parameter does not include either start or stop
+                locations of the load
+            ValueError: when nodes are not sorted in ascending order
+        """
+
+        def equiv_fun(a, b, func, *args):
+            """
+            function to calculate centroid of load between a and b
+
+            Parameters:
+                a: float: starting location for integration (current node)
+                b: float: ending location for integration (next node)
+                func: callable: function that defines the load magnitude as a function
+                    of position
+                args: tuple: optional arguments for func
+
+            See Also:
+                page 9 of this PDF defines the equation used to calculate the centroid
+                https://web.iit.edu/sites/web/files/departments/academic-affairs/academic-resource-center/pdfs/Distributed_Loading.pdf
+            """
+            wx = integrate.quad(lambda x: func(x, *args) * x, a, b)[0]
+            w = integrate.quad(lambda x: func(x, *args), a, b)[0]
+            return wx / w
+
+        if not np.all(np.diff(nodes) >= 0):
+            # the nodes are not sorted in ascending order!
+            raise ValueError("invalid nodes! They must be in ascending order!")
+
+        if self.start not in nodes or self.stop not in nodes:
+            raise ValueError("invalid nodes and distributed loads! Incompatible mesh.")
+
+        lengths = np.diff(nodes)  # lengths of all elements
+        locations = []
+        for node, length in zip(nodes, lengths):
+            if self.start <= node <= self.stop:
+                # current node has the distributed load applied to it
+
+                locations.append(equiv_fun(node, node + length, self.func, self.args))
+                if node + length == self.stop:
+                    # the distributed loads stops at the end of the current element.
+                    # No further analysis is required
+                    break
+
+        return locations
+
+    def centroid_location(self, nodes):
+        """
+        locations along beam that define centroid of the distributed load for each element
+
+        Parameters:
+            nodes: np.array: locations of nodes in the mesh. There must be a node that
+                corresponds to the start and stop locations of the distributed load,
+                otherwise an exception is raised.
+        """
+        locations = self.__centroid_locations(nodes)
+        if len(locations) == 1:
+            return locations[0]
+        return locations
