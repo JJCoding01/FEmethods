@@ -88,15 +88,6 @@ class DistributedLoad:
             raise ValueError(f"stop must be greater than start ({self.start})")
         self.__stop = value
 
-    @property
-    def args(self):
-        """optional arguments to pass to func to get the magnitude"""
-        return self.__args
-
-    @args.setter
-    def args(self, value):
-        self.__args = value
-
     def magnitude(self, x):
         """force magnitude at x"""
         return self.func(x, *self.args)
