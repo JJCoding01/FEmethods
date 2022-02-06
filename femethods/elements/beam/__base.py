@@ -3,6 +3,7 @@ import numpy as np
 
 from femethods.mesh import Mesh
 
+from ...loads import DistributedLoad
 from ..__base import Element
 
 
@@ -26,11 +27,35 @@ class BeamElement(Element):
         self.loads = loads  # note loads are set after reactions
         self.mesh = self.remesh()
 
+    @property
+    def loads(self):
+        """loads on system"""
+        return self.__loads
+
+    @loads.setter
+    def loads(self, value):
+        # basic loads
+
+        self.__loads = value
+
+        # update equivalent_loads
+        self.__equivalent_loads = []
+        for load in self.__loads:
+            if isinstance(load, DistributedLoad):
+                self.__equivalent_loads.extend(load.equivalent_loads(self.mesh.nodes))
+            else:
+                self.__equivalent_loads.append(load)
+
+    @property
+    def equivalent_loads(self):
+        """load that are equivalent to distributed loads"""
+        return self.__equivalent_loads
+
     def remesh(self):
         self.invalidate()
 
         locations = [r.location for r in self.reactions]
-        locations.extend([load.location for load in self.loads])
+        locations.extend([load.location for load in self.equivalent_loads])
         self.mesh = Mesh(self.length, locations, 2)
         return self.mesh
 
