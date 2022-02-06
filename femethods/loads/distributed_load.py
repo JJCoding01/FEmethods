@@ -284,21 +284,107 @@ class DistributedLoad:
         """
         raise NotImplementedError
 
-    def __p0(self, p, a, b, L):
-        """equivalent load at node 0"""
-        return (p * b ** 2 * (L + 2 * a)) / L ** 3
+    @staticmethod
+    def __p0(p, a, b, l):
+        """
+        equivalent point load at node 0
 
-    def __m0(self, p, a, b, L):
-        """equivalent moment at node 0"""
-        return -p * a * b ** 2 / L ** 2
+        Note that on its own, this load is not equivalent to the distributed load! It
+        is only when p0, m0, p1, and m1 are used together as a system that they are
+        equivalent!
 
-    def __p1(self, p, a, b, L):
-        """equivalent load at node 1"""
-        return p * a ** 2 * (L + 2 * b) / L ** 3
+        Parameters:
+            p: float: equivalent magnitude of distributed load acting on element
+            a: float: distance from start of node to load centroid
+            b: float: distance from centroid to second node of element
+            l: float: length of element
 
-    def __m1(self, p, a, b, L):
-        """equivalent moment at node 1"""
-        return p * a ** 2 * b / L ** 2
+        Returns:
+            float: magnitude of force acting on node 0 (left side)
+
+        See Also:
+             :class:`__m0`: for moment load at node 0
+             :class:`__p1`: for point load at node 1
+             :class:`__m1`: for moment load at node 1
+        """
+        return (p * b ** 2 * (l + 2 * a)) / l ** 3
+
+    @staticmethod
+    def __m0(p, a, b, l):
+        """
+        equivalent moment load at node 0
+
+        Note that on its own, this load is not equivalent to the distributed load! It
+        is only when p0, m0, p1, and m1 are used together as a system that they are
+        equivalent!
+
+        Note this is the opposite direction as :class:`__m1`.
+
+        Parameters:
+            p: float: equivalent magnitude of distributed load acting on element
+            a: float: distance from start of node to load centroid
+            b: float: distance from centroid to second node of element
+            l: float: length of element
+
+        Returns:
+            float: magnitude of moment acting on node 0 (left side)
+
+        See Also:
+             :class:`__p0`: for point load at node 0
+             :class:`__p1`: for point load at node 1
+             :class:`__m1`: for moment load at node 1
+        """
+        return -p * a * b ** 2 / l ** 2
+
+    @staticmethod
+    def __p1(p, a, b, l):
+        """
+        equivalent moment load at node 1
+
+        Note that on its own, this load is not equivalent to the distributed load! It
+        is only when p0, m0, p1, and m1 are used together as a system that they are
+        equivalent!
+
+        Parameters:
+            p: float: equivalent magnitude of distributed load acting on element
+            a: float: distance from start of node to load centroid
+            b: float: distance from centroid to second node of element
+            l: float: length of element
+
+        Returns:
+            float: magnitude of force acting on node 1 (right side)
+
+        See Also:
+             :class:`__p0`: for point load at node 0
+             :class:`__m0`: for moment load at node 0
+             :class:`__m1`: for moment load at node 1
+        """
+        return p * a ** 2 * (l + 2 * b) / l ** 3
+
+    @staticmethod
+    def __m1(p, a, b, l):
+        """
+        equivalent moment load at node 1
+
+        Note that on its own, this load is not equivalent to the distributed load! It
+        is only when p0, m0, p1, and m1 are used together as a system that they are
+        equivalent!
+
+        Parameters:
+            p: float: equivalent magnitude of distributed load acting on element
+            a: float: distance from start of node to load centroid
+            b: float: distance from centroid to second node of element
+            l: float: length of element
+
+        Returns:
+            float: magnitude of moment acting on node 1 (right side)
+
+        See Also:
+             :class:`__p0`: for point load at node 0
+             :class:`__m0`: for moment load at node 0
+             :class:`__p1`: for point load at node 1
+        """
+        return p * a ** 2 * b / l ** 2
 
     def equiv(self, nodes):
         """
