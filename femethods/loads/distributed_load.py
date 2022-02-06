@@ -390,6 +390,26 @@ class DistributedLoad:
         """
         return p * a ** 2 * b / l ** 2
 
+    @staticmethod
+    def centroid(a, b_, func, *args):
+        """
+        return the centroid of an arbitrary function between a and b
+
+        Parameters:
+            a: float: starting location
+            b_: float: ending location
+            func: callable: function to find the centroid of
+            args: tuple: optional arguments for func
+
+        See Also:
+            page 9 of this PDF defines the equation used to calculate the centroid
+            https://web.iit.edu/sites/web/files/departments/academic-affairs/academic-resource-center/pdfs/Distributed_Loading.pdf
+        """
+        # pylint: disable=invalid-name
+        wx = integrate.quad(lambda x: func(x, *args) * x, a, b_)[0]
+        w = integrate.quad(lambda x: func(x, *args), a, b_)[0]
+        return wx / w
+
     def equiv(self, nodes):
         """
         locations of centroid of distributed load acting on each element
@@ -406,26 +426,6 @@ class DistributedLoad:
                 locations of the load
             ValueError: when nodes are not sorted in ascending order
         """
-
-        def equiv_fun(a, b, func, *args):
-            """
-            function to calculate centroid of load between a and b
-
-            Parameters:
-                a: float: starting location for integration (current node)
-                b: float: ending location for integration (next node)
-                func: callable: function that defines the load magnitude as a function
-                    of position
-                args: tuple: optional arguments for func
-
-            See Also:
-                page 9 of this PDF defines the equation used to calculate the centroid
-                https://web.iit.edu/sites/web/files/departments/academic-affairs/academic-resource-center/pdfs/Distributed_Loading.pdf
-            """
-            # pylint: disable=invalid-name
-            wx = integrate.quad(lambda x: func(x, *args) * x, a, b)[0]
-            w = integrate.quad(lambda x: func(x, *args), a, b)[0]
-            return wx / w
 
         if not np.all(np.diff(nodes) >= 0):
             # the nodes are not sorted in ascending order!
@@ -444,7 +444,7 @@ class DistributedLoad:
 
             # calculate the location of the centroid of the load applied to the
             # current element
-            global_location = equiv_fun(node, node + length, self.func, self.args)
+            global_location = self.centroid(node, node + length, self.func, self.args)
             local_location = global_location - node
 
             # calculate the magnitude of the equivalent point load acting at the
