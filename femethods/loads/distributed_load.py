@@ -7,6 +7,9 @@ from scipy import integrate
 
 from femethods import validation
 
+from .moment import MomentLoad
+from .point import PointLoad
+
 
 class DistributedLoad:
     """
@@ -222,3 +225,162 @@ class DistributedLoad:
         if len(locations) == 1:
             return locations[0]
         return locations
+
+    def eq_moment(self, nodes):
+
+        P = self.__equivalent_magnitudes(nodes)
+        a_s, b_s = self.geometry_terms(nodes)
+
+        p0_list = []
+        m0_list = []
+        p1_list = []
+        m1_list = []
+        for p, a, b in zip(P, a_s, b_s):
+            L = a + b
+            p0 = (p * b ** 2 * (L + 2 * a)) / L ** 3
+            m0 = p * a * b ** 2 / L ** 2
+            p1 = p * a ** 2 * (L + 2 * b) / L ** 3
+            m1 = p * a ** 2 * b / L ** 2
+
+            p0_list.append(p0)
+            m0_list.append(m0)
+            p1_list.append(p1)
+            m1_list.append(m1)
+
+        return p0_list, m0_list, p1_list, m1_list
+
+    def geometry_terms(self, nodes):
+        """
+        distances from nodes to centroid in local coordinate system
+
+        a: distance from start of node 1 to centroid
+        b: distance from centroid to node 2
+
+        Parameters:
+            nodes: sequence: locations of nodes. Must include the start and stop
+                location of the load
+        """
+
+        used_lengths, centroids = self.__centroid_locations(nodes)
+        a = []
+        b = []
+        for length, centroid in zip(used_lengths, centroids):
+            a.append(centroid)
+            b.append(length - a[-1])
+        return a, b
+
+    @property
+    def location(self):
+        a = self.start
+        b = self.stop
+        return a, self.centroid_location((a, b)), b
+
+    def equivalent_loads(self, nodes):
+        """
+        Return list of equivalent loads for the distributed load
+
+        This will be a combination of PointLoads and MomentLoads that are statically
+        equivalent to the distributed load
+        """
+        raise NotImplementedError
+
+    def __p0(self, p, a, b, L):
+        """equivalent load at node 0"""
+        return (p * b ** 2 * (L + 2 * a)) / L ** 3
+
+    def __m0(self, p, a, b, L):
+        """equivalent moment at node 0"""
+        return -p * a * b ** 2 / L ** 2
+
+    def __p1(self, p, a, b, L):
+        """equivalent load at node 1"""
+        return p * a ** 2 * (L + 2 * b) / L ** 3
+
+    def __m1(self, p, a, b, L):
+        """equivalent moment at node 1"""
+        return p * a ** 2 * b / L ** 2
+
+    def equiv(self, nodes):
+        """
+        locations of centroid of distributed load acting on each element
+
+        There is a location for each element that has the load acting on it. The
+        location(s) returned are the centroid of the load acting over each element.
+
+        Parameters:
+            nodes: sequence: locations of nodes. Must include the start and stop
+                location of the load
+
+        Raises:
+            ValueError: when nodes parameter does not include either start or stop
+                locations of the load
+            ValueError: when nodes are not sorted in ascending order
+        """
+
+        def equiv_fun(a, b, func, *args):
+            """
+            function to calculate centroid of load between a and b
+
+            Parameters:
+                a: float: starting location for integration (current node)
+                b: float: ending location for integration (next node)
+                func: callable: function that defines the load magnitude as a function
+                    of position
+                args: tuple: optional arguments for func
+
+            See Also:
+                page 9 of this PDF defines the equation used to calculate the centroid
+                https://web.iit.edu/sites/web/files/departments/academic-affairs/academic-resource-center/pdfs/Distributed_Loading.pdf
+            """
+            # pylint: disable=invalid-name
+            wx = integrate.quad(lambda x: func(x, *args) * x, a, b)[0]
+            w = integrate.quad(lambda x: func(x, *args), a, b)[0]
+            return wx / w
+
+        if not np.all(np.diff(nodes) >= 0):
+            # the nodes are not sorted in ascending order!
+            raise ValueError("invalid nodes! They must be in ascending order!")
+        if self.start not in nodes or self.stop not in nodes:
+            raise ValueError("invalid nodes and distributed loads! Incompatible mesh.")
+
+        lengths = np.diff(nodes)  # lengths of all elements
+        # locations = []
+        # start_nodes = []
+        # used_lengths = []
+        loads = []
+        for node, length in zip(nodes, lengths):
+            # print('\tnode', node)
+            # print('\tlength', length)
+            if self.start <= node <= self.stop:
+                # print('loaded', self.start, node, self.stop)
+                # current node has the distributed load applied to it
+                print("loaded element")
+                print("\tstarting node", node)
+                print("\tlength", length)
+
+                global_location = equiv_fun(node, node + length, self.func, self.args)
+                local_location = global_location - node
+
+                # ignore type check for self.func:
+                # Union[function, LowLevelCallable], got Callable instead
+                # noinspection PyTypeChecker
+                mag = integrate.quad(
+                    self.func, a=node, b=node + length, args=self.args
+                )[0]
+                a = local_location
+                b = length - a
+                p = mag
+                L = length
+                p0 = self.__p0(p=p, a=a, b=b, L=L)
+                m0 = self.__m0(p=p, a=a, b=b, L=L)
+                p1 = self.__p1(p=p, a=a, b=b, L=L)
+                m1 = self.__m1(p=p, a=a, b=b, L=L)
+
+                P0 = PointLoad(p0, node)
+                P1 = PointLoad(p1, node + length)
+
+                M0 = MomentLoad(m0, node)
+                M1 = MomentLoad(m1, node + length)
+
+                loads.extend([P0, M0, P1, M1])
+        return loads
