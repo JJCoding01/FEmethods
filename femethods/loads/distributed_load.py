@@ -198,7 +198,9 @@ class DistributedLoad:
             if self.start <= node <= self.stop:
                 # current node has the distributed load applied to it
 
-                locations.append(equiv_fun(node, node + length, self.func, self.args))
+                global_location = equiv_fun(node, node + length, self.func, self.args)
+                local_location = global_location - node
+                locations.append(local_location)
                 if node + length == self.stop:
                     # the distributed loads stops at the end of the current element.
                     # No further analysis is required
