@@ -4,6 +4,7 @@
 from .core import ForceFactory
 from .elements import PropertyFactory
 from .loads import (
+    ConstantDistributedLoadFactory,
     DistributedLoadFactory,
     LoadFactory,
     MomentLoadFactory,
