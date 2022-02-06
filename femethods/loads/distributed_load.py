@@ -432,54 +432,56 @@ class DistributedLoad:
         lengths = np.diff(nodes)  # lengths of all elements
         loads = []
         for node, length in zip(nodes, lengths):
-            if self.start <= node <= self.stop:
-                # current element is loaded with distributed load
+            element_is_loaded = self.start <= node <= self.stop
+            if not element_is_loaded:
+                continue
 
-                # calculate the location of the centroid of the load applied to the
-                # current element
-                global_location = equiv_fun(node, node + length, self.func, self.args)
-                local_location = global_location - node
+            # current element is loaded with distributed load
 
-                # calculate the magnitude of the equivalent point load acting at the
-                # centroid of the distributed load of the active element
-                # ignore type check for self.func:
-                # Union[function, LowLevelCallable], got Callable instead
-                # noinspection PyTypeChecker
-                f_equiv = integrate.quad(
-                    self.func, node, node + length, args=self.args
-                )[0]
+            # calculate the location of the centroid of the load applied to the
+            # current element
+            global_location = equiv_fun(node, node + length, self.func, self.args)
+            local_location = global_location - node
 
-                # setup general geometry terms locating the load relative the element
-                # origin (x_local = 0)
+            # calculate the magnitude of the equivalent point load acting at the
+            # centroid of the distributed load of the active element
+            # ignore type check for self.func:
+            # Union[function, LowLevelCallable], got Callable instead
+            # noinspection PyTypeChecker
+            f_equiv = integrate.quad(self.func, node, node + length, args=self.args)[0]
 
-                # distance from equivalent load to right node
-                b = length - local_location
+            # setup general geometry terms locating the load relative the element
+            # origin (x_local = 0)
 
-                # calculate the equivalent point load and moment produced by relocating the point load acting at the
-                # distributed load centroid to the start and stop nodes of the active element.
-                # Note that the moments act in opposite directions'
-                #
-                # description of loads:
-                #   * p0: equivalent point load at node 0 (left) of current element
-                #   * m0: equivalent moment load at node 0 (left) of current element
-                #   * p1: equivalent point load at node 1 (right) of current element
-                #   * m1: equivalent moment load at node 1 (right) of current element
-                p0 = self.__p0(p=f_equiv, a=local_location, b=b, l=length)
-                m0 = self.__m0(p=f_equiv, a=local_location, b=b, l=length)
-                p1 = self.__p1(p=f_equiv, a=local_location, b=b, l=length)
-                m1 = self.__m1(p=f_equiv, a=local_location, b=b, l=length)
+            # distance from equivalent load to right node
+            b = length - local_location
 
-                # ... then create proper loads from the point/moment magnitudes and add
-                # them to a list of loads. This list of loads will be made up of basic
-                # PointLoad and MomentLoad combinations and will be equivalent to the
-                # distributed load
-                loads.extend(
-                    [
-                        PointLoad(p0, node),
-                        MomentLoad(m0, node),
-                        PointLoad(p1, node + length),
-                        MomentLoad(m1, node + length),
-                    ]
-                )
+            # calculate the equivalent point load and moment produced by relocating the
+            # point load acting at the distributed load centroid to the start and stop
+            # nodes of the active element.
+            # Note that the moments act in opposite directions'
+            #
+            # description of loads:
+            #   * p0: equivalent point load at node 0 (left) of current element
+            #   * m0: equivalent moment load at node 0 (left) of current element
+            #   * p1: equivalent point load at node 1 (right) of current element
+            #   * m1: equivalent moment load at node 1 (right) of current element
+            p0 = self.__p0(p=f_equiv, a=local_location, b=b, l=length)
+            m0 = self.__m0(p=f_equiv, a=local_location, b=b, l=length)
+            p1 = self.__p1(p=f_equiv, a=local_location, b=b, l=length)
+            m1 = self.__m1(p=f_equiv, a=local_location, b=b, l=length)
+
+            # ... then create proper loads from the point/moment magnitudes and add
+            # them to a list of loads. This list of loads will be made up of basic
+            # PointLoad and MomentLoad combinations and will be equivalent to the
+            # distributed load
+            loads.extend(
+                [
+                    PointLoad(p0, node),
+                    MomentLoad(m0, node),
+                    PointLoad(p1, node + length),
+                    MomentLoad(m1, node + length),
+                ]
+            )
 
         return loads
