@@ -430,43 +430,56 @@ class DistributedLoad:
             raise ValueError("invalid nodes and distributed loads! Incompatible mesh.")
 
         lengths = np.diff(nodes)  # lengths of all elements
-        # locations = []
-        # start_nodes = []
-        # used_lengths = []
         loads = []
         for node, length in zip(nodes, lengths):
-            # print('\tnode', node)
-            # print('\tlength', length)
             if self.start <= node <= self.stop:
-                # print('loaded', self.start, node, self.stop)
-                # current node has the distributed load applied to it
-                print("loaded element")
-                print("\tstarting node", node)
-                print("\tlength", length)
+                # current element is loaded with distributed load
 
+                # calculate the location of the centroid of the load applied to the
+                # current element
                 global_location = equiv_fun(node, node + length, self.func, self.args)
                 local_location = global_location - node
 
+                # calculate the magnitude of the equivalent point load acting at the
+                # centroid of the distributed load of the active element
                 # ignore type check for self.func:
                 # Union[function, LowLevelCallable], got Callable instead
                 # noinspection PyTypeChecker
-                mag = integrate.quad(
-                    self.func, a=node, b=node + length, args=self.args
+                f_equiv = integrate.quad(
+                    self.func, node, node + length, args=self.args
                 )[0]
-                a = local_location
-                b = length - a
-                p = mag
-                L = length
-                p0 = self.__p0(p=p, a=a, b=b, L=L)
-                m0 = self.__m0(p=p, a=a, b=b, L=L)
-                p1 = self.__p1(p=p, a=a, b=b, L=L)
-                m1 = self.__m1(p=p, a=a, b=b, L=L)
 
-                P0 = PointLoad(p0, node)
-                P1 = PointLoad(p1, node + length)
+                # setup general geometry terms locating the load relative the element
+                # origin (x_local = 0)
 
-                M0 = MomentLoad(m0, node)
-                M1 = MomentLoad(m1, node + length)
+                # distance from equivalent load to right node
+                b = length - local_location
 
-                loads.extend([P0, M0, P1, M1])
+                # calculate the equivalent point load and moment produced by relocating the point load acting at the
+                # distributed load centroid to the start and stop nodes of the active element.
+                # Note that the moments act in opposite directions'
+                #
+                # description of loads:
+                #   * p0: equivalent point load at node 0 (left) of current element
+                #   * m0: equivalent moment load at node 0 (left) of current element
+                #   * p1: equivalent point load at node 1 (right) of current element
+                #   * m1: equivalent moment load at node 1 (right) of current element
+                p0 = self.__p0(p=f_equiv, a=local_location, b=b, l=length)
+                m0 = self.__m0(p=f_equiv, a=local_location, b=b, l=length)
+                p1 = self.__p1(p=f_equiv, a=local_location, b=b, l=length)
+                m1 = self.__m1(p=f_equiv, a=local_location, b=b, l=length)
+
+                # ... then create proper loads from the point/moment magnitudes and add
+                # them to a list of loads. This list of loads will be made up of basic
+                # PointLoad and MomentLoad combinations and will be equivalent to the
+                # distributed load
+                loads.extend(
+                    [
+                        PointLoad(p0, node),
+                        MomentLoad(m0, node),
+                        PointLoad(p1, node + length),
+                        MomentLoad(m1, node + length),
+                    ]
+                )
+
         return loads
