@@ -194,10 +194,11 @@ class DistributedLoad:
 
         lengths = np.diff(nodes)  # lengths of all elements
         locations = []
+        used_lengths = []
         for node, length in zip(nodes, lengths):
             if self.start <= node <= self.stop:
                 # current node has the distributed load applied to it
-
+                used_lengths.append(length)
                 global_location = equiv_fun(node, node + length, self.func, self.args)
                 local_location = global_location - node
                 locations.append(local_location)
@@ -206,7 +207,7 @@ class DistributedLoad:
                     # No further analysis is required
                     break
 
-        return locations
+        return used_lengths, locations
 
     def centroid_location(self, nodes):
         """
@@ -217,7 +218,7 @@ class DistributedLoad:
                 corresponds to the start and stop locations of the distributed load,
                 otherwise an exception is raised.
         """
-        locations = self.__centroid_locations(nodes)
+        _, locations = self.__centroid_locations(nodes)
         if len(locations) == 1:
             return locations[0]
         return locations
