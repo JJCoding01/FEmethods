@@ -284,6 +284,7 @@ class DistributedLoad:
         """
         raise NotImplementedError
 
+    # pylint: disable=invalid-name
     @staticmethod
     def __p0(p, a, b, l):
         """
@@ -309,6 +310,7 @@ class DistributedLoad:
         """
         return (p * b ** 2 * (l + 2 * a)) / l ** 3
 
+    # pylint: disable=invalid-name
     @staticmethod
     def __m0(p, a, b, l):
         """
@@ -336,6 +338,7 @@ class DistributedLoad:
         """
         return -p * a * b ** 2 / l ** 2
 
+    # pylint: disable=invalid-name
     @staticmethod
     def __p1(p, a, b, l):
         """
@@ -361,6 +364,7 @@ class DistributedLoad:
         """
         return p * a ** 2 * (l + 2 * b) / l ** 3
 
+    # pylint: disable=invalid-name
     @staticmethod
     def __m1(p, a, b, l):
         """
