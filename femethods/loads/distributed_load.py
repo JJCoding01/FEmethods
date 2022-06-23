@@ -168,6 +168,10 @@ class DistributedLoad:
         is only when p0, m0, p1, and m1 are used together as a system that they are
         equivalent!
 
+        The equivalent loads are determined by calculating the reaction forces and
+        moments of a beam, fixed at both ends, with a single point load acting at the
+        centroid. The key parameters are:
+
         Parameters:
             p: float: equivalent magnitude of distributed load acting on element
             a: float: distance from start of node to load centroid
@@ -182,7 +186,7 @@ class DistributedLoad:
              :class:`__m0`: for moment load at node 0
              :class:`__m1`: for moment load at node 1
         """
-        return p * a ** 2 * (l + 2 * b) / l ** 3
+        return (p * a**2 / l**3) * (a + 3 * b)
 
     # pylint: disable=invalid-name
     @staticmethod
