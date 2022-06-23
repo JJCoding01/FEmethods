@@ -52,5 +52,5 @@ def test_simply_supported_center_max_moment(beam_setup):
 def test_simply_supported_center_max_deflection(beam_setup):
     beam, beam_length, load = beam_setup
 
-    d_max = load * beam_length ** 3 / (48 * EI)  # max displacement
+    d_max = load * beam_length**3 / (48 * EI)  # max displacement
     assert pytest.approx(beam.deflection(beam_length / 2), rel=TOL) == d_max
