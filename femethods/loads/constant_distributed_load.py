@@ -35,7 +35,7 @@ class ConstantDistributedLoad(DistributedLoad):
         lengths = np.diff(nodes)
         signs = cycle((-1, 1))
         magnitudes = [
-            self.magnitude * length ** 2 / 12 for sign, length in zip(signs, lengths)
+            self.magnitude * length**2 / 12 for sign, length in zip(signs, lengths)
         ]
         moments = []
         for k, (f, sign) in enumerate(zip(magnitudes, signs)):
