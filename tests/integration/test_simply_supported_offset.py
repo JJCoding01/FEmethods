@@ -64,6 +64,6 @@ def test_simply_supported_offset_max_deflection(beam_setup):
     a = load_location
 
     b = beam_length - a
-    d_loc = load * a ** 2 * b ** 2 / (3 * EI * beam_length)  # deflection at load
+    d_loc = load * a**2 * b**2 / (3 * EI * beam_length)  # deflection at load
 
     assert pytest.approx(beam.deflection(load_location), rel=TOL) == d_loc
