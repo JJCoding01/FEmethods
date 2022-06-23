@@ -43,7 +43,7 @@ def test_cantilevered_beam_load_max_deflection(beam_setup):
     """
     beam, beam_length, load = beam_setup
 
-    d_max = load * beam_length ** 3 / (3 * EI)  # at free end
+    d_max = load * beam_length**3 / (3 * EI)  # at free end
     assert pytest.approx(beam.deflection(0), rel=TOL) == d_max
 
 
