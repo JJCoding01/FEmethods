@@ -49,5 +49,5 @@ def test_simply_supported_eq_symmetric_moment(beam_setup):
 def test_simply_supported_eq_symmetric_max_deflection(beam_setup):
     beam, beam_length, load, a = beam_setup
     # max deflection (at center)
-    d_loc = load * a / (24 * EI) * (3 * beam_length ** 2 - 4 * a ** 2)
+    d_loc = load * a / (24 * EI) * (3 * beam_length**2 - 4 * a**2)
     assert pytest.approx(beam.deflection(beam_length / 2), rel=TOL) == d_loc
