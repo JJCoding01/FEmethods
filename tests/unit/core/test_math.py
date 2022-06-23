@@ -60,7 +60,7 @@ def test_derivative_2_sine(method, angle):
 def test_derivative_2_poly(method, x):
     expected_derivative = 2
     assert derivative(
-        lambda x_: x_ ** 2 + 5 * x_ + 3, x, n=2, method=method
+        lambda x_: x_**2 + 5 * x_ + 3, x, n=2, method=method
     ) == pytest.approx(expected_derivative, abs=1e-3)
 
 
