@@ -144,10 +144,10 @@ class BeamElement(Element):
         """
         if L is None:
             L = self.length
-        N1 = 1 / L ** 3 * (L ** 3 - 3 * L * x ** 2 + 2 * x ** 3)
-        N2 = 1 / L ** 2 * (L ** 2 * x - 2 * L * x ** 2 + x ** 3)
-        N3 = 1 / L ** 3 * (3 * L * x ** 2 - 2 * x ** 3)
-        N4 = 1 / L ** 2 * (x ** 3 - L * x ** 2)
+        N1 = 1 / L**3 * (L**3 - 3 * L * x**2 + 2 * x**3)
+        N2 = 1 / L**2 * (L**2 * x - 2 * L * x**2 + x**3)
+        N3 = 1 / L**3 * (3 * L * x**2 - 2 * x**3)
+        N4 = 1 / L**2 * (x**3 - L * x**2)
         return np.array([N1, N2, N3, N4])
 
     def plot_shapes(self, n=25):  # pragma: no cover
