@@ -190,12 +190,12 @@ class BeamElement(Element):
         k = np.array(
             [
                 [12, 6 * L, -12, 6 * L],
-                [6 * L, 4 * L ** 2, -6 * L, 2 * L ** 2],
+                [6 * L, 4 * L**2, -6 * L, 2 * L**2],
                 [-12, -6 * L, 12, -6 * L],
-                [6 * L, 2 * L ** 2, -6 * L, 4 * L ** 2],
+                [6 * L, 2 * L**2, -6 * L, 4 * L**2],
             ]
         )
-        return self.E * self.Ixx / L ** 3 * k
+        return self.E * self.Ixx / L**3 * k
 
     def stiffness_global(self):
         """
