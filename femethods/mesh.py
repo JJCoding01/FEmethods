@@ -77,11 +77,9 @@ class Mesh:
         if self.__lengths is not None:  # pragma: no cover
             return self.__lengths
 
-        # the lengths have not been calculated yet.
-        # Calculate the lengths of each element
-        self.__lengths = []
-        for k in range(len(self.nodes) - 1):
-            self.__lengths.append(self.nodes[k + 1] - self.nodes[k])
+        # the lengths have not been calculated yet. Calculate the lengths of each
+        # element
+        self.__lengths = np.diff(self.nodes)
         return self.__lengths
 
     def __str__(self):
