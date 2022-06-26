@@ -237,6 +237,8 @@ class Beam(BeamElement):
         title="Beam Analysis",
         diagrams=None,
         diagram_labels=None,
+        fig=None,
+        axes=None,
         **kwargs,
     ):
         """
@@ -285,10 +287,12 @@ class Beam(BeamElement):
         diagrams, diagram_labels = self.__validate_plot_diagrams(
             diagrams, diagram_labels
         )
-        fig, axes = plt.subplots(len(diagrams), 1, sharex="all")
-        if len(diagrams) == 1:
-            # make sure axes are iterable, even if there is only one
-            axes = [axes]
+        if axes is None:
+            fig, axes = plt.subplots(len(diagrams), 1, sharex="all")
+
+            if len(diagrams) == 1:
+                # make sure axes are iterable, even if there is only one
+                axes = [axes]
 
         xd = np.linspace(0, self.length, n)  # deflection
         x, y = None, None
