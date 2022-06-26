@@ -75,3 +75,60 @@ def test_lengths_read_only():
     mesh = MeshFactory()
     with pytest.raises(AttributeError):
         mesh.lengths = "Mesh element lengths are read-only"
+
+
+@pytest.mark.parametrize("value", [-2, -1, 0])
+def test_max_element_length_value_invalid_value(value):
+    with pytest.raises(ValueError):
+        MeshFactory(max_element_length=value)
+
+
+@pytest.mark.parametrize("value", ["string", [1, 2]])
+def test_max_element_length_value_invalid_type(value):
+    with pytest.raises(TypeError):
+        MeshFactory(max_element_length=value)
+
+
+@pytest.mark.parametrize("value", [None, 1, 5, 10, 15])
+def test_max_element_length_value_valid(value):
+    mesh = MeshFactory(max_element_length=value)
+    assert mesh.max_element_length == value
+
+
+@pytest.mark.parametrize("value", [-2, -1, 0])
+def test_min_element_count_value_invalid_value(value):
+    with pytest.raises(ValueError):
+        MeshFactory(min_element_count=value)
+
+
+@pytest.mark.parametrize("value", ["string", [1, 2]])
+def test_min_element_count_value_invalid_type(value):
+    with pytest.raises(TypeError):
+        MeshFactory(min_element_count=value)
+
+
+def test_min_element_count_value_none():
+    mesh = MeshFactory(min_element_count=None)
+    assert mesh.min_element_count is None
+
+
+@pytest.mark.parametrize("value", [None, 1, 5, 10, 15])
+def test_min_element_count_value_valid(value):
+    mesh = MeshFactory(max_element_length=value)
+    assert mesh.max_element_length == value
+
+
+@pytest.mark.parametrize("max_allowed_length", [1, 5, 7, 10, 100])
+def test_nodes_max_length(max_allowed_length):
+    mesh = MeshFactory(
+        length=10, locations=[0, 4, 10], max_element_length=max_allowed_length
+    )
+    lengths = np.diff(mesh.nodes)
+    assert np.max(lengths) <= max_allowed_length
+
+
+@pytest.mark.parametrize("min_required", [1, 5, 7, 10, 100])
+def test_nodes_min_count(min_required):
+    mesh = MeshFactory(length=10, locations=[0, 10], min_element_count=min_required)
+    count = np.diff(mesh.nodes).size
+    assert min_required <= count
