@@ -49,9 +49,10 @@ class Mesh:
         """location of nodes"""
         # create set of locations of each load and reaction, and the ends of the beam.
         # ensure first node is always at zero (0) (start of beam)
-        nodes__ = {0}
-        for location in self.locations:
-            nodes__.add(location)
+        nodes__ = np.array([0, self.length])
+        nodes__ = np.append(nodes__, self.locations, axis=0)
+        nodes__ = np.unique(nodes__)
+        nodes__ = np.sort(nodes__)
 
         nodes__.add(self.length)  # ensure last node is at the end of the beam
         return sorted(nodes__)
