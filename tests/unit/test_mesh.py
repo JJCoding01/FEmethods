@@ -33,7 +33,7 @@ def test_mesh_nodes(length, locations):
     expected_nodes = sorted(expected_nodes)
 
     mesh = MeshFactory(length=length, locations=locations)
-    assert expected_nodes == mesh.nodes
+    assert np.all(mesh.nodes == expected_nodes)
 
 
 @pytest.mark.parametrize("node_dof", (1, 2, 3))
