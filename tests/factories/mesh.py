@@ -14,3 +14,5 @@ class MeshFactory(Factory):
     length = 25
     locations = [10, 15]
     node_dof = 2
+    max_element_length = None
+    min_element_count = None
