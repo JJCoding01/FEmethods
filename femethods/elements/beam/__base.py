@@ -66,15 +66,23 @@ class BeamElement(Element):
         return self._node_deflections
 
     def __get_boundary_conditions(self):
-        # Initialize the  boundary conditions to None for each node, then
-        # iterate over reactions and apply them to the boundary conditions
-        # based on the reaction type.
         assert self.reactions is not None
-        bc = [(None, None) for _ in self.mesh.nodes]
-        for r in self.reactions:
-            assert r is not None
-            i = self.mesh.nodes.index(r.location)
-            bc[i] = r.boundary
+
+        # Initialize the  boundary conditions to None for each node
+        bc = np.array([(None, None) for _ in self.mesh.nodes])
+
+        # get location of all reactions
+        locations = np.array([r.location for r in self.reactions])
+
+        # create a boolean index map for the boundary conditions. True on the index
+        # (node) where a reaction is located
+        map_ = np.in1d(self.mesh.nodes, locations, assume_unique=True)
+
+        # using the reaction map, apply the boundary conditions for each reaction to
+        # the total boundary conditions of all nodes
+        bc_r = np.array([r.boundary for r in self.reactions])
+        bc[map_] = bc_r
+
         return bc
 
     def _calc_node_deflections(self):
