@@ -159,12 +159,12 @@ class BeamElement(Element):
         assert self.reactions is not None
 
         for ri in self.reactions:
-            i = self.mesh.nodes.index(ri.location)
+            i = np.where(self.mesh.nodes == ri.location)[0][0]
             force, moment = r[i * 2 : i * 2 + 2]
 
             # set the values in the reaction objects
-            ri.force = force[0]
-            ri.moment = moment[0]
+            ri.force = force
+            ri.moment = moment
         return r
 
     def shape(self, x, L=None):
