@@ -95,7 +95,7 @@ class Beam(BeamElement):
                 x_local = x - nodes[i]
                 L = self.mesh.lengths[i]
                 d = self.node_deflections[i * 2 : i * 2 + 4]
-                return self.shape(x_local, L).dot(d)[0]
+                return self.shape(x_local, L).dot(d)
 
     def moment(self, x, dx=1e-5, order=9):
         """Calculate the moment at location x

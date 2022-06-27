@@ -211,7 +211,6 @@ def test_shape_of_node_deflections():
     beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], 29e6, 345)
     assert beam.node_deflections.shape == (
         4,
-        1,
     ), "nodal deflections shape is not expected"
 
 
@@ -224,7 +223,7 @@ def test_node_deflections_at_fixed_end():
             "angular displacement at fixed end is non-zero",
         ]
         for i, msg in enumerate(msgs):
-            assert beam.node_deflections[i][0] == 0, msg
+            assert beam.node_deflections[i] == 0, msg
 
 
 def test_node_deflections_at_free_end():
@@ -236,7 +235,7 @@ def test_node_deflections_at_free_end():
             "angular displacement at free end is not negative",
         ]
         for i, msg in enumerate(msgs, 2):
-            assert beam.node_deflections[i][0] < 0, msg
+            assert beam.node_deflections[i] < 0, msg
 
 
 def test_solve_method():
