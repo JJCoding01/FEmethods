@@ -98,25 +98,46 @@ class BeamElement(Element):
         kg = self.K.copy()
         kg = self.apply_boundary_conditions(kg, bc)
 
-        # Use the same method of adding the input loads as the boundary
-        # conditions. Start by initializing a numpy array to zero loads, then
-        # iterate over the loads and add them to the appropriate index based on
-        # the load type (force or moment)
-        p = np.zeros((self.mesh.dof, 1))
-        for ld in self.loads:
-            i = self.mesh.nodes.index(ld.location)
-            # add force and moment components of load to respective node. Load
-            # components must be added and not simply assigned to account for the
-            # special case where multiple loads are applied to the same node (location)
-            p[i * 2][0] += ld[0]  # input force
-            p[i * 2 + 1][0] += ld[1]  # input moment
+        # create an array for all loads (forces and moments) initialized to zero. This
+        # vector is the input load vector that will be used to solve for the reaction
+        # forces
+        b = np.zeros(self.mesh.dof)
 
-        # Solve the global system of equations {p} = [K]*{d} for {d}
+        # create boolean index mapping for b vector to select all forces and moments
+        # (separately). Force and moment values are in alternating pairs, starting with
+        # force. Note these vectors have the same size as the number of nodes
+        force_map = np.array([True, False] * int(b.size / 2))
+        moment_map = np.array([not force for force in force_map])
+
+        # create array of load magnitudes. The locations of these loads line up with
+        # the locations array
+        forces = np.array([p[0] for p in self.loads])
+        moments = np.array([m[1] for m in self.loads])
+
+        # create a location vector with the locations of all loads acting on the beam.
+        # note there may be multiple loads acting at the same location. There also may
+        # be forces and moments acting at the same location. These must be recorded
+        # separately.
+        locations = np.array([p_.location for p_ in self.loads])
+
+        # total force and  magnitudes are aligned with mesh nodes (locations)
+        forces_total = np.array(
+            [forces[locations == iloc].sum(axis=0) for iloc in self.mesh.nodes]
+        )
+        moments_total = np.array(
+            [moments[locations == iloc].sum(axis=0) for iloc in self.mesh.nodes]
+        )
+
+        # update the input force vector with the total force and moments for each node
+        b[force_map] = forces_total
+        b[moment_map] = moments_total
+
+        # Solve the global system of equations {b} = [K]*{d} for {d}
         # save the deflection vector for the beam, so the analysis can be
         # reused without recalculating the stiffness matrix.
         # This vector should be cleared anytime any of the beam parameters
         # gets changed.
-        self._node_deflections = np.linalg.solve(kg, p)
+        self._node_deflections = np.linalg.solve(kg, b)
         return self._node_deflections
 
     def _get_reaction_values(self):
