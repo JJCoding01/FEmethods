@@ -30,12 +30,14 @@ class BeamElement(Element):
     @property
     def loads(self):
         """loads on system"""
-        return self.__loads
+        return super().loads
 
     @loads.setter
     def loads(self, value):
         # basic loads
-
+        # call super loads method to take advantage of the error checking and validation
+        # performed at that level
+        super(BeamElement, self.__class__).loads.fset(self, value)
         self.__loads = value
 
         # update equivalent_loads
