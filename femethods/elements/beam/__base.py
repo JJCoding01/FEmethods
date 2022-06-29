@@ -57,7 +57,7 @@ class BeamElement(Element):
         self.invalidate()
 
         locations = [r.location for r in self.reactions]
-        locations.extend([load.location for load in self.equivalent_loads])
+        locations.extend([load.location for load in self.loads])
         self.mesh = Mesh(self.length, locations, 2)
         return self.mesh
 
