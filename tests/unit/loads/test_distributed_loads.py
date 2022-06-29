@@ -87,6 +87,7 @@ def test_distributed_load_args_valid(args):
     assert dload.args == args
 
 
+@pytest.mark.xfail(reason="magnitude function not implemented for distributed load")
 @pytest.mark.parametrize(
     "func",
     [
@@ -103,6 +104,7 @@ def test_distributed_load_magnitude(func, args, x):
     assert expected_magnitude == dload.magnitude(x)
 
 
+@pytest.mark.xfail(reason="missing equivalent_magnitude parameter")
 @pytest.mark.parametrize("n", (2, 4, 16))
 @pytest.mark.parametrize("a", (0, 4, 6))
 @pytest.mark.parametrize("b", (8, 16, 20))
@@ -144,6 +146,7 @@ def test_distributed_load_equiv_mag_multi_node(n, a, b, w):
     assert np.allclose(actual, expected, atol=1.0e-8)
 
 
+@pytest.mark.xfail(reason="missing centroid_location property")
 @pytest.mark.parametrize("n", (2, 4, 16))
 @pytest.mark.parametrize("a", (0, 4, 6))
 @pytest.mark.parametrize("b", (8, 16, 20))
@@ -180,6 +183,7 @@ def test_distributed_load_centroid_loc_multi_node(n, a, b):
     assert np.allclose(dload.centroid_location(nodes), expected, atol=1.0e-8)
 
 
+@pytest.mark.xfail(reason="missing equivalent_magnitude property")
 @pytest.mark.parametrize("nodes", ((0, 12), (0, 5, 9, 11), (1, 10), (1, 5, 10)))
 def test_distributed_load_invalid_mesh_magnitude(nodes):
     dload = DistributedLoadFactory(start=0, stop=10)
@@ -188,6 +192,7 @@ def test_distributed_load_invalid_mesh_magnitude(nodes):
         dload.equivalent_magnitude(nodes)
 
 
+@pytest.mark.xfail(reason="missing centroid_location function")
 @pytest.mark.parametrize("nodes", ((0, 12), (0, 5, 9, 11), (1, 10), (1, 5, 10)))
 def test_distributed_load_invalid_mesh_location(nodes):
     dload = DistributedLoadFactory(start=0, stop=10)
@@ -196,6 +201,7 @@ def test_distributed_load_invalid_mesh_location(nodes):
         dload.centroid_location(nodes)
 
 
+@pytest.mark.xfail(reason="missing equivalent_magnitude function")
 def test_distributed_load_invalid_mesh_order_magnitude():
     dload = DistributedLoadFactory(start=0, stop=10)
 
@@ -203,6 +209,7 @@ def test_distributed_load_invalid_mesh_order_magnitude():
         dload.equivalent_magnitude((10, 0))
 
 
+@pytest.mark.xfail(reason="missing centroid_location function")
 def test_distributed_load_invalid_mesh_order_location():
     dload = DistributedLoadFactory(start=0, stop=10)
 
