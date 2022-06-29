@@ -2,6 +2,7 @@
 Examples for FEMethods showing how to use the module
 
 """
+import numpy as np
 
 from femethods.elements import Beam
 from femethods.loads import PointLoad, MomentLoad
@@ -20,16 +21,30 @@ def example_1():
     )
 
     beam_len = 10
+    P = -200
+    E = 29e6
+    I = 125
     # Note that both the reaction and load are both lists. They must always be
     # given to Beam as a list,
-    r = [FixedReaction(0)]  # define reactions as list
-    p = [PointLoad(magnitude=-2, location=beam_len)]  # define loads as list
+    r = [FixedReaction(beam_len)]  # define reactions as list
+    p = [PointLoad(magnitude=P, location=0)]  # define loads as list
 
-    b = Beam(beam_len, loads=p, reactions=r, E=29e6, Ixx=125)
+    b = Beam(beam_len, loads=p, reactions=r, E=E, Ixx=I)
 
     # an explicit solve is required to calculate the reaction values
     b.solve()
     print(b)
+
+    fig, axes = b.plot()
+    x = np.linspace(0, beam_len, 100)
+    Mx = P * x
+    Vx = P * np.ones(np.size(x))
+    dx = (P / (6 * E * I)) * (2 * beam_len**3 - 3 * beam_len**2 * x + x**3)
+    axes[0].plot(x, Vx)
+    axes[1].plot(x, Mx)
+    axes[2].plot(x, dx)
+    b.show()
+
 
 
 def example_2():
