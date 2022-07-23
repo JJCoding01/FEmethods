@@ -294,7 +294,7 @@ class DistributedLoad:
             #   * m0: equivalent moment load at node 0 (left) of current element
             #   * p1: equivalent point load at node 1 (right) of current element
             #   * m1: equivalent moment load at node 1 (right) of current element
-            # distance from equivalent load to right node
+            #   * b: distance from equivalent load to node 1 (right) of current element
             b = length - local_location
             p0 = self.__p0(p=f_equiv, a=local_location, b=b, l=length)
             m0 = self.__m0(p=f_equiv, a=local_location, b=b, l=length)
