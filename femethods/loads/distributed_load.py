@@ -284,9 +284,6 @@ class DistributedLoad:
             # noinspection PyTypeChecker
             f_equiv = integrate.quad(self.func, node, node + length, args=self.args)[0]
 
-            # setup general geometry terms locating the load relative the element
-            # origin (x_local = 0)
-
             # calculate the equivalent point load and moment produced by relocating the
             # point load acting at the distributed load centroid to the start and stop
             # nodes of the active element.
