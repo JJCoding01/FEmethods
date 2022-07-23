@@ -315,3 +315,11 @@ class DistributedLoad:
             )
 
         return loads
+
+    def __str__(self):
+        str_ = (
+            f"Type: {self.name}\n"
+            f"    Start: {self.start}\n"
+            f"    Stop: {self.stop}\n"
+        )
+        return str_
