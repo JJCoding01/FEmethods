@@ -29,6 +29,8 @@ class DistributedLoad:
         ValueError: if start is negative
     """
 
+    name = "distributed load"
+
     def __init__(self, func, start=0, stop=None, args=()):
         # set both start and stop to None. This way they are both defined for
         # comparisons with each other. They will both be updated to the proper values
