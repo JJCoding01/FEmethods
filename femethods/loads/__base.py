@@ -65,3 +65,11 @@ class Load(Force):
 
     def __getitem__(self, item):
         return self.__load_magnitude[item]
+
+    def __str__(self):
+        str_ = (
+            f"Type: {self.name}\n"
+            f"    Location: {self.location}\n"
+            f"    Magnitude: {self.__load_magnitude}\n"
+        )
+        return str_
