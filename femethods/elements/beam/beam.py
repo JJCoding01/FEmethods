@@ -349,9 +349,7 @@ class Beam(BeamElement):
 
         L = ""
         for load in self.loads:
-            L += "Type: {}\n".format(load.name)
-            L += "    Location: {}\n".format(load.location)
-            L += "   Magnitude: {}\n".format(load.magnitude)
+            L += str(load)
 
         r = ""
         for reaction in self.reactions:
