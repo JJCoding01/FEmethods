@@ -6,9 +6,9 @@ def beam_length(request):
     return request.param
 
 
-@pytest.fixture(scope="session")
-def load():
-    return 250
+@pytest.fixture(params=(-1000, -500, 500))
+def load(request):
+    return request.param
 
 
 @pytest.fixture(scope="session", autouse=True)
