@@ -11,7 +11,7 @@ def load():
     return 250
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="session", autouse=True)
 def E():
     """
     # psi, Young's modulus
@@ -19,7 +19,7 @@ def E():
     return 29e6
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="session", autouse=True)
 def I():
     """
     # in^4 area moment of inertia of beam
@@ -27,12 +27,12 @@ def I():
     return 350
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="session", autouse=True)
 def EI(E, I):
     """common constant"""
     return E * I
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="session", autouse=True)
 def TOL():
     return 1e-1
