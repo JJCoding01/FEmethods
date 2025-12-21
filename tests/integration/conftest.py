@@ -11,6 +11,11 @@ def load(request):
     return request.param
 
 
+@pytest.fixture(params=(-1000, -500, 500))
+def moment(request):
+    return request.param
+
+
 @pytest.fixture(scope="session", autouse=True)
 def E():
     """
