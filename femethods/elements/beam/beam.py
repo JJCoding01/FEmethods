@@ -53,11 +53,24 @@ class Beam(BeamElement):
         length,
         loads,
         reactions,
+        mesh=None,
         E=1,
         Ixx=1,
     ):
         super().__init__(length, loads, reactions, E=E, Ixx=Ixx)
+        self.mesh = mesh
         self.solve()
+
+        if mesh is None:
+            # create the default mesh
+            mesh = Mesh(
+                length=length,
+                locations=[0, length],
+                node_dof=2,
+                max_element_length=None,
+                min_element_count=None,
+            )
+            self.mesh = mesh
 
     def deflection(self, x):
         """Calculate deflection of the beam at location x
