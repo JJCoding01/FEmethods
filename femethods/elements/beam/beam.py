@@ -5,17 +5,13 @@ Currently the only element that is defined is a beam element.
 
 """
 
-from warnings import warn
-
 import matplotlib.pyplot as plt
 import numpy as np
 
-from scipy.misc import derivative
+from .__base import BeamElement
+
 
 # local imports
-from femethods.core import derivative as comm_derivative
-
-from .__base import BeamElement
 
 
 # noinspection PyPep8Naming
