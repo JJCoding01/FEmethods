@@ -22,7 +22,7 @@ def beam_setup(request, beam_length, load, E, I):
 
     mesh = MeshFactory(
         length=beam_length,
-        locations=[0, beam_length],
+        locations=[0, a, beam_length],
         node_dof=2,
         max_element_length=None,
         min_element_count=None,
@@ -46,7 +46,7 @@ def test_cantilevered_beam_max_moment(beam_setup, TOL):
     beam, L, P, a, b = beam_setup
     # noinspection PyPep8Naming
     M_max = P * b  # at fixed end
-    assert pytest.approx(beam.moment(L), rel=TOL) == M_max
+    assert pytest.approx(beam.moment(L), rel=TOL) == -M_max
 
 
 def test_cantilevered_d_max(beam_setup, EI, TOL):
