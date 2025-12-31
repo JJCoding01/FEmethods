@@ -25,11 +25,11 @@ def beam_setup(beam_length, load, load_location, overhang_length, E, I):
     # total beam length
     L = beam_length + overhang_length
     a = load_location
-    b = L - a
+    b = beam_length - a
 
     mesh = MeshFactory(
         length=L,
-        locations=[0, beam_length, L],
+        locations=[0, a, beam_length, L],
         node_dof=2,
         max_element_length=None,
         min_element_count=None,
@@ -43,7 +43,11 @@ def beam_setup(beam_length, load, load_location, overhang_length, E, I):
         E=E,
         Ixx=I,
     )
-    yield beam, beam_length, load, (a, b), overhang_length
+
+    # convert L to the length of the supported span
+    # noinspection PyPep8Naming
+    L = L - overhang_length
+    yield beam, L, load, (a, b), overhang_length
 
 
 # noinspection PyPep8Naming
@@ -53,8 +57,8 @@ def test_overhanging_offset_reaction_force(beam_setup, TOL):
     R1 = P * b / L
     R2 = P * a / L
 
-    assert pytest.approx(beam.reactions[0].force, rel=TOL) == R1
-    assert pytest.approx(beam.reactions[1].force, rel=TOL) == R2
+    assert pytest.approx(beam.reactions[0].force, rel=TOL) == -R1
+    assert pytest.approx(beam.reactions[1].force, rel=TOL) == -R2
 
 
 @pytest.mark.parametrize("reaction_index", [0, 1])
@@ -73,7 +77,7 @@ def test_overhanging_offset_max_moment(beam_setup):
 def test_overhanging_offset_deflection(beam_setup, EI, TOL):
     beam, L, P, (a, b), c = beam_setup
 
-    d_loc = P * a ** 2 * b ** 2 / (3 * EI * L)  # deflection at load
+    d_loc = P * a**2 * b**2 / (3 * EI * L)  # deflection at load
 
     assert pytest.approx(beam.deflection(a), rel=TOL) == d_loc
 
@@ -81,11 +85,14 @@ def test_overhanging_offset_deflection(beam_setup, EI, TOL):
 def test_overhanging_offset_deflection_max(beam_setup, EI, TOL):
     beam, L, P, (a, b), c = beam_setup
 
-    # TODO: skip this test when a <= b since it doesn't apply
-    #   make sure that at least for some cases, this test will apply
-    assert a > b
+    if a <= b:
+        pytest.skip(f"deflection equation only valid for a > b")
+
+    assert a > b, "deflection calculations are only valid when a > b"
 
     x = np.sqrt(a * (a + 2 * b) / 3)
-    d_max = P * a * b * (a + 2 * b) * np.sqrt(3 * a *(a + 2 * b)) / (27 * EI * L)  # deflection at load
+    d_max = (
+        P * a * b * (a + 2 * b) * np.sqrt(3 * a * (a + 2 * b)) / (27 * EI * L)
+    )  # deflection at load
 
     assert pytest.approx(beam.deflection(x), rel=TOL) == d_max
