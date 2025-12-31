@@ -36,6 +36,9 @@ def beam_setup(beam_length, load, overhang_length, E, I):
         E=E,
         Ixx=I,
     )
+    # convert L to the length of the supported span
+    # noinspection PyPep8Naming
+    L = L - overhang_length
     yield beam, L, load, overhang_length
 
 
@@ -46,7 +49,7 @@ def test_overhang_reaction_force(beam_setup, TOL):
     R1 = P * a / L  # lbs, reactions
     R2 = P / L * (L + a)
     assert pytest.approx(beam.reactions[0].force, rel=TOL) == R1
-    assert pytest.approx(beam.reactions[1].force, rel=TOL) == R2
+    assert pytest.approx(beam.reactions[1].force, rel=TOL) == -R2
 
 
 def test_overhang_max_moment(beam_setup, TOL):
@@ -54,7 +57,7 @@ def test_overhang_max_moment(beam_setup, TOL):
 
     # noinspection PyPep8Naming
     M_max = P * a  # psi, maximum moment (at R2
-    assert pytest.approx(beam.moment(L), rel=TOL) == M_max
+    assert pytest.approx(beam.moment(L), rel=TOL) == -M_max
 
 
 def test_overhang_max_deflection_between_supports(beam_setup, EI, TOL):
@@ -70,4 +73,4 @@ def test_overhang_max_deflection_overhang(beam_setup, EI, TOL):
 
     x = a
     d_max = P * a**2 / (3 * EI) * (L + a)  # max displacement
-    assert pytest.approx(beam.deflection(x), rel=TOL) == d_max
+    assert pytest.approx(beam.deflection(L + x), rel=TOL) == d_max
