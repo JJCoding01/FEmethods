@@ -43,7 +43,7 @@ def test_cantilevered_beam_max_moment(beam_setup, TOL):
     beam, L, P = beam_setup
     # noinspection PyPep8Naming
     M_max = P * L  # at fixed end
-    assert pytest.approx(beam.moment(L), rel=TOL) == M_max
+    assert pytest.approx(beam.moment(L), rel=TOL) == -M_max
 
 
 def test_cantilevered_beam_load_max_deflection(beam_setup, EI, TOL):
