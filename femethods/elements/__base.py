@@ -128,41 +128,6 @@ class Element(Properties, ABC):
 
         self.invalidate()
         self._loads = loads
-        self.__validate_load_locations()
-
-    def __validate_load_locations(self):
-        """All loads and reactions must have unique locations
-
-        This function will validate that all loads do not line up with any
-        reactions. If a load is aligned with a reaction, it is adjusted by a
-        slight amount so it can be solved.
-        :returns True if successful, False otherwise
-        """
-
-        for reaction in self.reactions:
-            for load in self.loads:
-                if load.location == reaction.location:
-                    # the load is directly on the reaction. Offset the load
-                    # location a tiny amount so that it is very close, but not
-                    # exactly on the reaction.
-                    # This is done so that the global stiffness matrix
-                    # is calculated properly to give accurate results
-
-                    # offset the load towards the inside of the beam to be sure
-                    # the new load position is located on the beam.
-                    if reaction.location == 0:
-                        load.location += 1e-8
-                        warn(
-                            f"load location moved by 1e-8 to avoid reaction "
-                            f"at {reaction.location}"
-                        )
-                    else:
-                        load.location -= 1e-8
-                        warn(
-                            f"load location moved by -1e-8 to avoid reaction"
-                            f" at {reaction.location}"
-                        )
-        return True
 
     @property
     def reactions(self):
@@ -201,7 +166,6 @@ class Element(Properties, ABC):
         """solve the system the FEM system to define the nodal displacements
         and reaction forces.
         """
-        self.__validate_load_locations()
         self.remesh()
         self._calc_node_deflections()
         self.update_reactions()
