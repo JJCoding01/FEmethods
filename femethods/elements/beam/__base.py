@@ -117,11 +117,6 @@ class BeamElement(Element):
         forces = np.array([p[0] for p in self.equivalent_loads])
         moments = np.array([m[1] for m in self.equivalent_loads])
 
-        # create a location vector with the locations of all loads acting on the beam.
-        # note there may be multiple loads acting at the same location. There also may
-        # be forces and moments acting at the same location. These must be recorded
-        # separately.
-        locations = np.array([p_.location for p_ in self.loads])
         # create a location vector with the locations of all loads acting on
         # the beam.
         # Note there may be multiple loads acting at the same location.
@@ -178,16 +173,91 @@ class BeamElement(Element):
         return r
 
     def shape(self, x, L=None):
-        """return an array of the shape functions evaluated at x the local
-        x-value
         """
+        array of shape functions
+
+        Parameters:
+            x: numeric: array-like: local x-coordinates where shape function is evaluated
+            L: numeric: optional: length of element.
+
+        Returns:
+            np.array: array of shape functions
+        """
+        x = np.asarray(x, dtype=float)
         if L is None:
             L = self.length
+        L = np.asarray(L, dtype=float)
         N1 = 1 / L**3 * (L**3 - 3 * L * x**2 + 2 * x**3)
         N2 = 1 / L**2 * (L**2 * x - 2 * L * x**2 + x**3)
         N3 = 1 / L**3 * (3 * L * x**2 - 2 * x**3)
         N4 = 1 / L**2 * (x**3 - L * x**2)
-        return np.array([N1, N2, N3, N4])
+        return np.stack([N1, N2, N3, N4], axis=-1)  # (..., 4)
+
+    def shape_d(self, x, L=None):
+        """
+        first derivative of shape functions
+
+        Parameters:
+            x: numeric | array-like: local x-coordinates where shape function is evaluated
+            L: numeric (optional): length of element. Defaults to beam length when None.
+
+        Returns:
+            np.array: array of the first derivative of shape functions
+        """
+        x = np.asarray(x, dtype=float)
+        if L is None:
+            L = self.length
+        L = np.asarray(L, dtype=float)
+        N1 = 6 * x / L**3 * (-L + x)
+        N2 = 1 - 4 * x / L + 3 * x**2 / L**2
+        N3 = 6 * x / L**3 * (L - x)
+        N4 = x / L**2 * (-2 * L + 3 * x)
+        return np.stack([N1, N2, N3, N4], axis=-1)  # (..., 4)
+
+    def shape_dd(self, x, L=None):
+        """
+        second derivative of shape functions
+
+        Parameters:
+            x: numeric | array-like: local x-coordinates where shape function is evaluated
+            L: numeric (optional): length of element. Defaults to beam length when None.
+
+        Returns:
+            np.array: array of the second derivative of shape functions
+        """
+
+        x = np.asarray(x, dtype=float)
+        if L is None:
+            L = self.length
+        L = np.asarray(L, dtype=float)
+        N1 = -6 / L**3 * (L - 2 * x)
+        N2 = 2 / L**2 * (-2 * L + 3 * x)
+        N3 = 2 / L**3 * (3 * L - 6 * x)
+        N4 = 2 / L**2 * (-L + 3 * x)
+        return np.stack([N1, N2, N3, N4], axis=-1)  # (..., 4)
+
+    def shape_ddd(self, x, L=None):
+        """
+        third derivative of shape functions
+
+        Parameters:
+            x: numeric | array-like: local x-coordinates where shape function is evaluated
+            L: numeric (optional): length of element. Defaults to beam length when None.
+
+        Returns:
+            np.array: array of the third derivative of shape functions
+        """
+
+        x = np.asarray(x, dtype=float)
+        if L is None:
+            L = self.length
+        L = np.asarray(L, dtype=float)
+
+        N1 = 12 / L**3 * np.ones(x.shape)
+        N2 = 6 / L**2 * np.ones(x.shape)
+        N3 = -12 / L**3 * np.ones(x.shape)
+        N4 = 6 / L**2 * np.ones(x.shape)
+        return np.stack([N1, N2, N3, N4], axis=-1)  # (..., 4)
 
     def plot_shapes(self, n=25):  # pragma: no cover
         """plot shape functions for the with n data points"""
