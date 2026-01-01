@@ -377,25 +377,17 @@ class Beam(BeamElement):
                 # make sure axes are iterable, even if there is only one
                 axes = [axes]
 
-        xd = np.linspace(0, self.length, n)  # deflection
-        x, y = None, None
+        x = np.linspace(0, self.length, n, endpoint=True)
+        y = None
         for ax, diagram, label in zip(axes, diagrams, diagram_labels):
             if diagram == "deflection":
-                x = xd
-                y = [self.deflection(xi) for xi in x]
+                y = self.deflection(x)
             if diagram == "angle":
                 y = self.angle(x)
             if diagram == "moment":
-                x = xd
-                y = [self.moment(xi, dx=self.length / (n + 3)) for xi in x]
+                y = self.moment(x)
             if diagram == "shear":
-                x = np.linspace(0, self.length, n + 4)[2:-2]
-                y = [self.shear(xi, dx=self.length / (n + 4)) for xi in x]
-
-            # regardless of the diagram that is being plotted, the number of
-            # data points should always equal the number specified by user
-            assert len(x) == n, "x does not match n"
-            assert len(y) == n, "y does not match n"
+                y = self.shear(x)
 
             ax.plot(x, y, **kwargs["plot_kwargs"])
             if kwargs["fill"]:
@@ -407,7 +399,7 @@ class Beam(BeamElement):
         axes[-1].set_xlabel(kwargs["xlabel"])
         axes[-1].set_xticks(locations)
 
-        fig.subplots_adjust(hspace=0.25)
+        fig.subplots_adjust(hspace=0.06)
         fig.suptitle(title)
         return fig, axes
 
