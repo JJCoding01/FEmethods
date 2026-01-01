@@ -199,7 +199,7 @@ class Beam(BeamElement):
 
         # calculate the angle as the dot product of the first derivative of
         # the shape functions and nodal displacements
-        ang = -np.sum(N * d, axis=1)
+        ang = np.sum(N * d, axis=1)
         return np.rad2deg(ang)
 
     def moment(self, x):
