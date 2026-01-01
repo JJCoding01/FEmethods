@@ -4,32 +4,22 @@ Functional tests for simply supported beams (beams with two pinned reactions)
 https://www.structx.com/Beam_Formulas_007.html
 """
 
-import numpy as np
 import pytest
 
 from femethods.elements import Beam
 from femethods.loads import PointLoad
 from femethods.reactions import PinnedReaction
-from tests.factories import MeshFactory
 
 
 @pytest.fixture()
 def beam_setup(beam_length, load, E, I):
     """Simply supported beam with center point load"""
 
-    mesh = MeshFactory(
-        length=beam_length,
-        locations=np.linspace(0, beam_length, num=5, endpoint=True),
-        node_dof=2,
-        max_element_length=None,
-        min_element_count=None,
-    )
-
     beam = Beam(
         length=beam_length,
         loads=[PointLoad(magnitude=load, location=beam_length / 2)],
         reactions=[PinnedReaction(x) for x in [0, beam_length]],
-        mesh=mesh,
+        mesh=None,
         E=E,
         Ixx=I,
     )

@@ -10,7 +10,6 @@ import pytest
 from femethods.elements import Beam
 from femethods.loads import PointLoad
 from femethods.reactions import FixedReaction, PinnedReaction
-from tests.factories import MeshFactory
 
 
 @pytest.fixture(params=(25, 50, 75))
@@ -24,19 +23,12 @@ def beam_setup(beam_length, load, load_location, E, I):
 
     a = load_location
     b = beam_length - a
-    mesh = MeshFactory(
-        length=beam_length,
-        locations=[0, beam_length],
-        node_dof=2,
-        max_element_length=None,
-        min_element_count=None,
-    )
 
     beam = Beam(
         beam_length,
         loads=[PointLoad(load, a)],
         reactions=[PinnedReaction(0), FixedReaction(beam_length)],
-        mesh=mesh,
+        mesh=None,
         E=E,
         Ixx=I,
     )

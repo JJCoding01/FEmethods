@@ -10,26 +10,17 @@ import pytest
 from femethods.elements import Beam
 from femethods.loads import PointLoad
 from femethods.reactions import FixedReaction, PinnedReaction
-from tests.factories import MeshFactory
 
 
 @pytest.fixture()
 def beam_setup(beam_length, load, E, I):
     """Simply supported beam with center point load"""
 
-    mesh = MeshFactory(
-        length=beam_length,
-        locations=[0, beam_length],
-        node_dof=2,
-        max_element_length=None,
-        min_element_count=None,
-    )
-
     beam = Beam(
         length=beam_length,
         loads=[PointLoad(magnitude=load, location=beam_length / 2)],
         reactions=[PinnedReaction(0), FixedReaction(beam_length)],
-        mesh=mesh,
+        mesh=None,
         E=E,
         Ixx=I,
     )
