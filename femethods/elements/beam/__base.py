@@ -100,27 +100,34 @@ class BeamElement(Element):
         kg = self.K.copy()
         kg = self.apply_boundary_conditions(kg, bc)
 
-        # create an array for all loads (forces and moments) initialized to zero. This
-        # vector is the input load vector that will be used to solve for the reaction
-        # forces
+        # create an array for all loads (forces and moments) initialized to
+        # zero. This vector is the input load vector that will be used to
+        # solve for the reaction forces
         b = np.zeros(self.mesh.dof)
 
-        # create boolean index mapping for b vector to select all forces and moments
-        # (separately). Force and moment values are in alternating pairs, starting with
-        # force. Note these vectors have the same size as the number of nodes
+        # create boolean index mapping for b vector to select all forces and
+        # moments (separately). Force and moment values are in alternating
+        # pairs, starting with force.
+        # Note these vectors have the same size as the number of nodes
         force_map = np.array([True, False] * int(b.size / 2))
         moment_map = np.array([not force for force in force_map])
 
-        # create array of load magnitudes. The locations of these loads line up with
-        # the locations array
-        forces = np.array([p[0] for p in self.loads])
-        moments = np.array([m[1] for m in self.loads])
+        # create array of load magnitudes. The locations of these loads line
+        # up with the locations array
+        forces = np.array([p[0] for p in self.equivalent_loads])
+        moments = np.array([m[1] for m in self.equivalent_loads])
 
         # create a location vector with the locations of all loads acting on the beam.
         # note there may be multiple loads acting at the same location. There also may
         # be forces and moments acting at the same location. These must be recorded
         # separately.
         locations = np.array([p_.location for p_ in self.loads])
+        # create a location vector with the locations of all loads acting on
+        # the beam.
+        # Note there may be multiple loads acting at the same location.
+        # There also may be forces and moments acting at the same location.
+        # These must be recorded separately.
+        locations = np.array([p_.location for p_ in self.equivalent_loads])
 
         # total force and  magnitudes are aligned with mesh nodes (locations)
         forces_total = np.array(
@@ -130,7 +137,8 @@ class BeamElement(Element):
             [moments[locations == iloc].sum(axis=0) for iloc in self.mesh.nodes]
         )
 
-        # update the input force vector with the total force and moments for each node
+        # update the input force vector with the total force and moments for
+        # each node
         b[force_map] = forces_total
         b[moment_map] = moments_total
 
