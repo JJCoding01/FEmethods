@@ -4,7 +4,8 @@ the base element class that all FEM elements will be derived from
 """
 
 from abc import ABC, abstractmethod
-from warnings import warn
+
+import numpy as np
 
 # Importing loads is only used for checking the type. Find a better way to do
 # this without needing to import loads
