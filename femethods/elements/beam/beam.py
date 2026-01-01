@@ -294,7 +294,7 @@ class Beam(BeamElement):
 
         # create default (and complete list of valid) diagrams that are
         # implemented
-        default_diagrams = ("shear", "moment", "deflection")
+        default_diagrams = ("shear", "moment", "angle", "deflection")
         if diagrams is None and diagram_labels is None:
             # set both the diagrams and labels to their defaults
             # no need for further validation of these values since they are
@@ -383,6 +383,8 @@ class Beam(BeamElement):
             if diagram == "deflection":
                 x = xd
                 y = [self.deflection(xi) for xi in x]
+            if diagram == "angle":
+                y = self.angle(x)
             if diagram == "moment":
                 x = xd
                 y = [self.moment(xi, dx=self.length / (n + 3)) for xi in x]
