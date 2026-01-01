@@ -19,13 +19,26 @@ class BeamElement(Element):
         length,
         loads,
         reactions,
+        mesh=None,
         E=1,
         Ixx=1,
     ):
         super().__init__(length, E, Ixx)
         self.reactions = reactions
-        self.loads = loads  # note loads are set after reactions
-        self.mesh = self.remesh()
+
+        if mesh is None:
+            # create the default mesh
+            mesh = Mesh(
+                length=length,
+                locations=[0, length],
+                node_dof=2,
+                max_element_length=None,
+                min_element_count=None,
+            )
+        self.mesh = mesh
+
+        # note loads are set after reactions and mesh
+        self.loads = loads
 
     @property
     def loads(self):
@@ -55,10 +68,6 @@ class BeamElement(Element):
 
     def remesh(self):
         self.invalidate()
-
-        locations = [r.location for r in self.reactions]
-        locations.extend([load.location for load in self.loads])
-        self.mesh = Mesh(self.length, locations, 2)
         return self.mesh
 
     def __get_boundary_conditions(self):
