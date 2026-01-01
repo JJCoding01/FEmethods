@@ -137,6 +137,11 @@ class BeamElement(Element):
         b[force_map] = forces_total
         b[moment_map] = moments_total
 
+        # get a mask for the elements in the b matrix to apply the boundary
+        # conditions to
+        bci = np.array([val is not None for val in bc.ravel()])
+        b[bci] = 0
+
         # Solve the global system of equations {b} = [K]*{d} for {d}
         # save the deflection vector for the beam, so the analysis can be
         # reused without recalculating the stiffness matrix.
