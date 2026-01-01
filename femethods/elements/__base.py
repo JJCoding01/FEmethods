@@ -185,6 +185,7 @@ class Element(Properties, ABC):
     def update_reactions(self):
         raise NotImplementedError("must be overloaded!")
 
+    @property
     def load_vector(self):
         """
         Calculate the nodal forces acting on each node

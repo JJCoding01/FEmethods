@@ -183,7 +183,7 @@ class BeamElement(Element):
     def update_reactions(self):
 
         # get the load vector of all loads on each node
-        r = self.load_vector()
+        r = self.load_vector
 
         assert self.reactions is not None
         # go over all reactions and update the force/moment value
