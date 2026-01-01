@@ -61,12 +61,6 @@ class BeamElement(Element):
         self.mesh = Mesh(self.length, locations, 2)
         return self.mesh
 
-    @property
-    def node_deflections(self):
-        if self._node_deflections is None:
-            self._node_deflections = self._calc_node_deflections()
-        return self._node_deflections
-
     def __get_boundary_conditions(self):
         assert self.reactions is not None
 
