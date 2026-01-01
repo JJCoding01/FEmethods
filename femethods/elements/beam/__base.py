@@ -117,9 +117,14 @@ class BeamElement(Element):
 
         return bc
 
-    def _calc_node_deflections(self):
-        """solve for vertical and angular displacement at each node"""
+    @property
+    def Kbc(self):
+        """
+        Stiffness matrix with boundary conditions applied
 
+        Returns:
+            np.array: Stiffness matrix with boundary conditions applied
+        """
         # Get the boundary conditions from the reactions
         bc = self.__get_boundary_conditions()
 
@@ -129,6 +134,16 @@ class BeamElement(Element):
         # calculations (ie, for calculating reaction values)
         kg = self.K.copy()
         kg = self.apply_boundary_conditions(kg, bc)
+        return kg
+
+    @property
+    def b_input(self):
+        """
+        input load vector b
+
+        Returns:
+            np.array: input load vector b
+        """
 
         # create an array for all loads (forces and moments) initialized to
         # zero. This vector is the input load vector that will be used to
@@ -167,10 +182,23 @@ class BeamElement(Element):
         b[force_map] = forces_total
         b[moment_map] = moments_total
 
+        # Get the boundary conditions from the reactions
+        bc = self.__get_boundary_conditions()
+
         # get a mask for the elements in the b matrix to apply the boundary
         # conditions to
         bci = np.array([val is not None for val in bc.ravel()])
         b[bci] = 0
+        return b
+
+    def _calc_node_deflections(self):
+        """solve for vertical and angular displacement at each node"""
+
+        # get the stiffness matrix with boundary conditions applied
+        kg = self.Kbc
+
+        # get the input load vector
+        b = self.b_input
 
         # Solve the global system of equations {b} = [K]*{d} for {d}
         # save the deflection vector for the beam, so the analysis can be
