@@ -60,4 +60,4 @@ def test_cantilevered_d_a(beam_setup, EI, TOL):
     beam, L, P, a, b = beam_setup
 
     d = P * b**3 / (3 * EI)  # at point load
-    assert pytest.approx(beam.deflection(0), rel=TOL) == d
+    assert pytest.approx(beam.deflection(a), rel=TOL) == d
