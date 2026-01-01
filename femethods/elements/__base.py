@@ -204,15 +204,44 @@ class Element(Properties, ABC):
         self.__validate_load_locations()
         self.remesh()
         self._calc_node_deflections()
-        self._get_reaction_values()
+        self.update_reactions()
+
+    @property
+    def node_deflections(self):
+        if self._node_deflections is None:
+            self._node_deflections = self._calc_node_deflections()
+        return self._node_deflections
 
     @abstractmethod
     def _calc_node_deflections(self):
         raise NotImplementedError("must be overloaded!")
 
     @abstractmethod
-    def _get_reaction_values(self):
+    def update_reactions(self):
         raise NotImplementedError("must be overloaded!")
+
+    def load_vector(self):
+        """
+        Calculate the nodal forces acting on each node
+
+        Note that the forces returned here will also include the input forces
+
+        reactions are calculated by solving the matrix equation
+        {r} = [K] * {d}
+
+        where
+           - {r} is the vector of forces acting on the beam
+           - [K] is the global stiffness matrix (without BCs applied)
+           - {d} displacements of nodes
+
+        Returns:
+            np.array: nodal forces acting on each node
+        """
+
+        K = self.K  # global stiffness matrix
+        d = self.node_deflections  # force displacement vector
+        r = np.matmul(K, d)
+        return r
 
     @abstractmethod
     def stiffness(self, L):

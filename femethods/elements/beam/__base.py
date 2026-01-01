@@ -150,24 +150,13 @@ class BeamElement(Element):
         self._node_deflections = np.linalg.solve(kg, b)
         return self._node_deflections
 
-    def _get_reaction_values(self):
-        """Calculate the nodal forces acting on the beam. Note that the forces
-        will also include the input forces.
+    def update_reactions(self):
 
-        reactions are calculated by solving the matrix equation
-        {r} = [K] * {d}
+        # get the load vector of all loads on each node
+        r = self.load_vector()
 
-        where
-           - {r} is the vector of forces acting on the beam
-           - [K] is the global stiffness matrix (without BCs applied)
-           - {d} displacements of nodes
-        """
-        K = self.K  # global stiffness matrix
-        d = self.node_deflections  # force displacement vector
-
-        r = np.matmul(K, d)
         assert self.reactions is not None
-
+        # go over all reactions and update the force/moment value
         for ri in self.reactions:
             i = np.where(self.mesh.nodes == ri.location)[0][0]
             force, moment = r[i * 2 : i * 2 + 2]
