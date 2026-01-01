@@ -260,11 +260,21 @@ class BeamElement(Element):
         return np.stack([N1, N2, N3, N4], axis=-1)  # (..., 4)
 
     def plot_shapes(self, n=25):  # pragma: no cover
-        """plot shape functions for the with n data points"""
-        x = np.linspace(0, self.length, n)
+        """
+        plot shape functions for the with n data points
+
+        Does not automatically show the figure. Use the `.show()` method to
+        show the figure.
+
+        Parameters:
+            n: int: number of data points
+
+        Returns:
+            fig, axes: matplotlib figure and axes for the generated figure
+        """
 
         # set up list of axes with a grid where the two figures in each column
-        # share an x axis
+        # share an x-axis
         axes = []
         fig = plt.figure()
         axes.append(fig.add_subplot(221))
@@ -272,20 +282,25 @@ class BeamElement(Element):
         axes.append(fig.add_subplot(223, sharex=axes[0]))
         axes.append(fig.add_subplot(224, sharex=axes[1]))
 
-        N = [[], [], [], []]
-        for xi in x:
-            n_local = self.shape(xi)
-            for i in range(4):
-                N[i].append(n_local[i])
+        # calculate the shape functions and their derivatives
+        x = np.linspace(0, self.length, n, endpoint=True)
+        N = self.shape(x, self.length).T
+        Nd = self.shape_d(x, self.length).T
+        Ndd = self.shape_dd(x, self.length).T
+        Nddd = self.shape_ddd(x, self.length).T
 
         for k in range(4):
             ax = axes[k]
             ax.grid(True)
-            ax.plot(x, N[k], label=f"$N_{k + 1}$")
+            ax.plot(x, N[k], "-", color="tab:blue", label=f"$N_{k + 1}$")
+            ax.plot(x, Nd[k], "--", color="tab:orange", label="$\\frac{dN}{dx}$")
+            ax.plot(x, Ndd[k], ":", color="tab:green", label="$\\frac{d^2N}{dx^2}$")
+            ax.plot(x, Nddd[k], "-.", color="tab:red", label="$\\frac{d^3N}{dx^3}$")
             ax.legend()
 
-        fig.subplots_adjust(wspace=0.25, hspace=0)
-        plt.show()
+        fig.subplots_adjust(wspace=0.125, hspace=0)
+
+        return fig, axes
 
     def stiffness(self, L):
         """
