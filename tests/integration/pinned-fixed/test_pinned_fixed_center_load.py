@@ -61,7 +61,7 @@ def test_pinned_fixed_center_moment(beam_setup, TOL):
 
     # noinspection PyPep8Naming
     M1 = 5 * P * L / 32  # in-lb, moment at point of load
-    assert pytest.approx(beam.moment(L / 2), rel=TOL) == -M1
+    assert pytest.approx(beam.moment(L / 2), rel=TOL) == M1
 
 
 def test_pinned_fixed_center_deflection(beam_setup, EI, TOL):
