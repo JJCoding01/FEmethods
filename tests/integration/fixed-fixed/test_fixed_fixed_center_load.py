@@ -49,7 +49,7 @@ def test_fixed_fixed_center_max_moment(beam_setup, TOL):
     # noinspection PyPep8Naming
     M_max = P * L / 8  # in-lb, moment at center and ends
     assert pytest.approx(beam.moment(0), rel=TOL) == -M_max  # start
-    assert pytest.approx(beam.moment(L / 2), rel=TOL) == -M_max  # center
+    assert pytest.approx(beam.moment(L / 2), rel=TOL) == M_max  # center
     assert pytest.approx(beam.moment(L), rel=TOL) == -M_max  # end
 
 
