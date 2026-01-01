@@ -260,13 +260,18 @@ class Element(Properties, ABC):
     @staticmethod
     def apply_boundary_conditions(k, bcs):
         """
-        Given the stiffness matrix 'k_local', and the boundary conditions as a list
-        of tuples, apply the boundary conditions to the stiffness matrix by
-        setting the rows and columns that correspond to the boundary conditions
-        to zeros, with ones on the diagonal.
+        Given the stiffness matrix 'k_local', and the boundary conditions as a
+        list of tuples, apply the boundary conditions to the stiffness matrix
+        by setting the rows and columns that correspond to the boundary
+        conditions to zeros, with ones on the diagonal.
 
         The boundary conditions (bcs) are in the form
-        bcs = [(displacement1, rotation1), (displacement2, rotation2)]
+        bcs = [
+            (displacement1, rotation1),
+            (displacement2, rotation2),
+            (..., ...),
+            (displacementn, rotationn),
+            ]
 
         For the boundary condition, if the conditional evaluates to None, then
         movement is allowed, otherwise no displacement is allowed.
