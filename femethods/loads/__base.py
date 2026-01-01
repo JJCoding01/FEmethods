@@ -1,6 +1,8 @@
 """
 Module to define different loads
 """
+
+from abc import ABC, abstractmethod
 from collections.abc import Iterable
 
 import numpy as np
@@ -8,7 +10,7 @@ import numpy as np
 from ..core import Force
 
 
-class Load(Force):
+class Load(Force, ABC):
     """Base class for all load types
 
     Used primarily for type checking the loads on input
@@ -62,6 +64,20 @@ class Load(Force):
     def __load_magnitude(self):
         """the actual magnitude of force and moment after applying the proper split"""
         return self.magnitude * self.fm_factor
+
+    @abstractmethod
+    def fe(self, a, b):
+        """
+        Equivalent nodal forces and moments
+        Parameters:
+            a: float: offset from left node to location of load
+            b: float: offset from load location to right node
+
+        Returns:
+             np.array: equivalent loads in the form [F1, M1, F2, M2]
+        """
+
+        raise NotImplementedError
 
     def __getitem__(self, item):
         return self.__load_magnitude[item]
