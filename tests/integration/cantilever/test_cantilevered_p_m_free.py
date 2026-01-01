@@ -1,7 +1,7 @@
 """
-Functional tests for beams with fixed supports
+Functional tests for cantilevered beam
 
-https://www.structx.com/Beam_Formulas_022.html
+https://www.structx.com/Beam_Formulas_023.html
 
 """
 
@@ -29,7 +29,7 @@ def beam_setup(beam_length, load, E, I):
         length=beam_length,
         loads=[
             PointLoad(magnitude=load, location=0),
-            MomentLoad(magnitude=load, location=0),
+            MomentLoad(magnitude=-load, location=0),
         ],
         reactions=[FixedReaction(beam_length)],
         mesh=mesh,
@@ -40,9 +40,10 @@ def beam_setup(beam_length, load, E, I):
 
 
 def test_cantilevered_beam_reaction(beam_setup, TOL):
-    beam, beam_length, load_ = beam_setup
-    assert pytest.approx(beam.reactions[0].force, rel=TOL) == -load_
-    assert pytest.approx(beam.reactions[0].moment, rel=TOL) == load_
+    beam, L, P = beam_setup
+
+    assert pytest.approx(beam.reactions[0].force, rel=TOL) == -P
+    assert pytest.approx(beam.reactions[0].moment, rel=TOL) == P * L / 2
 
 
 def test_cantilevered_beam_max_moment(beam_setup, TOL):
