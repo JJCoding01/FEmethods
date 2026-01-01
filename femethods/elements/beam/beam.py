@@ -11,9 +11,6 @@ import numpy as np
 from .__base import BeamElement
 
 
-# local imports
-
-
 # noinspection PyPep8Naming
 class Beam(BeamElement):
     """A Beam defines a beam element for analysis
@@ -57,60 +54,116 @@ class Beam(BeamElement):
         self.mesh = mesh
         self.solve()
 
-        if mesh is None:
-            # create the default mesh
-            mesh = Mesh(
-                length=length,
-                locations=[0, length],
-                node_dof=2,
-                max_element_length=None,
-                min_element_count=None,
-            )
-            self.mesh = mesh
-
-    def deflection(self, x):
-        """Calculate deflection of the beam at location x
+    def validate_x(self, x):
+        """
+        Validate the x value for use when calculating deflection, moment or shear
 
         Parameters:
-            x (:obj:`float | int`): location along the length of the beam where
-                           deflection should be calculated.
+            x: numeric | array-like: x-coordinate to validate
+        """
+
+        # update x to ensure it is an array, regardless of how it was entered
+        if np.isscalar(x):
+            # the input is a scalar, update it to be an array
+            x = np.array([x])
+
+        # ensure that even if lists, tuples etc are given, x is always treated
+        # like an array
+        x = np.asarray(x)
+
+        # validate that x is valid by ensuring that x is in the allowed range
+        invalid_mask = (x < 0) | (self.length < x)
+        if np.any(invalid_mask):
+            # there are some invalid x-values, show these in the error message
+            raise ValueError(
+                f"cannot perform calculation outside the beam "
+                f"(range of 0 to {self.length})!"
+                f" Invalid entries: {x[invalid_mask]}"
+            )
+        # once it gets to this point, the x value has been validated
+        # and is an array
+        return x
+
+    def __result_setup(self, x):
+        """
+        Perform the setup calculations for deflection, moment and shear calculations
+
+        This will perform the calculations/transforms to return the following:
+
+        * validate the x values and array
+        * array with the local x-coordinates for each x-value
+        * nodal displacements
+        * element length for each x-value
+
+        Parameters:
+            x: array-like: global x-coordinates along the beam
 
         Returns:
-            :obj:`float`: deflection of the beam in units of the beam length
+            tuple: (validated x coordinates, local x coordinates, nodal displacements, lengths)
+        """
+
+        # Ensure that all x-values are valid and are in array form
+        x = self.validate_x(x)
+
+        # Calculate some values that are needed for calculating deflection
+        nodes = self.mesh.nodes  # node locations (entire beam)
+        lengths = self.mesh.lengths  # element lengths (entire beam)
+        nd = self.node_deflections  # nodal deflections (entire beam)
+
+        # for each x-value, find the element index where it is located
+        i = np.clip(
+            np.searchsorted(nodes, x, side="left") - 1,  # index
+            a_min=0,
+            a_max=None,
+        )
+        x_local = x - nodes[i]  # local x-coordinates
+        L = lengths[i]  # array of local lengths
+
+        # collect nodal deflections that are related to these x's
+        idx = (2 * i)[:, None] + np.arange(4)[None, :]
+        d_nodal = nd[idx]  # nodal deflections for each x
+
+        return x, x_local, d_nodal, L
+
+    def deflection(self, x):
+        """
+        Calculate deflection of the beam at location x
+
+        The deflections are calculated by taking the dot product of the shape
+        functions, and the nodal displacements.
+        This is represented in the form:
+
+        .. centered::
+            :math:`d(x) = N \\cdot d_{nodal}`
+
+        Where $N$ is the shape functions evaluated at the local `x` values of
+        each element for each `x` coordinate, and $d_{nodal}$ is the nodal
+        displacement.
+
+        Parameters:
+            x array-like: locations along the beam where deflection is calculated.
+
+        Returns:
+            array-like: deflection of the beam in units of the beam length
 
         Raises:
             :obj:`ValueError`: when the :math:`0\\leq x \\leq length` is False
-            :obj:`TypeError`: when x cannot be converted to a float
         """
 
-        # TODO: store the lengths/node locations in the class so they only have
-        #  to be assessed without recalculating
-        nodes = self.mesh.nodes
+        x, x_local, d_nodal, L = self.__result_setup(x)
 
-        # validate that x is valid by ensuring that x is in the allowed range
-        if x < 0 or self.length < x:
-            raise ValueError(
-                f"cannot calculate deflection at location {x} as "
-                f"it is outside of the beam!"
-            )
+        # calculate the shape functions for all local x and L values
+        N = self.shape(x_local, L)
 
-        # Using the given global x-value, determine the local x-value, length
-        # of active element, and the nodal displacements (vertical, angular)
-        # vector d
-        for i in range(len(self.mesh.lengths)):
-            if nodes[i] <= x <= nodes[i + 1]:
-                # this is the element where the global x-value falls into.
-                # Get the parameters in the local system and exit the loop
-                x_local = x - nodes[i]
-                L = self.mesh.lengths[i]
-                d = self.node_deflections[i * 2 : i * 2 + 4]
-                return self.shape(x_local, L).dot(d)
+        # calculate the deflections as the dot product of the nodal
+        # displacements and shape functions.
+        return np.sum(N * d_nodal, axis=1)
 
-    def moment(self, x, dx=1e-5, order=9):
-        """Calculate the moment at location x
+    def angle(self, x):
+        """
+        Calculate angle of the beam at location x in degrees
 
-        Calculate the moment in the beam at the global x value by taking
-        the second derivative of the deflection curve.
+        The moments are calculated by solving this equation:
 
         .. centered::
             :math:`M(x) = E \\cdot Ixx \\cdot \\frac{d^2 v(x)}{dx^2}`
@@ -118,99 +171,120 @@ class Beam(BeamElement):
         where :math:`M` is the moment, :math:`E` is Young's modulus and
         :math:`Ixx` is the area moment of inertia.
 
-        .. note: When calculating the moment near the beginning of the beam
-                 the moment calculation may be unreliable.
+        An alternate representation can be calculated using the second
+        derivative of the shape functions, and taking the dot product of the
+        nodal displacements.
+
+        .. centered::
+            :math:`M(x) = \frac{d^2 N}{dx^2} \\cdot d_{nodal}`
+
+        Where $N$ is the shape functions evaluated at the local `x` values of
+        each element for each `x` coordinate, and $d_{nodal}$ is the nodal
+        displacement.
 
         Parameters:
-            x (:obj:`int`): location along the beam where moment is calculated
-            dx (:obj:`float`, optional): spacing. Default is 1e-5
-            order (:obj:`int`, optional): number of points to use, must be odd.
-                Default is 9
+            x: array-like: locations along the beam where moment is calculated.
 
         Returns:
-            :obj:`float`: moment in beam at location x
+            array-like: moment of the beam
 
         Raises:
             :obj:`ValueError`: when the :math:`0\\leq x \\leq length` is False
-            :obj:`TypeError`: when x cannot be converted to a float
-
-        For more information on the parameters, see the scipy.misc.derivative
-        documentation.
         """
 
-        try:
-            return (
-                self.E
-                * self.Ixx
-                * derivative(self.deflection, x, dx=dx, n=2, order=order)
-            )
-        except ValueError:
-            # there was an error, probably due to the central difference
-            # method attempting to calculate the moment near the ends of the
-            # beam. Determine whether the desired position is near the start
-            # or end of the beam, and use the forward/backward difference
-            # method accordingly
+        x, x_local, d, L = self.__result_setup(x)
 
-            if x <= self.length / 2:
-                # the desired moment is near the beginning of the beam, use the
-                # forward difference method
-                method = "forward"
-            else:
-                # the desired moment is near the end of the beam, use the
-                # backward difference method
-                method = "backward"
-            return (
-                self.E
-                * self.Ixx
-                * comm_derivative(self.deflection, x, method=method, n=2)
-            )
+        # calculate the shape functions for all local x and L values
+        N = self.shape_d(x_local, L)
 
-    def shear(self, x, dx=0.01, order=5):
+        # calculate the angle as the dot product of the first derivative of
+        # the shape functions and nodal displacements
+        ang = -np.sum(N * d, axis=1)
+        return np.rad2deg(ang)
+
+    def moment(self, x):
         """
-        Calculate the shear force in the beam at location x
+        Calculate moment of the beam at location x
 
-        Calculate the shear in the beam at the global x value by taking
-        the third derivative of the deflection curve.
+        The moments are calculated by solving this equation:
+
+        .. centered::
+            :math:`M(x) = E \\cdot Ixx \\cdot \\frac{d^2 v(x)}{dx^2}`
+
+        where :math:`M` is the moment, :math:`E` is Young's modulus and
+        :math:`Ixx` is the area moment of inertia.
+
+        An alternate representation can be calculated using the second
+        derivative of the shape functions, and taking the dot product of the
+        nodal displacements.
+
+        .. centered::
+            :math:`M(x) = \frac{d^2 N}{dx^2} \\cdot d_{nodal}`
+
+        Where $N$ is the shape functions evaluated at the local `x` values of
+        each element for each `x` coordinate, and $d_{nodal}$ is the nodal
+        displacement.
+
+        Parameters:
+            x: array-like: locations along the beam where moment is calculated.
+
+        Returns:
+            array-like: moment of the beam
+
+        Raises:
+            :obj:`ValueError`: when the :math:`0\\leq x \\leq length` is False
+        """
+
+        x, x_local, d, L = self.__result_setup(x)
+
+        # calculate the shape functions for all local x and L values
+        N = self.shape_dd(x_local, L)
+
+        # calculate the moment as the dot product of the second derivative of
+        # the shape functions and nodal displacements
+        return -self.E * self.Ixx * np.sum(N * d, axis=1)
+
+    def shear(self, x):
+        """
+        Calculate shear force of the beam at location x
+
+        The shear forces are calculated by solving this equation:
 
         .. centered::
             :math:`V(x) = E \\cdot Ixx \\cdot \\frac{d^3 v(x)}{dx^3}`
 
-        where :math:`V` is the shear force, :math:`E` is Young's modulus and
+        where :math:`M` is the moment, :math:`E` is Young's modulus and
         :math:`Ixx` is the area moment of inertia.
 
-        .. note: When calculating the shear near the beginning of the beam
-                 the shear calculation may be unreliable.
+        An alternate representation can be calculated using the third
+        derivative of the shape functions, and taking the dot product of the
+        nodal displacements.
+
+        .. centered::
+            :math:`V(x) = \frac{d^3 N}{dx^3} \\cdot d_{nodal}`
+
+        Where $N$ is the shape functions evaluated at the local `x` values of
+        each element for each `x` coordinate, and $d_{nodal}$ is the nodal
+        displacement.
 
         Parameters:
-            x (:obj:`int`): location along the beam where moment is calculated
-            dx (:obj:`float`, optional): spacing. Default is 0.01
-            order (:obj:`int`, optional): number of points to use, must be odd.
-                Default is 5
+            x: array-like: locations along the beam where moment is calculated.
 
         Returns:
-            :obj:`float`: moment in beam at location x
+            array-like: shear force in the beam
 
         Raises:
             :obj:`ValueError`: when the :math:`0\\leq x \\leq length` is False
-            :obj:`TypeError`: when x cannot be converted to a float
-
-        For more information on the parameters, see the scipy.misc.derivative
-        documentation.
         """
-        return (
-            self.E * self.Ixx * derivative(self.deflection, x, dx=dx, n=3, order=order)
-        )
 
-    def bending_stress(self, x, dx=1, c=1):
-        """
-        returns the bending stress at global coordinate x
+        x, x_local, d, L = self.__result_setup(x)
 
-        .. deprecated:: 0.1.7a1
-            calculate bending stress as :obj:`Beam.moment(x) * c / Ixx`
+        # calculate the shape functions for all local x and L values
+        N = self.shape_ddd(x_local, L)
 
-        """
-        warn("bending_stress will be removed soon", DeprecationWarning)
-        return self.moment(x, dx=dx) * c / self.Ixx
+        # calculate the shear as the dot product of the third derivative of
+        # the shape functions and nodal displacements
+        return -self.E * self.Ixx * np.sum(N * d, axis=1)
 
     @staticmethod
     def __validate_plot_diagrams(diagrams, diagram_labels):
