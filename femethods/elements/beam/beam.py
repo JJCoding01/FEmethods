@@ -50,7 +50,7 @@ class Beam(BeamElement):
         E=1,
         Ixx=1,
     ):
-        super().__init__(length, loads, reactions, E=E, Ixx=Ixx)
+        super().__init__(length, loads, reactions, mesh=mesh, E=E, Ixx=Ixx)
         self.mesh = mesh
         self.solve()
 
