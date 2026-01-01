@@ -1,6 +1,7 @@
 """
 Module to define different loads
 """
+
 import numpy as np
 
 from scipy import integrate
