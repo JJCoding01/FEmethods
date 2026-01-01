@@ -2,9 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from femethods.mesh import Mesh
-
-from ...loads import DistributedLoad
 from ..__base import Element
+from ...loads import DistributedLoad, MomentLoad, PointLoad
 
 
 # Allow upper case letters for variable names to match engineering conventions
