@@ -85,7 +85,8 @@ def test_fixed_fixed_offset_max_deflection(beam_setup, EI, TOL):
     beam, L, P, (a, b) = beam_setup
 
     # the below equation is only valid when this is true
-    assert a > b, "invalid load position for these equations"
+    if a <= b:
+        pytest.skip(f"deflection equation only valid for a > b")
 
     x = 2 * a * L / (3 * a + b)
     d = 4 * P * a**3 * b**2 / (3 * EI * (3 * a + b) ** 2)
