@@ -59,7 +59,35 @@ class BeamElement(Element):
             if isinstance(load, DistributedLoad):
                 self.__equivalent_loads.extend(load.equivalent_loads(self.mesh.nodes))
             else:
-                self.__equivalent_loads.append(load)
+                # this is a point load/moment
+
+                # find the index for the left node where the load is applied
+                e = int(
+                    np.searchsorted(self.mesh.nodes, load.location, side="left") - 1
+                )
+                node1 = self.mesh.nodes[e]  # left node of element
+                node2 = self.mesh.nodes[e + 1]  # right node of element
+                length = node2 - node1  # length of element with load
+
+                # calculate the load position
+                # TODO: Consider skipping 0 equivalent forces when already on a node
+                #   When a or b equals zero, that means the load is already acting
+                #   on an existing node. Consider adding it to the equivalent loads
+                #   vector on its own without adding the f1, m1, f2, m2 loads
+                #   0-magnitudes
+                a = load.location - node1  # local load position relative to left node
+                b = length - a  # local load position relative to right node
+
+                # calculate the equivalent load vector for the load
+                fe = load.fe(a, b)
+                p1, m1, p2, m2 = fe  # extract the magnitudes for equivalent loads
+                eq_loads = [  # create an equivalent load vector of actual loads
+                    PointLoad(p1, node1),  # force at node 1
+                    MomentLoad(m1, node1),  # moment at node 1
+                    PointLoad(p2, node2),  # force at node 2
+                    MomentLoad(m2, node2),  # moment at node 2
+                ]
+                self.__equivalent_loads.extend(eq_loads)
 
     @property
     def equivalent_loads(self):
