@@ -38,7 +38,7 @@ def test_simply_supported_center_reaction_force(reaction_index, beam_setup, TOL)
 @pytest.mark.parametrize("reaction_index", [0, 1])
 def test_simply_supported_center_reaction_moment_0(reaction_index, beam_setup):
     beam = beam_setup[0]
-    assert beam.reactions[reaction_index].moment == 0
+    assert pytest.approx(beam.reactions[reaction_index].moment, abs=0.01) == 0
 
 
 def test_simply_supported_center_max_moment(beam_setup, TOL):

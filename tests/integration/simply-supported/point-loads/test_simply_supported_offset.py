@@ -57,7 +57,7 @@ def test_simply_supported_offset_reaction_force(beam_setup, TOL):
 @pytest.mark.parametrize("reaction_index", [0, 1])
 def test_simply_supported_offset_reaction_moment_0(reaction_index, beam_setup):
     beam = beam_setup[0]
-    assert pytest.approx(beam.reactions[reaction_index].moment, abs=1) == 0
+    assert pytest.approx(beam.reactions[reaction_index].moment, abs=0.01) == 0
 
 
 # noinspection PyPep8Naming
