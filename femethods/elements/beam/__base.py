@@ -27,17 +27,21 @@ class BeamElement(Element):
 
         if mesh is None:
             # create the default mesh
-            locations = [r.location for r in reactions]
-            locations.extend([load.location for load in loads])
-            mesh = Mesh(length, locations, 2)
+            mesh = self.__default_mesh(length, reactions, loads)
         self.mesh = mesh
 
         # note loads are set after reactions and mesh
         self.loads = loads
 
-    def __default_mesh(self, length, reactions, loads):
-        locations = [r.location for r in reactions]
-        locations.extend([load.location for load in loads])
+    @staticmethod
+    def __default_mesh(length, reactions, loads):
+        try:
+            locations = [r.location for r in reactions]
+            locations.extend([load.location for load in loads])
+        except AttributeError as e:
+            # error likely due to either reaction or load not being of a
+            # proper type, causing an error on r.location or load.location
+            raise TypeError(e)
         mesh = Mesh(length, locations, 2)
         return mesh
 
