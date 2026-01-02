@@ -35,6 +35,12 @@ class BeamElement(Element):
         # note loads are set after reactions and mesh
         self.loads = loads
 
+    def __default_mesh(self, length, reactions, loads):
+        locations = [r.location for r in reactions]
+        locations.extend([load.location for load in loads])
+        mesh = Mesh(length, locations, 2)
+        return mesh
+
     @property
     def loads(self):
         """loads on system"""
@@ -99,6 +105,8 @@ class BeamElement(Element):
 
     def remesh(self):
         self.invalidate()
+        mesh = self.__default_mesh(self.length, self.reactions, self.loads)
+        self.mesh = mesh
         return self.mesh
 
     def __get_boundary_conditions(self):
