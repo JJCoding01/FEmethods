@@ -56,10 +56,23 @@ class BeamElement(Element):
             else:
                 # this is a point load/moment
 
-                # find the index for the left node where the load is applied
-                e = int(
-                    np.searchsorted(self.mesh.nodes, load.location, side="left") - 1
+                # find the index for the right node where the load is applied.
+                # Do this by finding index where the load location would be
+                # inserted into the mesh and offsetting it down by one, which
+                # will get the start of the element
+                idx = int(
+                    np.searchsorted(self.mesh.nodes, load.location, side="right") - 1
                 )
+                # Then, clip the index to be a valid index WITHOUT ROLLING TO
+                # THE OPPOSITE SIDE. When the index is near the beginning of
+                # the beam, there's a chance that the index would be negative,
+                # this will effectively roll it to the other side, which is not
+                # what should happen in this case.
+                e = int(np.clip(idx, 0, len(self.mesh.nodes) - 2))
+
+                # Now that we have the proper index for the node, define the
+                # first (left) node, and calculate the second (right) node and
+                # element length.
                 node1 = self.mesh.nodes[e]  # left node of element
                 node2 = self.mesh.nodes[e + 1]  # right node of element
                 length = node2 - node1  # length of element with load
