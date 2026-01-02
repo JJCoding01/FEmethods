@@ -9,26 +9,18 @@ import numpy as np
 import pytest
 
 from femethods.elements import Beam
-from femethods.loads import MomentLoad, PointLoad
-from femethods.reactions import FixedReaction
+from femethods.loads import PointLoad
+from femethods.reactions import FixedReaction, SlotReaction
 from tests.factories import MeshFactory
-
-# TODO: update setup for vertical deflection with no-rotation
-#   This was originally misunderstood as a cantilevered beam with end point
-#   load and end moment. The end moment is used specifically to prevent all
-#   rotation, it is not an applied moment.
-
-pytest.skip(
-    "Skip these tests. "
-    "These are for a beam with vertical displacement with no rotation; "
-    "test setup is for a point load and moment load at the end",
-    allow_module_level=True,
-)
 
 
 @pytest.fixture()
 def beam_setup(beam_length, load, E, I):
-    """Cantilever beam with load and moment at free end"""
+    """
+    Cantilever beam with load free end
+
+    Free end constrained to vertical displacement
+    """
 
     P = load
     M = -load
@@ -44,9 +36,8 @@ def beam_setup(beam_length, load, E, I):
         length=beam_length,
         loads=[
             PointLoad(magnitude=P, location=0),
-            MomentLoad(magnitude=M, location=0),
         ],
-        reactions=[FixedReaction(beam_length)],
+        reactions=[SlotReaction(0), FixedReaction(beam_length)],
         mesh=mesh,
         E=E,
         Ixx=I,
@@ -56,7 +47,7 @@ def beam_setup(beam_length, load, E, I):
 
 def test_cantilevered_beam_reaction(beam_setup, TOL):
     beam, L, (P, M) = beam_setup
-    assert pytest.approx(beam.reactions[0].force, rel=TOL) == -P
+    assert pytest.approx(beam.reactions[0].force, rel=TOL) == P
     assert pytest.approx(beam.reactions[0].moment, rel=TOL) == P * L / 2
 
 
@@ -68,7 +59,7 @@ def test_cantilevered_beam_max_moment(beam_setup, TOL):
 
     # noinspection PyPep8Naming
     M_max = P * L / 2  # both ends
-    assert pytest.approx(beam.moment(L), rel=TOL) == M_max
+    assert pytest.approx(beam.moment(L), rel=TOL) == -M_max
     assert pytest.approx(beam.moment(0), rel=TOL) == M_max
 
 
