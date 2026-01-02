@@ -147,7 +147,7 @@ def test_invalid_reaction_errors(invalid_reaction):
 def test_shape_function():
     reactions = [PinnedReaction(x) for x in [0, 50, 100]]
     loads = [PointLoad(-100, x) for x in [5, 45, 90]]
-    beam = Beam(100, loads, reactions, 29e6, 345)
+    beam = Beam(100, loads, reactions, E=29e6, Ixx=345)
 
     assert beam.shape(0).shape == (4,), "unexpected shape of shape functions"
     n1, _, n3, _ = beam.shape(0)
@@ -184,8 +184,9 @@ def test_apply_boundary_conditions():
         25,
         [PointLoad(-100, 25), PointLoad(-100, 12)],
         [FixedReaction(0)],
-        29e6,
-        345,
+        mesh=None,
+        E=29e6,
+        Ixx=345,
     )
 
     k = beam.K
@@ -208,7 +209,7 @@ def test_apply_boundary_conditions():
 
 
 def test_shape_of_node_deflections():
-    beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], 29e6, 345)
+    beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], E=29e6, Ixx=345)
     assert beam.node_deflections.shape == (
         4,
     ), "nodal deflections shape is not expected"
@@ -216,7 +217,7 @@ def test_shape_of_node_deflections():
 
 def test_node_deflections_at_fixed_end():
     for load in [PointLoad(-100, 25), MomentLoad(-100, 25)]:
-        beam = Beam(25, [load], [FixedReaction(0)], 29e6, 345)
+        beam = Beam(25, [load], [FixedReaction(0)], E=29e6, Ixx=345)
         # check that the deflection at the fixed end is 0
         msgs = [
             "displacement at fixed end is non-zero",
@@ -228,7 +229,7 @@ def test_node_deflections_at_fixed_end():
 
 def test_node_deflections_at_free_end():
     for load in [PointLoad(-100, 25), MomentLoad(-100, 25)]:
-        beam = Beam(25, [load], [FixedReaction(0)], 29e6, 345)
+        beam = Beam(25, [load], [FixedReaction(0)], E=29e6, Ixx=345)
         # check that the deflection at the free end is non-zero and negative
         msgs = [
             "displacement at free end is not negative",
@@ -239,7 +240,7 @@ def test_node_deflections_at_free_end():
 
 
 def test_solve_method():
-    beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], 29e6, 345)
+    beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], E=29e6, Ixx=345)
 
     reaction = beam.reactions[0]
     assert reaction.force == 100, "Reaction force must be equal to and opposite load"
@@ -250,13 +251,13 @@ def test_solve_method():
 
 @pytest.mark.parametrize("invalid_location", [-4, 30])
 def test_invalid_deflection_location_value(invalid_location):
-    beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], 29e6, 345)
+    beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], E=29e6, Ixx=345)
     with pytest.raises(ValueError):
         beam.deflection(invalid_location)
 
 
 def test_invalid_deflection_location_type():
-    beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], 29e6, 345)
+    beam = Beam(25, [PointLoad(-100, 25)], [FixedReaction(0)], E=29e6, Ixx=345)
     with pytest.raises(TypeError):
         beam.deflection("a string (not a number)")
 
