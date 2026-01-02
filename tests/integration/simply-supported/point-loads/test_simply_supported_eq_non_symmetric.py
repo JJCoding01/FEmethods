@@ -36,10 +36,10 @@ def beam_setup(beam_length, load, E, I):
 def test_simply_supported_eq_non_symmetric_reaction_force(
     reaction_index, beam_setup, TOL
 ):
-    beam, beam_length_, load_, a, b = beam_setup
+    beam, L, P, a, b = beam_setup
 
-    R1 = -load_ / beam_length_ * (beam_length_ - a + b)
-    R2 = -load_ / beam_length_ * (beam_length_ + a - b)
+    R1 = -P / L * (L - a + b)
+    R2 = -P / L * (L - b + a)
     R = [R1, R2]
     assert (
         pytest.approx(beam.reactions[reaction_index].force, rel=TOL)
