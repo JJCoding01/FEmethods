@@ -303,8 +303,8 @@ def test_plot_diagram_labels_without_diagrams():
 def test_plot_default_labels():
     beam = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
     _, axes = beam.plot()
-    x_labels = ("", "", "Beam position, x")
-    y_labels = ("shear", "moment", "deflection")
+    x_labels = ("", "", "", "Beam position, x")
+    y_labels = ("shear", "moment", "angle", "deflection")
 
     assert len(axes) == len(x_labels), "wrong number of sub-plots"
     for ax, x_label, y_label in zip(axes, x_labels, y_labels):
