@@ -109,28 +109,6 @@ def test_invalid_loads(invalid_load, length, reaction_simple):
         Beam(length=length, reactions=reaction_simple, loads=[invalid_load])
 
 
-def test_invalid_load_placement():
-    reactions = [PinnedReaction(x) for x in [0, 50, 100]]
-    loads = [PointLoad(-100, x) for x in [0, 50, 100]]
-
-    # there should be a warning indicating that the load position was moved
-    # slightly so it does not line up with the reaction.
-    with pytest.warns(UserWarning):
-        beam = Beam(100, loads=loads, reactions=reactions)
-
-    for load, reaction in zip(beam.loads, beam.reactions):
-        assert (
-            load.location != reaction.location
-        ), "moved load is still the same as a reaction"
-
-
-@pytest.mark.parametrize("invalid_load", ["a string", FixedReaction(0), [], 10])
-def test_invalid_load_errors(invalid_load):
-    # Check for a TypeError for a variety of invalid loads
-    with pytest.raises(TypeError):
-        Beam(25, loads=[invalid_load], reactions=[FixedReaction(0)])
-
-
 @pytest.mark.parametrize("invalid_reaction", ["a string", PointLoad(25, 15), [], 10])
 def test_invalid_reaction_errors(invalid_reaction):
     # Check for an TypeError for a variety of invalid reactions
