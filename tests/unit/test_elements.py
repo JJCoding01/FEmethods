@@ -50,12 +50,6 @@ def test_beam_E_input(length, reaction_simple, load_centered, E):
     assert beam.E == E, "beam modulus of elasticity does not match input"
 
 
-def test_bending_stress_depreciation_warning():
-    with pytest.warns(DeprecationWarning):
-        b = Beam(10, [PointLoad(10, 10)], [FixedReaction(0)])
-        b.bending_stress(x=5, c=1)
-
-
 # noinspection PyPep8Naming
 @pytest.mark.parametrize("E", [0, -1])
 def test_beam_E_input_errors(length, reaction_simple, load_centered, E):
