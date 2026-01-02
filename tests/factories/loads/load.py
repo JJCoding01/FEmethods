@@ -7,9 +7,15 @@ from factory import Factory
 from femethods.loads import Load
 
 
+class LoadForFactory(Load):
+
+    def fe(self, a, b):
+        pass
+
+
 class LoadFactory(Factory):
     class Meta:
-        model = Load
+        model = LoadForFactory
 
     magnitude = 100
     location = 0
