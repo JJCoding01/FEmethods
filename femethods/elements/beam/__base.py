@@ -3,7 +3,7 @@ import numpy as np
 
 from femethods.mesh import Mesh
 from ..__base import Element
-from ...loads import DistributedLoad, MomentLoad, PointLoad
+from ...loads import DistributedLoad, MomentLoad, PointLoad, Load
 
 
 # Allow upper case letters for variable names to match engineering conventions
@@ -63,7 +63,7 @@ class BeamElement(Element):
         for load in self.__loads:
             if isinstance(load, DistributedLoad):
                 self.__equivalent_loads.extend(load.equivalent_loads(self.mesh.nodes))
-            else:
+            elif isinstance(load, Load):
                 # this is a point load/moment
 
                 # find the index for the right node where the load is applied.
@@ -101,6 +101,8 @@ class BeamElement(Element):
                     MomentLoad(m2, node2),  # moment at node 2
                 ]
                 self.__equivalent_loads.extend(eq_loads)
+            else:
+                raise TypeError(f'load must be of type Load or DistributedLoad, not {type(load)})')
 
     @property
     def equivalent_loads(self):
