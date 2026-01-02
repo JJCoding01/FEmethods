@@ -67,7 +67,7 @@ def test_pinned_fixed_offset_moment_fixed(beam_setup, TOL):
 
     M_fixed = P * a * b / (2 * L**2) * (a + L)  # moment at fixed end
 
-    assert pytest.approx(beam.moment(a), rel=TOL) == M_fixed
+    assert pytest.approx(beam.moment(L), rel=TOL) == -M_fixed
 
 
 def test_pinned_fixed_offset_deflection(beam_setup, EI, TOL):
