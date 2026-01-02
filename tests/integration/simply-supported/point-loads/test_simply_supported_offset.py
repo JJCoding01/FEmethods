@@ -4,7 +4,6 @@ Functional tests for simply supported beams (beams with two pinned reactions)
 https://www.structx.com/Beam_Formulas_008.html
 """
 
-import numpy as np
 import pytest
 
 from femethods.elements import Beam
@@ -24,7 +23,7 @@ def beam_setup(beam_length, load, load_location, E, I):
 
     mesh = MeshFactory(
         length=beam_length,
-        locations=np.linspace(0, beam_length, num=6, endpoint=True),
+        locations=[0, load_location, beam_length],
         node_dof=2,
         max_element_length=None,
         min_element_count=None,
