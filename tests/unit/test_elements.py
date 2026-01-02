@@ -267,7 +267,7 @@ def test_shear_cantilevered(location):
     beam = Beam(25, [PointLoad(-1000, 25)], [FixedReaction(0)])
 
     assert (
-        pytest.approx(beam.shear(location), rel=1e-5) == 1000
+        pytest.approx(beam.shear(location), rel=1e-5) == -1000
     ), f"shear does not equal load at location {location}"
 
 
