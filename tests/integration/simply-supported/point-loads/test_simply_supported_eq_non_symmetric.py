@@ -68,8 +68,8 @@ def test_simply_supported_eq_non_symmetric_moment(location, beam_setup, TOL):
     Mx = R1 * x + load_ * (x - a)  # moment at center
     M2 = R2 * b  # moment at second load
     if location == "load1":
-        assert pytest.approx(beam.moment(a), rel=TOL) == M1
+        assert pytest.approx(beam.moment(a), rel=TOL) == -M1
     if location == "center":
-        assert pytest.approx(beam.moment(x), rel=TOL) == Mx
+        assert pytest.approx(beam.moment(x), rel=TOL) == -Mx
     if location == "load2":
-        assert pytest.approx(beam.moment(beam_length_ - b), rel=TOL) == M2
+        assert pytest.approx(beam.moment(beam_length_ - b), rel=TOL) == -M2

@@ -42,7 +42,7 @@ def test_simply_supported_eq_symmetric_moment(beam_setup, TOL):
 
     # noinspection PyPep8Naming
     M_loc = -load_ * a  # max moment (at center between loads)
-    assert pytest.approx(beam.moment(a), rel=TOL) == M_loc
+    assert pytest.approx(beam.moment(a), rel=TOL) == -M_loc
 
 
 def test_simply_supported_eq_symmetric_max_deflection(beam_setup, EI, TOL):

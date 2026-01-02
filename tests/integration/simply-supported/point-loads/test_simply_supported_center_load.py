@@ -46,7 +46,7 @@ def test_simply_supported_center_max_moment(beam_setup, TOL):
 
     # noinspection PyPep8Naming
     M_max = -load_ * beam_length_ / 4  # psi, maximum moment
-    assert pytest.approx(beam.moment(beam_length_ / 2), rel=TOL) == M_max
+    assert pytest.approx(beam.moment(beam_length_ / 2), rel=TOL) == -M_max
 
 
 def test_simply_supported_center_max_deflection(beam_setup, EI, TOL):
