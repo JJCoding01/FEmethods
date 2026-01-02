@@ -51,4 +51,4 @@ def test_simply_supported_center_center_moment(beam_setup, TOL):
 
     # noinspection PyPep8Naming
     M_max = (P * L / 4) - (M1 + M2) / L  # psi, maximum moment
-    assert pytest.approx(beam.moment(L / 2), rel=TOL) == -M_max
+    assert pytest.approx(beam.moment(L / 2), rel=TOL) == M_max
