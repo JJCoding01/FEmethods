@@ -69,11 +69,6 @@ class BeamElement(Element):
                 length = node2 - node1  # length of element with load
 
                 # calculate the load position
-                # TODO: Consider skipping 0 equivalent forces when already on a node
-                #   When a or b equals zero, that means the load is already acting
-                #   on an existing node. Consider adding it to the equivalent loads
-                #   vector on its own without adding the f1, m1, f2, m2 loads
-                #   0-magnitudes
                 a = load.location - node1  # local load position relative to left node
                 b = length - a  # local load position relative to right node
 

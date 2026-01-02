@@ -41,6 +41,21 @@ class PointLoad(Load):
         Returns:
              np.array: equivalent loads in the form [F1, M1, F2, M2]
         """
+
+        if a == 0:
+            # when a = 0 or b=0, the load is already applied at a node, don't
+            # "spread" it out over multiple nodes
+            # For this case: the load is applied to the first node
+            return self.magnitude * np.array([1, 0, 0, 0])
+        if b == 0:
+            # when a = 0 or b=0, the load is already applied at a node, don't
+            # "spread" it out over multiple nodes
+            # For this case: the load is applied to the second node
+            return self.magnitude * np.array([0, 0, 1, 0])
+
+        # the load is applied somewhere in the middle, find the equivalent
+        # loads and moments spread out over both nodes.
+
         L = a + b  # length of element
         z = a / L  # non-dimensional zeta
 
