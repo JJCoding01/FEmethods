@@ -27,13 +27,9 @@ class BeamElement(Element):
 
         if mesh is None:
             # create the default mesh
-            mesh = Mesh(
-                length=length,
-                locations=[0, length],
-                node_dof=2,
-                max_element_length=None,
-                min_element_count=None,
-            )
+            locations = [r.location for r in reactions]
+            locations.extend([load.location for load in loads])
+            mesh = Mesh(length, locations, 2)
         self.mesh = mesh
 
         # note loads are set after reactions and mesh
