@@ -13,6 +13,18 @@ from femethods.loads import MomentLoad, PointLoad
 from femethods.reactions import FixedReaction
 from tests.factories import MeshFactory
 
+# TODO: update setup for vertical deflection with no-rotation
+#   This was originally misunderstood as a cantilevered beam with end point
+#   load and end moment. The end moment is used specifically to prevent all
+#   rotation, it is not an applied moment.
+
+pytest.skip(
+    "Skip these tests. "
+    "These are for a beam with vertical displacement with no rotation; "
+    "test setup is for a point load and moment load at the end",
+    allow_module_level=True,
+)
+
 
 @pytest.fixture()
 def beam_setup(beam_length, load, E, I):
