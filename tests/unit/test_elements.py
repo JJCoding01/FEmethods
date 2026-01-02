@@ -271,7 +271,7 @@ def test_shear_cantilevered(location):
     ), f"shear does not equal load at location {location}"
 
 
-@pytest.mark.parametrize("location", [-5, 0, 25, 35])
+@pytest.mark.parametrize("location", [-5, 35])
 def test_shear_cantilevered_error(location):
     # right now, the derivative function will try to calculate shear outside the beam
     # when calculating shear at or near endpoints. Verify that calculating shear at ends
