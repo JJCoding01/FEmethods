@@ -2,10 +2,11 @@
 Examples for FEMethods showing how to use the module
 
 """
+
 import numpy as np
 
 from femethods.elements import Beam
-from femethods.loads import PointLoad, MomentLoad
+from femethods.loads import MomentLoad, PointLoad
 from femethods.reactions import FixedReaction, PinnedReaction
 
 
@@ -29,22 +30,25 @@ def example_1():
     r = [FixedReaction(beam_len)]  # define reactions as list
     p = [PointLoad(magnitude=P, location=0)]  # define loads as list
 
-    b = Beam(beam_len, loads=p, reactions=r, E=E, Ixx=I)
+    b = Beam(beam_len, loads=p, reactions=r, mesh=None, E=E, Ixx=I)
 
     # an explicit solve is required to calculate the reaction values
     b.solve()
     print(b)
 
-    fig, axes = b.plot()
+    fig, axes = b.plot(
+        diagrams=("shear", "moment", "deflection"),
+        plot_kwargs={"label": "approx solution"},
+    )
     x = np.linspace(0, beam_len, 100)
-    Mx = P * x
-    Vx = P * np.ones(np.size(x))
+    Mx = -P * x
+    Vx = -P * np.ones(np.size(x))
     dx = (P / (6 * E * I)) * (2 * beam_len**3 - 3 * beam_len**2 * x + x**3)
-    axes[0].plot(x, Vx)
-    axes[1].plot(x, Mx)
-    axes[2].plot(x, dx)
+    axes[0].plot(x, Vx, "--", label="exact solution")
+    axes[1].plot(x, Mx, "--", label="exact solution")
+    axes[-1].plot(x, dx, "--", label="exact solution")
+    axes[-1].legend()
     b.show()
-
 
 
 def example_2():
@@ -66,6 +70,9 @@ def example_2():
     # an explicit solve is required to calculate the reaction values
     b.solve()
     print(b)
+
+    b.plot()
+    b.show()
 
 
 def example_3():
@@ -95,8 +102,17 @@ def example_3():
     b = Beam(beam_len, loads=p, reactions=r, E=29e6, Ixx=125)
     print(b)
 
+    b.plot()
+    b.show()
+
 
 if __name__ == "__main__":
+    np.set_printoptions(
+        precision=None,
+        linewidth=300,
+        suppress=True,
+        formatter={"float": "{:0,.5f}".format, "int": "{:0,.0f}".format},
+    )
     example_1()
     example_2()
     example_3()
