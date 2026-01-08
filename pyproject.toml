@@ -71,6 +71,19 @@ lines_between_types = 1
 multi_line_output = 3
 profile = "black"
 src_paths = [ "femethods", "tests", "docs" ]
+known_first_party = [ "femethods" ]
+
+[tool.pytest.ini_options]
+
+# See https://docs.pytest.org/en/6.2.x/usage.html for more details
+addopts = [
+  #  "--maxfail=3",        # stop tests after this many fails
+  "-rfE",               # Short summary of failed tests in terminal
+  "-qq",                # quiet mode (displays less verbose output). Can also stack to -qqq
+  "--cov-context=test",
+]
+
+testpaths = [ "tests" ]
 
 [tool.mypy]
 
