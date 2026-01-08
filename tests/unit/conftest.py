@@ -1,6 +1,9 @@
 # pylint: disable=missing-function-docstring
 # pylint: disable=redefined-outer-name
 
+
+import matplotlib
+
 # disable pylint "redefined-outer-name" error as this is triggered by using pytest
 # fixtures
 import pytest
@@ -8,6 +11,12 @@ import pytest
 from femethods.elements import Beam
 from femethods.loads import PointLoad
 from femethods.reactions import FixedReaction, PinnedReaction
+
+# Use static backend for matplotlib to avoid tkinter issues when running tests
+# that generate a plot. Since the window isn't needed for the tests, there's
+# no reason to create it. Use a simple backend to keep tests streamlined.
+# https://matplotlib.org/stable/users/explain/figure/backends.html
+matplotlib.use("Agg")
 
 
 @pytest.fixture()
