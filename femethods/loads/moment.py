@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.typing as npt
 
 from .__base import Load
 
@@ -10,10 +11,10 @@ class MomentLoad(Load):
 
     name = "moment load"
 
-    def __init__(self, magnitude, location):
+    def __init__(self, magnitude: float, location: float) -> None:
         super().__init__(magnitude, location, fm_factor=(0, 1))
 
-    def fe(self, a, b):
+    def fe(self, a: float, b: float) -> npt.NDArray[np.float64]:
         """
         Return the equivalent loads for the moment load acting on adjacent nodes
 

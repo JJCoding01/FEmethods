@@ -105,6 +105,7 @@ files = [ # whitelist files as typing is added to the project
   # white list typed modules here
     "femethods/core",
     "femethods/reactions",
+    "femethods/loads",
 
   # optionally, white list specific files here
 

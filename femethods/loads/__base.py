@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Iterable
 
 import numpy as np
+import numpy.typing as npt
 
 from ..core import Force
 
@@ -24,12 +25,17 @@ class Load(Force, ABC):
 
     name = ""
 
-    def __init__(self, magnitude, location=0, fm_factor=(1, 0)):
+    __fm_factor: npt.NDArray[np.float64]
+
+    def __init__(
+        self, magnitude: float, location: float = 0, fm_factor: tuple[int, int] = (1, 0)
+    ) -> None:
         super().__init__(magnitude, location)
+
         self.fm_factor = fm_factor
 
     @property
-    def fm_factor(self):
+    def fm_factor(self) -> npt.NDArray[np.float64]:
         """
         Force-Moment split in magnitude
 
@@ -52,21 +58,22 @@ class Load(Force, ABC):
         return self.__fm_factor
 
     @fm_factor.setter
-    def fm_factor(self, value):
+    def fm_factor(self, value: tuple[int, int]) -> None:
         if not isinstance(value, Iterable):
             raise TypeError("fm_factor must be an iterable of length 2!")
-        value = np.array(value)
-        if len(value) != 2:
+        output_value = np.array(value)
+        if len(output_value) != 2:
             raise ValueError("fm_factor must have length 2!")
-        self.__fm_factor = value
+        self.__fm_factor = output_value
 
     @property
-    def __load_magnitude(self):
+    def __load_magnitude(self) -> npt.NDArray[np.float64]:
         """the actual magnitude of force and moment after applying the proper split"""
+        assert self.magnitude is not None
         return self.magnitude * self.fm_factor
 
     @abstractmethod
-    def fe(self, a, b):
+    def fe(self, a: float, b: float) -> npt.NDArray[np.float64]:
         """
         Equivalent nodal forces and moments
         Parameters:
@@ -79,10 +86,11 @@ class Load(Force, ABC):
 
         raise NotImplementedError
 
-    def __getitem__(self, item):
-        return self.__load_magnitude[item]
+    def __getitem__(self, item: int) -> float:
+        # force the index of the numpy array to a float
+        return float(self.__load_magnitude[item])
 
-    def __str__(self):
+    def __str__(self) -> str:
         str_ = (
             f"Type: {self.name}\n"
             f"    Location: {self.location}\n"
