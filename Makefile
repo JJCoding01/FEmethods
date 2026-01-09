@@ -11,18 +11,22 @@ docs:
 	cd docs && make html
 
 format:
-	black $(PACKAGE_NAME)
 	isort $(PACKAGE_NAME)
+	black $(PACKAGE_NAME)
 
 format-tests:
-	black tests
 	isort tests
+	black tests
 
 format-all:
-	black $(PACKAGE_NAME)
 	isort $(PACKAGE_NAME)
-	black tests
+	black $(PACKAGE_NAME)
 	isort tests
+	black tests
+
+pyproject:
+	validate-pyproject pyproject.toml
+	pyproject-fmt pyproject.toml
 
 install:
 	python setup.py install
