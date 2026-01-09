@@ -22,6 +22,6 @@ class FixedReaction(Reaction):
 
     name = "fixed"
 
-    def __init__(self, location):
+    def __init__(self, location: float) -> None:
         # do not allow vertical or rotational displacement
         super().__init__(location, boundary=(0, 0))

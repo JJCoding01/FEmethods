@@ -21,6 +21,6 @@ class SlotReaction(Reaction):
 
     name = "slot"
 
-    def __init__(self, location):
+    def __init__(self, location: float) -> None:
         # allow vertical displacement but no rotation
         super().__init__(location, boundary=(None, 0))

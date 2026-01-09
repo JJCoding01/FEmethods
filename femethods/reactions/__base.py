@@ -9,11 +9,15 @@ There are two types of reactions that are defined.
     * FixedReaction, does not allow any displacement
 """
 
-from collections.abc import Iterable
+from typing import Any, Literal, Optional, TypeAlias
 from warnings import warn
 
 from .. import validation
 from ..core import Force
+
+DOF: TypeAlias = Literal[0] | None
+BOUNDARY: TypeAlias = tuple[DOF, DOF]
+BOUNDARIES: TypeAlias = tuple[BOUNDARY, ...]
 
 
 class Reaction(Force):
@@ -47,14 +51,14 @@ class Reaction(Force):
 
     name = "reaction"
 
-    def __init__(self, location, boundary=(None, None)):
+    def __init__(self, location: float, boundary: BOUNDARY = (None, None)) -> None:
         super().__init__(magnitude=None, location=location)
         self.force = None
         self.moment = None
         self.boundary = boundary
 
     @property
-    def boundary(self):
+    def boundary(self) -> BOUNDARY:
         """
         boundary conditions for the reaction
 
@@ -66,7 +70,7 @@ class Reaction(Force):
         return self._boundary
 
     @boundary.setter
-    def boundary(self, value):
+    def boundary(self, value: BOUNDARY) -> None:
 
         if not isinstance(value, Iterable):
             value = [value]
@@ -84,7 +88,7 @@ class Reaction(Force):
         self._boundary = value
 
     @property
-    def location(self):
+    def location(self) -> float:
         """
         Location of the reaction along the length of the beam
 
@@ -106,14 +110,14 @@ class Reaction(Force):
     @location.setter
     @validation.is_numeric
     @validation.non_negative
-    def location(self, location):
+    def location(self, location: float) -> None:
         # The location is overloading the location property in Forces so that
         # the reaction can be invalidated when the location is changed
         self.invalidate()
         self._location = location
 
     @property
-    def value(self):
+    def value(self) -> tuple[Optional[float], Optional[float]]:
         """
         Simple tuple of force and moment
 
@@ -122,7 +126,7 @@ class Reaction(Force):
         """
         return self.force, self.moment
 
-    def invalidate(self):
+    def invalidate(self) -> None:
         """Invalidate the reaction values
 
         This will set the force and moment values to :obj:`None`
@@ -132,7 +136,7 @@ class Reaction(Force):
         """
         self.force, self.moment = (None, None)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f"{self.__class__.__name__}\n"
             f"  Location: {self.location}\n"
@@ -140,10 +144,10 @@ class Reaction(Force):
             f"    Moment: {self.moment}\n"
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.__class__.__name__}(location={self.location})"
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
 
         if not isinstance(other, self.__class__):
             return False
