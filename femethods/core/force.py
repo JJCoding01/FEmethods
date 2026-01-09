@@ -2,22 +2,22 @@
 Base module that contains base classes to be used by other modules
 """
 
-from typing import Any
+from typing import Any, Optional
 
 
 class Force:
     """Base class for all loads and reactions"""
 
-    def __init__(self, magnitude: float, location: float = 0):
+    def __init__(self, magnitude: Optional[float], location: float = 0):
         self.magnitude = magnitude
         self.location = location
 
     @property
-    def magnitude(self) -> float:
+    def magnitude(self) -> Optional[float]:
         return self._magnitude
 
     @magnitude.setter
-    def magnitude(self, magnitude: float) -> None:
+    def magnitude(self, magnitude: Optional[float]) -> None:
         self._magnitude = magnitude
 
     @property
@@ -42,9 +42,11 @@ class Force:
 
         f1 = self.magnitude
         x1 = self.location
+        assert f1 is not None
 
         f2 = force2.magnitude
         x2 = force2.location
+        assert f2 is not None
 
         x = (f1 * x1 + f2 * x2) / (f1 + f2)
         return self.__class__(f1 + f2, x)
@@ -59,4 +61,6 @@ class Force:
         return self.magnitude * self.location == other.magnitude * other.location
 
     def __sub__(self, force2: "Force") -> "Force":
+        if force2.magnitude is None:
+            return self + self.__class__(None, force2.location)
         return self + self.__class__(-force2.magnitude, force2.location)

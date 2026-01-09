@@ -115,6 +115,7 @@ exclude = [
   # black list any non-typed files that are inside a white-listed module.
   # these are regex patterns, so anchor the start to the begining of the
   # package name
+    ".*distributed.*.py"
 ]
 
 disable_error_code = [
