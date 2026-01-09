@@ -1,4 +1,8 @@
-# Change Log
+# Changelog
+
+## UNRELEASED
+
+- Rewrite entire project to have better structure, and improve organization
 
 ## v0.1.7a2
 - Move common/private functionality into core module
