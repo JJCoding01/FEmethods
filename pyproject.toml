@@ -103,6 +103,7 @@ warn_unused_ignores = true
 # only check the areas of the project that have been typed so far
 files = [ # whitelist files as typing is added to the project
   # white list typed modules here
+    "femethods/core",
 
   # optionally, white list specific files here
 
