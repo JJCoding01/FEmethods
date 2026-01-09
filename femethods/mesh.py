@@ -1,4 +1,7 @@
+from typing import Optional
+
 import numpy as np
+import numpy.typing as npt
 
 from . import validation
 
@@ -17,23 +20,25 @@ class Mesh:
 
     def __init__(
         self,
-        length,
-        locations,
-        node_dof,
-        max_element_length=None,
-        min_element_count=None,
-    ):
+        length: float,
+        locations: npt.NDArray[np.float64],
+        node_dof: int,
+        max_element_length: Optional[float] = None,
+        min_element_count: Optional[int] = None,
+    ) -> None:
         self.length = length
         self.locations = locations
         self.node_dof = node_dof
 
-        self.__lengths = None  # this will be lazy calculated on-demand
+        self.__lengths: npt.NDArray[np.float64] | None = (
+            None  # this will be lazy calculated on-demand
+        )
 
         self.max_element_length = max_element_length
         self.min_element_count = min_element_count
 
     @property
-    def node_dof(self):
+    def node_dof(self) -> int:
         """
         degrees of freedom for a single node
 
@@ -46,17 +51,17 @@ class Mesh:
     @node_dof.setter
     @validation.is_numeric
     @validation.positive
-    def node_dof(self, value):
+    def node_dof(self, value: int, /) -> None:
         if value != int(value):
             raise ValueError(f"node_dof must be an integer, not {value}")
         self.__node_dof = value
 
     @property
-    def max_element_length(self):
+    def max_element_length(self) -> Optional[float]:
         return self.__max_element_length
 
     @max_element_length.setter
-    def max_element_length(self, value):
+    def max_element_length(self, value: Optional[float]) -> None:
         if value is None:
             self.__max_element_length = None
             return
@@ -70,11 +75,11 @@ class Mesh:
         self.__max_element_length = value
 
     @property
-    def min_element_count(self):
+    def min_element_count(self) -> Optional[int]:
         return self.__min_element_count
 
     @min_element_count.setter
-    def min_element_count(self, value):
+    def min_element_count(self, value: Optional[int]) -> None:
         if value is None:
             self.__min_element_count = None
             return
@@ -87,7 +92,9 @@ class Mesh:
             )
         self.__min_element_count = value
 
-    def __max_length_nodes(self, required_nodes):
+    def __max_length_nodes(
+        self, required_nodes: npt.NDArray[np.float64]
+    ) -> npt.NDArray[np.float64]:
         """
         get node locations when the max length of an element is specified
         """
@@ -123,7 +130,9 @@ class Mesh:
             lengths = np.diff(nodes)
         return nodes
 
-    def __min_count_nodes(self, required_nodes):
+    def __min_count_nodes(
+        self, required_nodes: npt.NDArray[np.float64]
+    ) -> npt.NDArray[np.float64]:
         """get node locations when min number of elements are specified"""
 
         if self.__min_element_count is None:  # pragma: no cover
@@ -152,7 +161,7 @@ class Mesh:
         return nodes
 
     @property
-    def nodes(self):
+    def nodes(self) -> npt.NDArray[np.float64]:
         """location of nodes"""
         # create set of locations of each load and reaction, and the ends of the beam.
         # ensure first node is always at zero (0) (start of beam)
@@ -171,7 +180,7 @@ class Mesh:
         return nodes__
 
     @property
-    def dof(self):
+    def dof(self) -> int:
         """
         Degrees of freedom of the entire beam
 
@@ -181,7 +190,7 @@ class Mesh:
         return self.node_dof * len(self.nodes)
 
     @property
-    def lengths(self):
+    def lengths(self) -> npt.NDArray[np.float64]:
         """
         List of lengths of mesh elements
 
@@ -196,7 +205,7 @@ class Mesh:
         self.__lengths = np.diff(self.nodes)
         return self.__lengths
 
-    def __str__(self):
+    def __str__(self) -> str:
         mesh_string = (
             "MESH PARAMETERS\n"
             f"Number of elements: {len(self.lengths)}\n"

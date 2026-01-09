@@ -111,6 +111,7 @@ files = [ # whitelist files as typing is added to the project
 
   # module level files
     "femethods/validation.py",
+    "femethods/mesh.py",
 ]
 
 exclude = [
