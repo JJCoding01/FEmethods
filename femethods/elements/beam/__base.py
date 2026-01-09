@@ -1,10 +1,18 @@
+from typing import Optional, Sequence, TYPE_CHECKING
+
 import matplotlib.pyplot as plt
 import numpy as np
+import numpy.typing as npt
 
 from femethods.mesh import Mesh
 
 from ...loads import DistributedLoad, Load, MomentLoad, PointLoad
+from ...reactions import Reaction
 from ..__base import Element
+
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes
+    from matplotlib.figure import Figure
 
 
 # Allow upper case letters for variable names to match engineering conventions
@@ -16,15 +24,14 @@ class BeamElement(Element):
 
     def __init__(
         self,
-        length,
-        loads,
-        reactions,
-        mesh=None,
-        E=1,
-        Ixx=1,
-    ):
-        super().__init__(length, E, Ixx)
-        self.reactions = reactions
+        length: float,
+        loads: Sequence[Load],
+        reactions: Sequence[Reaction],
+        mesh: Optional[Mesh] = None,
+        E: float = 1,
+        Ixx: float = 1,
+    ) -> None:
+        super().__init__(length, reactions, E, Ixx)
 
         if mesh is None:
             # create the default mesh
@@ -35,7 +42,9 @@ class BeamElement(Element):
         self.loads = loads
 
     @staticmethod
-    def __default_mesh(length, reactions, loads):
+    def __default_mesh(
+        length: float, reactions: Sequence[Reaction], loads: Sequence[Load]
+    ) -> Mesh:
         try:
             locations = [r.location for r in reactions]
             locations.extend([load.location for load in loads])
@@ -43,16 +52,16 @@ class BeamElement(Element):
             # error likely due to either reaction or load not being of a
             # proper type, causing an error on r.location or load.location
             raise TypeError(e)
-        mesh = Mesh(length, locations, 2)
+        mesh = Mesh(length, np.array(locations), 2)
         return mesh
 
     @property
-    def loads(self):
+    def loads(self) -> Sequence[Load]:
         """loads on system"""
         return super().loads
 
     @loads.setter
-    def loads(self, value):
+    def loads(self, value: Sequence[Load]) -> None:
         # basic loads
         # call super loads method to take advantage of the error checking and validation
         # performed at that level
@@ -108,17 +117,17 @@ class BeamElement(Element):
                 )
 
     @property
-    def equivalent_loads(self):
+    def equivalent_loads(self) -> Sequence[Load]:
         """load that are equivalent to distributed loads"""
         return self.__equivalent_loads
 
-    def remesh(self):
+    def remesh(self) -> Mesh:
         self.invalidate()
         mesh = self.__default_mesh(self.length, self.reactions, self.loads)
         self.mesh = mesh
         return self.mesh
 
-    def __get_boundary_conditions(self):
+    def __get_boundary_conditions(self) -> npt.NDArray[np.float64]:
         assert self.reactions is not None
 
         # Initialize the  boundary conditions to None for each node
@@ -139,7 +148,7 @@ class BeamElement(Element):
         return bc
 
     @property
-    def Kbc(self):
+    def Kbc(self) -> npt.NDArray[np.float64]:
         """
         Stiffness matrix with boundary conditions applied
 
@@ -158,7 +167,7 @@ class BeamElement(Element):
         return kg
 
     @property
-    def b_input(self):
+    def b_input(self) -> npt.NDArray[np.float64]:
         """
         input load vector b
 
@@ -212,7 +221,7 @@ class BeamElement(Element):
         b[bci] = 0
         return b
 
-    def _calc_node_deflections(self):
+    def _calc_node_deflections(self) -> npt.NDArray[np.float64]:
         """solve for vertical and angular displacement at each node"""
 
         # get the stiffness matrix with boundary conditions applied
@@ -226,10 +235,10 @@ class BeamElement(Element):
         # reused without recalculating the stiffness matrix.
         # This vector should be cleared anytime any of the beam parameters
         # gets changed.
-        self._node_deflections = np.linalg.solve(kg, b)
+        self._node_deflections: npt.NDArray[np.float64] = np.linalg.solve(kg, b)
         return self._node_deflections
 
-    def update_reactions(self):
+    def update_reactions(self) -> npt.NDArray[np.float64]:
 
         # get the load vector of all loads on each node
         r = self.load_vector
@@ -245,7 +254,9 @@ class BeamElement(Element):
             ri.moment = moment
         return r
 
-    def shape(self, x, L=None):
+    def shape(
+        self, x: npt.NDArray[np.float64], L: Optional[float] = None
+    ) -> npt.NDArray[np.float64]:
         """
         array of shape functions
 
@@ -259,14 +270,15 @@ class BeamElement(Element):
         x = np.asarray(x, dtype=float)
         if L is None:
             L = self.length
-        L = np.asarray(L, dtype=float)
         N1 = 1 / L**3 * (L**3 - 3 * L * x**2 + 2 * x**3)
         N2 = 1 / L**2 * (L**2 * x - 2 * L * x**2 + x**3)
         N3 = 1 / L**3 * (3 * L * x**2 - 2 * x**3)
         N4 = 1 / L**2 * (x**3 - L * x**2)
         return np.stack([N1, N2, N3, N4], axis=-1)  # (..., 4)
 
-    def shape_d(self, x, L=None):
+    def shape_d(
+        self, x: npt.NDArray[np.float64], L: Optional[float] = None
+    ) -> npt.NDArray[np.float64]:
         """
         first derivative of shape functions
 
@@ -280,14 +292,15 @@ class BeamElement(Element):
         x = np.asarray(x, dtype=float)
         if L is None:
             L = self.length
-        L = np.asarray(L, dtype=float)
         N1 = 6 * x / L**3 * (-L + x)
         N2 = 1 - 4 * x / L + 3 * x**2 / L**2
         N3 = 6 * x / L**3 * (L - x)
         N4 = x / L**2 * (-2 * L + 3 * x)
         return np.stack([N1, N2, N3, N4], axis=-1)  # (..., 4)
 
-    def shape_dd(self, x, L=None):
+    def shape_dd(
+        self, x: npt.NDArray[np.float64], L: Optional[float] = None
+    ) -> npt.NDArray[np.float64]:
         """
         second derivative of shape functions
 
@@ -302,14 +315,15 @@ class BeamElement(Element):
         x = np.asarray(x, dtype=float)
         if L is None:
             L = self.length
-        L = np.asarray(L, dtype=float)
         N1 = -6 / L**3 * (L - 2 * x)
         N2 = 2 / L**2 * (-2 * L + 3 * x)
         N3 = 2 / L**3 * (3 * L - 6 * x)
         N4 = 2 / L**2 * (-L + 3 * x)
         return np.stack([N1, N2, N3, N4], axis=-1)  # (..., 4)
 
-    def shape_ddd(self, x, L=None):
+    def shape_ddd(
+        self, x: npt.NDArray[np.float64], L: Optional[float] = None
+    ) -> npt.NDArray[np.float64]:
         """
         third derivative of shape functions
 
@@ -324,15 +338,15 @@ class BeamElement(Element):
         x = np.asarray(x, dtype=float)
         if L is None:
             L = self.length
-        L = np.asarray(L, dtype=float)
-
         N1 = 12 / L**3 * np.ones(x.shape)
         N2 = 6 / L**2 * np.ones(x.shape)
         N3 = -12 / L**3 * np.ones(x.shape)
         N4 = 6 / L**2 * np.ones(x.shape)
         return np.stack([N1, N2, N3, N4], axis=-1)  # (..., 4)
 
-    def plot_shapes(self, n=25):  # pragma: no cover
+    def plot_shapes(
+        self, n: int = 25
+    ) -> tuple["Figure", list["Axes"]]:  # pragma: no cover
         """
         plot shape functions for the with n data points
 
@@ -348,7 +362,7 @@ class BeamElement(Element):
 
         # set up list of axes with a grid where the two figures in each column
         # share an x-axis
-        axes = []
+        axes: list["Axes"] = []
         fig = plt.figure()
         axes.append(fig.add_subplot(221))
         axes.append(fig.add_subplot(222))
@@ -375,7 +389,7 @@ class BeamElement(Element):
 
         return fig, axes
 
-    def stiffness(self, L):
+    def stiffness(self, L: Optional[float] = None) -> npt.NDArray[np.float64]:
         """
         local stiffness matrix as numpy array
 
@@ -383,6 +397,8 @@ class BeamElement(Element):
             L: numeric: optional: length of element.
                 Defaults to None (which means use the overall length of the structure)
         """
+        if L is None:
+            L = self.length
 
         k = np.array(
             [
@@ -394,7 +410,7 @@ class BeamElement(Element):
         )
         return self.E * self.Ixx / L**3 * k
 
-    def stiffness_global(self):
+    def stiffness_global(self) -> npt.NDArray[np.float64]:
         """
         Global stiffness matrix of entire structure
         """
