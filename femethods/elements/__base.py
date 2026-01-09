@@ -4,14 +4,19 @@ the base element class that all FEM elements will be derived from
 """
 
 from abc import ABC, abstractmethod
+from typing import Optional, Sequence, TYPE_CHECKING
 
 import numpy as np
+import numpy.typing as npt
 
 # Importing loads is only used for checking the type. Find a better way to do
 # this without needing to import loads
 from .. import validation
 from ..loads import Load
 from ..reactions import Reaction
+
+if TYPE_CHECKING:
+    from femethods.mesh import Mesh
 
 
 # Allow upper case letters for variable names to match engineering conventions
@@ -34,13 +39,13 @@ class Properties:
         ValueError: when length, E, or Ixx is not positive
     """
 
-    def __init__(self, length, E=1, Ixx=1):
+    def __init__(self, length: float, E: float = 1, Ixx: float = 1) -> None:
         self.length = length
         self.E = E  # Young's modulus
         self.Ixx = Ixx  # area moment of inertia
 
     @property
-    def length(self):
+    def length(self) -> float:
         """
         length of structure or element
 
@@ -58,11 +63,11 @@ class Properties:
     @length.setter
     @validation.is_numeric
     @validation.positive
-    def length(self, length):
+    def length(self, length: float) -> None:
         self._length = length
 
     @property
-    def E(self):
+    def E(self) -> float:
         """
         Young's modulus of elasticity of structure or element
 
@@ -78,11 +83,11 @@ class Properties:
     @E.setter
     @validation.is_numeric
     @validation.positive
-    def E(self, E):
+    def E(self, E: float) -> None:
         self._E = E
 
     @property
-    def Ixx(self):
+    def Ixx(self) -> float:
         """
         Area moment of inertia in the key direction for the structure or element
 
@@ -98,7 +103,7 @@ class Properties:
     @Ixx.setter
     @validation.is_numeric
     @validation.positive
-    def Ixx(self, Ixx):
+    def Ixx(self, Ixx: float) -> None:
         self._Ixx = Ixx
 
 
@@ -109,19 +114,21 @@ class Properties:
 class Element(Properties, ABC):
     """General element that will be inherited from for specific elements"""
 
-    def __init__(self, length, E=1, Ixx=1):
+    def __init__(
+        self, length: float, reactions: Sequence[Reaction], E: float = 1, Ixx: float = 1
+    ) -> None:
         super().__init__(length, E, Ixx)
-        self._node_deflections = None
-        self._K = None  # global stiffness matrix
-        self._reactions = None
-        self._loads = None
+        self._node_deflections: npt.NDArray[np.float64] | None = None
+        self._K: npt.NDArray[np.float64] | None = None  # global stiffness matrix
+        self._reactions: Sequence[Reaction] = reactions
+        self._loads: Sequence[Load] = ()
 
     @property
-    def loads(self):
+    def loads(self) -> Sequence[Load]:
         return self._loads
 
     @loads.setter
-    def loads(self, loads):
+    def loads(self, loads: Sequence[Load]) -> None:
         # validate that loads is a list of valid Loads
         for load in loads:
             if not isinstance(load, Load):
@@ -131,11 +138,11 @@ class Element(Properties, ABC):
         self._loads = loads
 
     @property
-    def reactions(self):
+    def reactions(self) -> Sequence[Reaction]:
         return self._reactions
 
     @reactions.setter
-    def reactions(self, reactions):
+    def reactions(self, reactions: Sequence[Reaction]) -> None:
         for reaction in reactions:
             if not isinstance(reaction, Reaction):
                 msg = f"type {type(reaction)} is not of type Reaction"
@@ -144,11 +151,11 @@ class Element(Properties, ABC):
         self._reactions = reactions
 
     @abstractmethod
-    def remesh(self):
+    def remesh(self) -> "Mesh":
         """force a remesh calculation and invalidate any calculation results"""
         raise NotImplementedError("method must be overloaded")
 
-    def invalidate(self):
+    def invalidate(self) -> None:
         """invalidate the element to force resolving"""
         self._node_deflections = None
         self._K = None
@@ -157,13 +164,14 @@ class Element(Properties, ABC):
                 reaction.invalidate()
 
     @property
-    def K(self):
+    def K(self) -> npt.NDArray[np.float64]:
         """global stiffness matrix"""
         if self._K is None:
+            # calculate stiffness matrix
             self._K = self.stiffness_global()
         return self._K
 
-    def solve(self):
+    def solve(self) -> None:
         """solve the system the FEM system to define the nodal displacements
         and reaction forces.
         """
@@ -172,21 +180,21 @@ class Element(Properties, ABC):
         self.update_reactions()
 
     @property
-    def node_deflections(self):
+    def node_deflections(self) -> npt.NDArray[np.float64]:
         if self._node_deflections is None:
             self._node_deflections = self._calc_node_deflections()
         return self._node_deflections
 
     @abstractmethod
-    def _calc_node_deflections(self):
+    def _calc_node_deflections(self) -> npt.NDArray[np.float64]:
         raise NotImplementedError("must be overloaded!")
 
     @abstractmethod
-    def update_reactions(self):
+    def update_reactions(self) -> npt.NDArray[np.float64]:
         raise NotImplementedError("must be overloaded!")
 
     @property
-    def load_vector(self):
+    def load_vector(self) -> npt.NDArray[np.float64]:
         """
         Calculate the nodal forces acting on each node
 
@@ -206,25 +214,28 @@ class Element(Properties, ABC):
 
         K = self.K  # global stiffness matrix
         d = self.node_deflections  # force displacement vector
-        r = np.matmul(K, d)
+        r: npt.NDArray[np.float64] = np.matmul(K, d)
         return r
 
     @abstractmethod
-    def stiffness(self, L):
+    def stiffness(self, L: Optional[float]) -> npt.NDArray[np.float64]:
         """return local stiffness matrix, k, as numpy array evaluated with beam
         element length L, where L defaults to the length of the beam
         """
         raise NotImplementedError("Method must be overloaded!")
 
     @abstractmethod
-    def stiffness_global(self):
+    def stiffness_global(self) -> npt.NDArray[np.float64]:
         # Initialize the global stiffness matrix, then iterate over the
         # elements, calculate a local stiffness matrix, and add it to the
         # global stiffness matrix.
         raise NotImplementedError("Method must be overloaded!")
 
     @staticmethod
-    def apply_boundary_conditions(k, bcs):
+    def apply_boundary_conditions(
+        k: npt.NDArray[np.float64],
+        bcs: Sequence[tuple[Optional[float], Optional[float]]],
+    ) -> npt.NDArray[np.float64]:
         """
         Given the stiffness matrix 'k_local', and the boundary conditions as a
         list of tuples, apply the boundary conditions to the stiffness matrix
@@ -250,7 +261,7 @@ class Element(Properties, ABC):
         conditions are applied
         """
 
-        def apply(k_local, i):
+        def apply(k_local: npt.NDArray[np.float64], i: int) -> npt.NDArray[np.float64]:
             """sub function to apply the boundary condition at row/col i to
             stiffness matrix k_local
 

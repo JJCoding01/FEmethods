@@ -108,6 +108,7 @@ files = [ # whitelist files as typing is added to the project
     "femethods/loads",
 
   # optionally, white list specific files here
+    "femethods/elements/__base.py",
 
   # module level files
     "femethods/validation.py",
