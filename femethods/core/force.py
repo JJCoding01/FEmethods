@@ -6,7 +6,24 @@ from typing import Any, Optional
 
 
 class Force:
-    """Base class for all loads and reactions"""
+    """
+    Base class for all loads and reactions
+
+    Parameters
+    ----------
+        magnitude : float | None:
+            magnitude of the force
+        location : float: default = `0`
+            location of the force
+
+    Notes
+    -----
+
+    Forces can be added, using the equation below:
+
+    .. centered::
+        :math:`F = \\frac{F_1 \\cdot x_1 + F_1 \\cdot x_1}{F_1 + F_2}`
+    """
 
     def __init__(self, magnitude: Optional[float], location: float = 0):
         self.magnitude = magnitude
@@ -14,6 +31,15 @@ class Force:
 
     @property
     def magnitude(self) -> Optional[float]:
+        """
+        Magnitude of the force
+
+        Returns
+        -------
+            None | float
+                Returns `None` when the magnitude is not known or unset.
+        """
+
         return self._magnitude
 
     @magnitude.setter
@@ -22,6 +48,14 @@ class Force:
 
     @property
     def location(self) -> float:
+        """
+        Location of force
+
+        Returns
+        -------
+        float
+            Location of force
+        """
         return self._location
 
     @location.setter
@@ -35,7 +69,6 @@ class Force:
         )
 
     def __add__(self, force2: "Force") -> "Force":
-
         if not isinstance(force2, self.__class__):
             # only addition between forces is implemented
             raise TypeError(f"cannot add {self.__class__} and {type(force2)}")

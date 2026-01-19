@@ -9,12 +9,15 @@ class FixedReaction(Reaction):
     angle are both constrained and must be zero at the reaction point.
     FixedReactions are typically applied at the ends of a Beam.
 
-    Parameters:
-        location (:obj:`float`): the axial location of the reaction along the
-                                 length of the beam
+    Parameters
+    ----------
+        location : float
+            the axial location of the reaction along the length of the beam
 
-    Attributes:
-        name (:obj:`str`): short name of the reaction (fixed). Used internally
+    Attributes
+    ----------
+        name : str
+            short name of the reaction (fixed). Used internally
 
     .. warning:: The **name** attribute is used internally.
                  **Do not change this value!**

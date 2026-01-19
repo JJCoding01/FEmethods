@@ -125,6 +125,13 @@ class Element(Properties, ABC):
 
     @property
     def loads(self) -> Sequence[Load]:
+        """
+        list of Loads acting on the element
+
+        Returns
+        -------
+        list: list of elements on the element
+        """
         return self._loads
 
     @loads.setter
@@ -139,6 +146,13 @@ class Element(Properties, ABC):
 
     @property
     def reactions(self) -> Sequence[Reaction]:
+        """
+        Reactions on element
+
+        Returns
+        -------
+        list: list of reactions acting on all elements.
+        """
         return self._reactions
 
     @reactions.setter
@@ -181,6 +195,13 @@ class Element(Properties, ABC):
 
     @property
     def node_deflections(self) -> npt.NDArray[np.float64]:
+        """
+        Calculate nodal deflections
+
+        Returns
+        -------
+        np.array: array of the nodal deflections
+        """
         if self._node_deflections is None:
             self._node_deflections = self._calc_node_deflections()
         return self._node_deflections
@@ -191,6 +212,15 @@ class Element(Properties, ABC):
 
     @abstractmethod
     def update_reactions(self) -> npt.NDArray[np.float64]:
+        """
+        Method to update the reactions after solving
+
+        This method must be overloaded in the specific element class.
+
+        Returns
+        -------
+        np.array: array of the magnitude of each reaction
+        """
         raise NotImplementedError("must be overloaded!")
 
     @property
@@ -226,6 +256,16 @@ class Element(Properties, ABC):
 
     @abstractmethod
     def stiffness_global(self) -> npt.NDArray[np.float64]:
+        """
+        Global stiffness matrix
+
+        This must be overloaded by the specific element.
+
+        Returns
+        -------
+        npt.NDArray[np.float64]: array of the global stiffness matrix
+        """
+
         # Initialize the global stiffness matrix, then iterate over the
         # elements, calculate a local stiffness matrix, and add it to the
         # global stiffness matrix.
@@ -242,12 +282,13 @@ class Element(Properties, ABC):
         by setting the rows and columns that correspond to the boundary
         conditions to zeros, with ones on the diagonal.
 
-        The boundary conditions (bcs) are in the form
-        bcs = [
-            (displacement1, rotation1),
-            (displacement2, rotation2),
-            (..., ...),
-            (displacementn, rotationn),
+        The boundary conditions (bcs) are in the form::
+
+            bcs = [
+                (displacement1, rotation1),
+                (displacement2, rotation2),
+                (..., ...),
+                (displacementn, rotationn),
             ]
 
         For the boundary condition, if the conditional evaluates to None, then

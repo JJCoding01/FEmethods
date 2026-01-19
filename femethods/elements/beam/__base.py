@@ -152,8 +152,10 @@ class BeamElement(Element):
         """
         Stiffness matrix with boundary conditions applied
 
-        Returns:
-            np.array: Stiffness matrix with boundary conditions applied
+        Returns
+        -------
+            np.array
+                Stiffness matrix with boundary conditions applied
         """
         # Get the boundary conditions from the reactions
         bc = self.__get_boundary_conditions()
@@ -169,10 +171,12 @@ class BeamElement(Element):
     @property
     def b_input(self) -> npt.NDArray[np.float64]:
         """
-        input load vector b
+        input load vector `b`
 
-        Returns:
-            np.array: input load vector b
+        Returns
+        -------
+            np.array
+                input load vector `b`
         """
 
         # create an array for all loads (forces and moments) initialized to
@@ -260,12 +264,17 @@ class BeamElement(Element):
         """
         array of shape functions
 
-        Parameters:
-            x: numeric: array-like: local x-coordinates where shape function is evaluated
-            L: numeric: optional: length of element.
+        Parameters
+        ----------
+            x : numeric | array_like
+                local x-coordinates where shape function is evaluated
+            L : numeric | None
+                length of element.Default is total beam length
 
-        Returns:
-            np.array: array of shape functions
+        Returns
+        -------
+            np.array
+                array of shape functions
         """
         x = np.asarray(x, dtype=float)
         if L is None:
@@ -282,12 +291,17 @@ class BeamElement(Element):
         """
         first derivative of shape functions
 
-        Parameters:
-            x: numeric | array-like: local x-coordinates where shape function is evaluated
-            L: numeric (optional): length of element. Defaults to beam length when None.
+        Parameters
+        ----------
+            x : numeric | array_like
+                local x-coordinates where shape function is evaluated
+            L : numeric | None
+                length of element. Defaults to beam length when None.
 
-        Returns:
-            np.array: array of the first derivative of shape functions
+        Returns
+        -------
+            np.array
+                array of the first derivative of shape functions
         """
         x = np.asarray(x, dtype=float)
         if L is None:
@@ -304,12 +318,17 @@ class BeamElement(Element):
         """
         second derivative of shape functions
 
-        Parameters:
-            x: numeric | array-like: local x-coordinates where shape function is evaluated
-            L: numeric (optional): length of element. Defaults to beam length when None.
+        Parameters
+        ----------
+            x : numeric | array_like
+                local x-coordinates where shape function is evaluated
+            L : numeric | None
+                length of element. Defaults to beam length when None.
 
-        Returns:
-            np.array: array of the second derivative of shape functions
+        Returns
+        -------
+            np.array
+                array of the second derivative of shape functions
         """
 
         x = np.asarray(x, dtype=float)
@@ -327,12 +346,17 @@ class BeamElement(Element):
         """
         third derivative of shape functions
 
-        Parameters:
-            x: numeric | array-like: local x-coordinates where shape function is evaluated
-            L: numeric (optional): length of element. Defaults to beam length when None.
+        Parameters
+        ----------
+            x : numeric | array_like
+                local x-coordinates where shape function is evaluated
+            L : numeric | None
+                length of element. Defaults to beam length when None.
 
-        Returns:
-            np.array: array of the third derivative of shape functions
+        Returns
+        -------
+            np.array
+                array of the third derivative of shape functions
         """
 
         x = np.asarray(x, dtype=float)
@@ -348,16 +372,20 @@ class BeamElement(Element):
         self, n: int = 25
     ) -> tuple["Figure", list["Axes"]]:  # pragma: no cover
         """
-        plot shape functions for the with n data points
+        plot shape functions for the with `n` data points
 
         Does not automatically show the figure. Use the `.show()` method to
         show the figure.
 
-        Parameters:
-            n: int: number of data points
+        Parameters
+        ----------
+            n : int
+                number of data points
 
-        Returns:
-            fig, axes: matplotlib figure and axes for the generated figure
+        Returns
+        -------
+             (fig, axes) : tuple
+                matplotlib figure and axes for the generated figure in a tuple
         """
 
         # set up list of axes with a grid where the two figures in each column
@@ -393,9 +421,10 @@ class BeamElement(Element):
         """
         local stiffness matrix as numpy array
 
-        Parameters:
-            L: numeric: optional: length of element.
-                Defaults to None (which means use the overall length of the structure)
+        Parameters
+        ----------
+            L : numeric | optional
+                length of element. Defaults to beam length when None.
         """
         if L is None:
             L = self.length

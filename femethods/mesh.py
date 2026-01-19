@@ -10,10 +10,18 @@ class Mesh:
     """
     Mesh to handle degrees-of-freedom (dof) and element lengths
 
-    Parameters:
-        length: float: overall length of structure
-        locations: sequence: sequence of locations of nodes (loads and reactions)
-        node_dof: int: degrees-of-freedom for a single node
+    Parameters
+    ----------
+        length : float
+            overall length of structure
+        locations : sequence
+            locations of nodes (loads and reactions)
+        node_dof : int
+            degrees-of-freedom for a single node
+        max_element_length : float | None
+            maximum allowed length of mesh element
+        min_element_count : int | None
+            minimum required number of elements
 
     .. versionchanged:: 0.1.8a1 renamed :obj:`dof` parameter to :obj:`node_dof`
     """
@@ -42,7 +50,8 @@ class Mesh:
         """
         degrees of freedom for a single node
 
-        Raises:
+        Raises
+        ------
             TypeError: when not a number
             ValueError: when not a positive integer
         """
@@ -58,6 +67,13 @@ class Mesh:
 
     @property
     def max_element_length(self) -> Optional[float]:
+        """
+        maximum allowed length of mesh element
+
+        Returns
+        -------
+        float: maximum allowed length of mesh element
+        """
         return self.__max_element_length
 
     @max_element_length.setter
@@ -76,6 +92,14 @@ class Mesh:
 
     @property
     def min_element_count(self) -> Optional[int]:
+        """
+        Minimum required number of elements.
+
+        Returns
+        -------
+        int | None
+            minimum required number of elements
+        """
         return self.__min_element_count
 
     @min_element_count.setter
@@ -184,8 +208,10 @@ class Mesh:
         """
         Degrees of freedom of the entire beam
 
-        Returns:
-            :obj:`int`: Read-only. Number of degrees of freedom of the beam
+        Returns
+        -------
+        int
+            Read-only. Number of degrees of freedom of the beam
         """
         return self.node_dof * len(self.nodes)
 
@@ -194,8 +220,10 @@ class Mesh:
         """
         List of lengths of mesh elements
 
-        Returns:
-            :obj:`list`: Read-only. List of lengths of local mesh elements
+        Returns
+        -------
+        array_like
+            Read-only. List of lengths of local mesh elements
         """
         if self.__lengths is not None:  # pragma: no cover
             return self.__lengths

@@ -19,26 +19,29 @@ class Beam(BeamElement):
     It is assumed to have homogeneous properties, with a constant
     cross-section.
 
-
-    Parameters:
-        length (:obj:`float`): the length of a beam. This is the total length
-                        of the beam, this is not the length of the meshed
-                        element. This must be a float that is greater than 0.
-        loads (:obj:`list`): list of load elements
-        reactions (:obj:`list`): list of reactions acting on the beam
-        E (:obj:`float`, optional): Young's modulus of the beam in units of
-                         :math:`\\frac{force}{length^2}`. Defaults to 1.
-                         The :math:`force` units used here are the same
-                         units that are used in the input forces, and
-                         calculated reaction forces. The :math:`length` unit
-                         must be the same as the area moment of inertia
-                         (**Ixx**) and the beam **length** units.
-        Ixx (:obj:`float`, optional): Area moment of inertia of the beam.
-                    Defaults to 1. This is constant (constant cross-sectional
-                    area) along the length of the beam. This is in units of
-                    :math:`length^4`. This must be the same length unit of
-                    Young's modulus (**E**) and the beam **length**.
-
+    Parameters
+    ----------
+    length : float
+        the length of a beam. This is the total length of the beam, this is
+        not the length of the meshed element. This must be a float that is
+        greater than 0.
+    loads : list
+        applied load elements
+    reactions : list
+        reactions acting on the beam
+    mesh : Mesh: default = None
+        mesh object for beam. Default is to auto create the mesh
+    E : float: Optional: default = `1`
+        Young's modulus of the beam in units of :math:`\\frac{force}{length^2}`.
+         The :math:`force` units used here are the same units
+         that are used in the input forces, and calculated reaction forces.
+         The :math:`length` unit must be the same as the area moment of inertia
+         (`Ixx`) and the beam `length` units.
+    Ixx : float Optional: default = `1`
+        Area moment of inertia of the beam. This is constant (constant
+        cross-sectional area) along the length of the beam. This is in units
+        of :math:`length^4`. This must be the same length unit of Young's
+        modulus (`E`) and the beam `length`.
     """
 
     def __init__(
@@ -55,10 +58,30 @@ class Beam(BeamElement):
 
     def validate_x(self, x):
         """
-        Validate the x value for use when calculating deflection, moment or shear
+        Validate the `x` value for use when calculating deflection, angle moment or shear
 
-        Parameters:
-            x: numeric | array-like: x-coordinate to validate
+        This will perform the following validations:
+
+        * `x` is an array (even for single values)
+        * all values in `x` are greater than or equal to `0`
+        * all values in `x` are less than or equal to beam length
+
+
+        Parameters
+        ----------
+            x : numeric | array_like
+                x-coordinate to validate
+
+        Returns
+        -------
+        array_like:
+            `x` as an array
+
+        Raises
+        ------
+        ValueError:
+            any `x` values are less than 0
+            any `x` values are greater than length
         """
 
         # update x to ensure it is an array, regardless of how it was entered
@@ -94,11 +117,15 @@ class Beam(BeamElement):
         * nodal displacements
         * element length for each x-value
 
-        Parameters:
-            x: array-like: global x-coordinates along the beam
+        Parameters
+        ----------
+            x : array_like
+                global x-coordinates along the beam
 
-        Returns:
-            tuple: (validated x coordinates, local x coordinates, nodal displacements, lengths)
+        Returns
+        -------
+            tuple
+                (validated x coordinates, local x coordinates, nodal displacements, lengths)
         """
 
         # Ensure that all x-values are valid and are in array form
@@ -128,25 +155,33 @@ class Beam(BeamElement):
         """
         Calculate deflection of the beam at location x
 
+        Parameters
+        ----------
+            x : array_like
+                locations along the beam where deflection is calculated.
+
+        Returns
+        -------
+            array_like
+                deflection of the beam in units of the beam length
+
+        Raises
+        ------
+            ValueError
+                when the :math:`0\\leq x \\leq length` is False
+
+        Notes
+        -----
         The deflections are calculated by taking the dot product of the shape
         functions, and the nodal displacements.
         This is represented in the form:
 
         .. centered::
-            :math:`d(x) = N \\cdot d_{nodal}`
+            :math:`d(x) = \\vec{N} \\cdot \\vec{d}_{nodal}`
 
-        Where $N$ is the shape functions evaluated at the local `x` values of
-        each element for each `x` coordinate, and $d_{nodal}$ is the nodal
-        displacement.
-
-        Parameters:
-            x array-like: locations along the beam where deflection is calculated.
-
-        Returns:
-            array-like: deflection of the beam in units of the beam length
-
-        Raises:
-            :obj:`ValueError`: when the :math:`0\\leq x \\leq length` is False
+        Where :math:`\\vec{N}` is the shape function vector evaluated at the
+        local `x` values of each element for each `x` coordinate, and
+        :math:`\\vec{d_{nodal}}` is the nodal displacement vector.
         """
 
         x, x_local, d_nodal, L = self.__result_setup(x)
@@ -162,33 +197,41 @@ class Beam(BeamElement):
         """
         Calculate angle of the beam at location x in degrees
 
-        The moments are calculated by solving this equation:
+        Parameters
+        ----------
+            x : array_like
+                locations along the beam where moment is calculated.
+
+        Returns
+        -------
+            array_like
+                moment of the beam
+
+        Raises
+        ------
+            ValueError
+                when the :math:`0\\leq x \\leq length` is False
+
+        Notes
+        -----
+
+        The angles are calculated by taking the first derivative of the
+        deflection equation:
 
         .. centered::
-            :math:`M(x) = E \\cdot Ixx \\cdot \\frac{d^2 v(x)}{dx^2}`
+            :math:`\\theta(x) = \\frac{d v(x)}{dx}`
 
-        where :math:`M` is the moment, :math:`E` is Young's modulus and
-        :math:`Ixx` is the area moment of inertia.
-
-        An alternate representation can be calculated using the second
+        An alternate representation can be calculated using the first
         derivative of the shape functions, and taking the dot product of the
-        nodal displacements.
+        nodal displacements. This method is more reliable when the function
+        :math:`v(x)` is unknown, so taking the derivative is done numerically.
 
         .. centered::
-            :math:`M(x) = \frac{d^2 N}{dx^2} \\cdot d_{nodal}`
+            :math:`\\theta(x) = \\frac{d\\vec{N}}{dx} \\cdot \\vec{d}_{nodal}`
 
-        Where $N$ is the shape functions evaluated at the local `x` values of
-        each element for each `x` coordinate, and $d_{nodal}$ is the nodal
-        displacement.
-
-        Parameters:
-            x: array-like: locations along the beam where moment is calculated.
-
-        Returns:
-            array-like: moment of the beam
-
-        Raises:
-            :obj:`ValueError`: when the :math:`0\\leq x \\leq length` is False
+        Where :math:`\\vec{N}` is the shape functions evaluated at the local
+        `x` values of each element for each `x` coordinate, and
+        :math:`\\vec{d}_{nodal}` is the nodal displacement vector.
         """
 
         x, x_local, d, L = self.__result_setup(x)
@@ -205,6 +248,24 @@ class Beam(BeamElement):
         """
         Calculate moment of the beam at location x
 
+
+        Parameters
+        ----------
+            x : array_like
+                locations along the beam where moment is calculated.
+
+        Returns
+        -------
+            array_like
+                moment of the beam
+
+        Raises
+        ------
+            ValueError
+                when the :math:`0\\leq x \\leq length` is False
+
+        Notes
+        -----
         The moments are calculated by solving this equation:
 
         .. centered::
@@ -215,23 +276,16 @@ class Beam(BeamElement):
 
         An alternate representation can be calculated using the second
         derivative of the shape functions, and taking the dot product of the
-        nodal displacements.
+        nodal displacements. This method is more reliable when the function
+        :math:`v(x)` is unknown, so taking the derivative is done numerically.
 
         .. centered::
-            :math:`M(x) = \frac{d^2 N}{dx^2} \\cdot d_{nodal}`
+            :math:`M(x) = \\frac{d^2 \\vec{N}}{dx^2} \\cdot \\vec{d}_{nodal}`
 
-        Where $N$ is the shape functions evaluated at the local `x` values of
-        each element for each `x` coordinate, and $d_{nodal}$ is the nodal
-        displacement.
+        Where :math:`\\vec{N}` is the shape functions evaluated at the local
+        `x` values of each element for each `x` coordinate, and
+        :math:`\\vec{d}_{nodal}` is the nodal displacement vector.
 
-        Parameters:
-            x: array-like: locations along the beam where moment is calculated.
-
-        Returns:
-            array-like: moment of the beam
-
-        Raises:
-            :obj:`ValueError`: when the :math:`0\\leq x \\leq length` is False
         """
 
         x, x_local, d, L = self.__result_setup(x)
@@ -247,6 +301,23 @@ class Beam(BeamElement):
         """
         Calculate shear force of the beam at location x
 
+        Parameters
+        ----------
+            x : array_like
+                locations along the beam where moment is calculated.
+
+        Returns
+        --------
+            array_like
+                shear force in the beam
+
+        Raises
+        -------
+            ValueError
+                when the :math:`0\\leq x \\leq length` is False
+
+        Notes
+        -----
         The shear forces are calculated by solving this equation:
 
         .. centered::
@@ -257,23 +328,15 @@ class Beam(BeamElement):
 
         An alternate representation can be calculated using the third
         derivative of the shape functions, and taking the dot product of the
-        nodal displacements.
+        nodal displacements. This method is more reliable when the function
+        :math:`v(x)` is unknown, so taking the derivative is done numerically.
 
         .. centered::
-            :math:`V(x) = \frac{d^3 N}{dx^3} \\cdot d_{nodal}`
+            :math:`V(x) = \\frac{d^3 \\vec{N}}{dx^3} \\cdot \\vec{d}_{nodal}`
 
-        Where $N$ is the shape functions evaluated at the local `x` values of
-        each element for each `x` coordinate, and $d_{nodal}$ is the nodal
-        displacement.
-
-        Parameters:
-            x: array-like: locations along the beam where moment is calculated.
-
-        Returns:
-            array-like: shear force in the beam
-
-        Raises:
-            :obj:`ValueError`: when the :math:`0\\leq x \\leq length` is False
+        Where :math:`\\vec{N}` is the shape functions evaluated at the local
+        `x` values of each element for each `x` coordinate, and
+        :math:`\\vec{d}_{nodal}` is the nodal displacement vector.
         """
 
         x, x_local, d, L = self.__result_setup(x)
@@ -330,21 +393,40 @@ class Beam(BeamElement):
         deflection, moment, and shear diagrams along the length of the beam
         element. Which of these diagrams, and their order may be customized.
 
-        Parameters:
-            n (:obj:`int`): defaults to `250`:
+        Parameters
+        ----------
+            n : int: default = `250`
                 number of data-points to use in plots
-            title (:obj:`str`) defaults to 'Beam Analysis`
+            title : str: default = "Beam Analysis"
                 title on top of plot
-            diagrams (:obj:`tuple`): defaults to
-                `('shear', 'moment', 'deflection')`
+            diagrams : tuple | None: {"shear", "moment", "angle", "deflection"}
                 tuple of diagrams to plot. All values in tuple must be strings,
                 and one of the defaults.
-                Valid values are :obj:`('shear', 'moment', 'deflection')`
-            diagram_labels (:obj:`tuple`): y-axis labels for subplots.
-                Must have the same length as `diagrams`
+                Default value is all charts: ("shear", "moment", "angle", "deflection")
+            diagram_labels : tuple | None
+                y-axis labels for subplots. Must have the same length as `diagrams`
+                Default is the name of the chart (ie "shear")
+            fig : matplotlib.figure.Figure | None: default = None
+                figure where the chart should be made. If `None`, one is created.
+            axes : matplotlib.axes.Axes | None: default = None
+                axes where plots are made. If `None`, one is created.
+            **kwargs:
+                Additional keyword arguments used to format the figure and
+                axes. Some key ones are:
 
-        Returns:
-             :obj:`tuple`:
+                * `grid`: bool: whether grid is applied, default is `True`
+                * `xlabel`: str: x-axis label, default is `Beam Position, x`
+                * `fill`: bool: whether to fill between the x-axis and value
+                    for all charts
+                * `plot_kwargs`: any keyword argument to pass to the
+                    `matplotlib.pyplot.plot()` function.
+                    Default is no additional arguments.
+                * `fill_kwargs`: any keyword argument to pass to the
+                  `matplotlib.pyplot.fill_between()` function()
+
+        Returns
+        -------
+             tuple
                 Tuple of :obj:`matplotlib.pyplot` figure and list of axes in
                 the form :obj:`(figure, axes)`
 
@@ -411,8 +493,8 @@ class Beam(BeamElement):
         just to show the plots
 
         Parameters:
-             args/kwargs: args and kwargs are passed directly to
-                          matplotlib.pyplot.show
+             args kwargs
+                args and kwargs are passed directly to `matplotlib.pyplot.show()` method
         """
         plt.show(*args, **kwargs)  # pragma: no cover
 
