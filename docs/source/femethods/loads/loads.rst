@@ -1,7 +1,0 @@
-Loads
-=====
-
-.. toctree::
-    :glob:
-
-    *

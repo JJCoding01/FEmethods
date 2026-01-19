@@ -1,7 +1,0 @@
-Reactions
-=========
-
-.. toctree::
-    :glob:
-
-    *

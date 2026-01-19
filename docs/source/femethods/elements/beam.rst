@@ -2,8 +2,6 @@ Beam
 ====
 
 
-.. automodule:: femethods.elements.beam
+.. automodule:: femethods.elements.beam.beam
     :members:
-    :undoc-members:
     :show-inheritance:
-    :inherited-members:

@@ -1,7 +1,7 @@
-Fixed
+Slot
 =====
 
 
-.. automodule:: femethods.reactions.fixed
+.. automodule:: femethods.reactions.slot
     :show-inheritance:
     :inherited-members:

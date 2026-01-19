@@ -11,18 +11,15 @@ on many different load cases, including statically indeterminate cases. The
 disadvantage of FEM is that it will have less accuracy then the exact equations
 derived for a particular case.
 
-    .. note::
-        This package is currently a work-in-progress.
-
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Table of Contents:
+   :glob:
 
    intro
-   femethods/core/core
-   femethods/elements/elements
-   femethods/loads/loads
-   femethods/reactions/reactions
+
+   femethods/index
+
 
 Indices and tables
 ==================
