@@ -28,7 +28,7 @@ def test_reaction_boundary_valid_len1(bc1):
     if bc1 is None:
         pytest.skip("skip None boundary")
     reaction = ReactionFactory(boundary=bc1)
-    assert reaction.boundary == bc1
+    assert reaction.boundary == (bc1,)
 
 
 @pytest.mark.parametrize("bc1", (None, 0))
