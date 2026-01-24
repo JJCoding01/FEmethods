@@ -15,9 +15,9 @@ from warnings import warn
 from .. import validation
 from ..core import Force
 
-DOF: TypeAlias = Literal[0] | None
-BOUNDARY: TypeAlias = tuple[DOF, DOF]
-BOUNDARIES: TypeAlias = tuple[BOUNDARY, ...]
+Dof: TypeAlias = Literal[0] | None
+Boundary: TypeAlias = tuple[Dof, Dof]
+Boundaries: TypeAlias = tuple[Boundary, ...]
 
 
 class Reaction(Force):
@@ -51,29 +51,29 @@ class Reaction(Force):
 
     name = "reaction"
 
-    def __init__(self, location: float, boundary: BOUNDARY = (None, None)) -> None:
+    def __init__(self, location: float, boundary: Boundary = (None, None)) -> None:
         super().__init__(magnitude=None, location=location)
         self.force = None
         self.moment = None
         self.boundary = boundary
 
     @property
-    def boundary(self) -> BOUNDARY:
+    def boundary(self) -> Boundary:
         """
         boundary conditions for the reaction
 
         The boundary conditions are a tuple where each degree of freedom is free to move
         unless the boundary has a 0 in that position
         """
-        if len(self._boundary) == 1:
-            return self._boundary[0]
+        # if len(self._boundary) == 1:
+        #     return self._boundary[0]
         return self._boundary
 
     @boundary.setter
-    def boundary(self, value: BOUNDARY) -> None:
+    def boundary(self, value: Boundary) -> None:
 
-        if not isinstance(value, Iterable):
-            value = [value]
+        # if not isinstance(value, Iterable):
+        #     value = (value,)
 
         for dof in value:
             if dof not in (0, None):

@@ -49,6 +49,7 @@ class Beam(BeamElement):
         length,
         loads,
         reactions,
+        *,  # force everything after this to be keyword
         mesh=None,
         E=1,
         Ixx=1,
@@ -181,7 +182,7 @@ class Beam(BeamElement):
 
         Where :math:`\\vec{N}` is the shape function vector evaluated at the
         local `x` values of each element for each `x` coordinate, and
-        :math:`\\vec{d_{nodal}}` is the nodal displacement vector.
+        :math:`\\vec{d}_{nodal}` is the nodal displacement vector.
         """
 
         x, x_local, d_nodal, L = self.__result_setup(x)
@@ -379,6 +380,7 @@ class Beam(BeamElement):
     def plot(
         self,
         n=250,
+        *,  # force everything after this to be keyword arguments.
         title="Beam Analysis",
         diagrams=None,
         diagram_labels=None,
@@ -511,10 +513,10 @@ class Beam(BeamElement):
 
         r = ""
         for reaction in self.reactions:
-            r += "Type: {}\n".format(reaction.name)
-            r += "    Location: {}\n".format(reaction.location)
-            r += "       Force: {}\n".format(reaction.force)
-            r += "      Moment: {}\n".format(reaction.moment)
+            r += f"Type: {reaction.name}\n"
+            r += f"    Location: {reaction.location}\n"
+            r += f"       Force: {reaction.force}\n"
+            r += f"      Moment: {reaction.moment}\n"
 
         msg = (
             "PARAMETERS\n"

@@ -31,6 +31,7 @@ class Mesh:
         length: float,
         locations: npt.NDArray[np.float64],
         node_dof: int,
+        *,
         max_element_length: Optional[float] = None,
         min_element_count: Optional[int] = None,
     ) -> None:

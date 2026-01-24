@@ -14,6 +14,8 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from matplotlib.figure import Figure
 
+BOUNDARY = tuple[float | None, float | None]
+
 
 # Allow upper case letters for variable names to match engineering conventions
 # for variables, such as E for Young's modulus and I for the polar moment of
@@ -27,6 +29,7 @@ class BeamElement(Element):
         length: float,
         loads: Sequence[Load],
         reactions: Sequence[Reaction],
+        *,
         mesh: Optional[Mesh] = None,
         E: float = 1,
         Ixx: float = 1,
@@ -51,7 +54,7 @@ class BeamElement(Element):
         except AttributeError as e:
             # error likely due to either reaction or load not being of a
             # proper type, causing an error on r.location or load.location
-            raise TypeError(e)
+            raise TypeError(e) from e
         mesh = Mesh(length, np.array(locations), 2)
         return mesh
 
@@ -61,7 +64,7 @@ class BeamElement(Element):
         return super().loads
 
     @loads.setter
-    def loads(self, value: Sequence[Load]) -> None:
+    def loads(self, value: Sequence[Load]) -> None:  # pylint: disable=too-many-locals
         # basic loads
         # call super loads method to take advantage of the error checking and validation
         # performed at that level
@@ -127,7 +130,7 @@ class BeamElement(Element):
         self.mesh = mesh
         return self.mesh
 
-    def __get_boundary_conditions(self) -> npt.NDArray[np.float64]:
+    def __get_boundary_conditions(self) -> npt.NDArray[BOUNDARY]:
         assert self.reactions is not None
 
         # Initialize the  boundary conditions to None for each node
@@ -239,7 +242,9 @@ class BeamElement(Element):
         # reused without recalculating the stiffness matrix.
         # This vector should be cleared anytime any of the beam parameters
         # gets changed.
-        self._node_deflections: npt.NDArray[np.float64] = np.linalg.solve(kg, b)
+        nd = np.linalg.solve(kg, b)
+        nd64 = np.asarray(nd, dtype=np.float64)
+        self._node_deflections = nd64
         return self._node_deflections
 
     def update_reactions(self) -> npt.NDArray[np.float64]:
