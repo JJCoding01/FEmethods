@@ -91,7 +91,7 @@ plugins = [
 ]
 
 # setup some defaults for incremental typing
-strict = false
+strict = true
 allow_subclassing_any = true
 follow_imports = "silent"    # options: "skip", "normal", "silent"
 no_implicit_reexport = false
@@ -106,9 +106,11 @@ files = [ # whitelist files as typing is added to the project
     "femethods/core",
     "femethods/reactions",
     "femethods/loads",
+    "femethods/elements",
 
   # optionally, white list specific files here
-    "femethods/elements/__base.py",
+#    "femethods/elements/__base.py",
+    "femethods/elements/beam/__base.py",
 
   # module level files
     "femethods/validation.py",
@@ -119,7 +121,8 @@ exclude = [
   # black list any non-typed files that are inside a white-listed module.
   # these are regex patterns, so anchor the start to the begining of the
   # package name
-    ".*distributed.*.py"
+    ".*distributed.*.py",
+    "^femethods/elements/beam/*",
 ]
 
 disable_error_code = [
