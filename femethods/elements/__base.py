@@ -123,6 +123,9 @@ class Element(Properties, ABC):
         self._reactions: Sequence[Reaction] = reactions
         self._loads: Sequence[Load] = ()
 
+        # add call to reactions to include all the error handling
+        self.reactions = reactions
+
     @property
     def loads(self) -> Sequence[Load]:
         """

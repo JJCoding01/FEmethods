@@ -9,7 +9,7 @@ There are two types of reactions that are defined.
     * FixedReaction, does not allow any displacement
 """
 
-from typing import Any, Literal, Optional, TypeAlias
+from typing import Any, Iterable, Literal, Optional, TypeAlias
 from warnings import warn
 
 from .. import validation
@@ -72,8 +72,8 @@ class Reaction(Force):
     @boundary.setter
     def boundary(self, value: Boundary) -> None:
 
-        # if not isinstance(value, Iterable):
-        #     value = (value,)
+        if not isinstance(value, Iterable):
+            value = (value,)
 
         for dof in value:
             if dof not in (0, None):
