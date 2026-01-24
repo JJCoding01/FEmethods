@@ -32,7 +32,7 @@ install:
 	python setup.py install
 
 lint:
-	pylint $(PACKAGE_NAME)
+	pylint $(PACKAGE_NAME) --disable=fixme
 
 lint-tests:
 	pylint tests
