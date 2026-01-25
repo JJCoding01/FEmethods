@@ -10,6 +10,35 @@ from femethods.loads import MomentLoad, PointLoad
 from femethods.reactions import FixedReaction, PinnedReaction
 
 
+def intro_demo():
+    """
+    Simply supported beam with a single centered point load
+
+    This is the example shown in the intro docs
+    """
+    print("=" * 79)
+    print("Intro Demo")
+    print("Show an example of a simply supported beam with centered load")
+
+    # Note that both the reaction and load are both lists. They must always be
+    # given to Beam as a list,
+    r = [PinnedReaction(x) for x in [0, 30]]  # define reactions as list
+    p = [PointLoad(magnitude=-100, location=15)]  # define loads as list
+
+    b = Beam(30, loads=p, reactions=r)
+
+    # an explicit solve is required to calculate the reaction values
+    b.solve()
+
+    print(b)
+
+    b.plot(
+        diagrams=("shear", "moment", "deflection"),
+        # plot_kwargs={"label": "approx solution"},
+    )
+    b.show()
+
+
 def example_1():
     """
     Cantilevered Beam with Fixed Support and End Loading
@@ -113,6 +142,7 @@ if __name__ == "__main__":
         suppress=True,
         formatter={"float": "{:0,.5f}".format, "int": "{:0,.0f}".format},
     )
-    example_1()
+    # intro_demo()
+    # example_1()
     example_2()
-    example_3()
+    # example_3()
