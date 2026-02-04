@@ -104,26 +104,26 @@ warn_unused_ignores = true
 # only check the areas of the project that have been typed so far
 files = [ # whitelist files as typing is added to the project
   # white list typed modules here
-    "femethods/core",
-    "femethods/reactions",
-    "femethods/loads",
-    "femethods/elements",
+  "femethods/core",
+  "femethods/reactions",
+  "femethods/loads",
+  "femethods/elements",
 
   # optionally, white list specific files here
-#    "femethods/elements/__base.py",
-    "femethods/elements/beam/__base.py",
+  #    "femethods/elements/__base.py",
+  "femethods/elements/beam/__base.py",
 
   # module level files
-    "femethods/validation.py",
-    "femethods/mesh.py",
+  "femethods/validation.py",
+  "femethods/mesh.py",
 ]
 
 exclude = [
   # black list any non-typed files that are inside a white-listed module.
   # these are regex patterns, so anchor the start to the begining of the
   # package name
-    ".*distributed.*.py",
-    "^femethods/elements/beam/*",
+  ".*distributed.*.py",
+  "^femethods/elements/beam/*",
 ]
 
 disable_error_code = [
