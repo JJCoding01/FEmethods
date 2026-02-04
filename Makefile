@@ -1,15 +1,25 @@
 PACKAGE_NAME=femethods
 
 .PHONY: install docs lint-html tests
+
+
+install:
+	pip install -e .[dev, docs]
+
+# ============= BUILD AND UPLOAD COMMANDS =============
 .PHONY: build
-
 build:
-	python setup.py sdist
-	python setup.py bdist_wheel
+	python -m build
 
+upload:
+	twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
+
+
+# ============= DOCS =============
 docs:
 	cd docs && make html
 
+# ============= FORMATTING AND LINTING =============
 format:
 	isort $(PACKAGE_NAME)
 	black $(PACKAGE_NAME)
@@ -24,12 +34,10 @@ format-all:
 	isort tests
 	black tests
 
+# ============= FORMATTING AND LINTING =============
 pyproject:
 	validate-pyproject pyproject.toml
 	pyproject-fmt pyproject.toml
-
-install:
-	python setup.py install
 
 lint:
 	pylint $(PACKAGE_NAME) --disable=fixme
@@ -48,6 +56,8 @@ lint-ci:
 	flake8 tests --count --select=E9,F63,F7,F82 --show-source --statistics
 	flake8 tests --count --max-complexity=10 --max-line-length=127 --statistics
 
+
+# ============= RUNNING TESTS =============
 tests:
 	pytest tests
 
@@ -75,6 +85,3 @@ tests-core-cov:
 tests-ci-cov:
 	coverage run -m --source=actions pytest tests
 	coverage report --fail-under=100
-
-upload:
-	twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
