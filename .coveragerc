@@ -1,24 +1,18 @@
 [run]
-branch = True
+    branch = True
 
 [report]
-# Regexes for lines to exclude from consideration
-exclude_lines =
-# Have to re-enable the standard pragma
-    pragma: no cover
+    # Regexes for lines to exclude from consideration
+    exclude_lines =
+        pragma: no cover
+        def __repr__
+        def __str__
+        raise AssertionError
+        raise NotImplementedError
+        if __name__ == .__main__.:
 
-# Don't complain about missing debug-only code:
-    def __repr__
-    def __str__
-
-# Don't complain if tests don't hit defensive assertion code:
-    raise AssertionError
-    raise NotImplementedError
-
-# Don't complain if non-runnable code isn't run:
-    if __name__ == .__main__.:
-
-;ignore_errors = True
+    show_missing = True
 
 [html]
-directory = htmlcov
+    directory = htmlcov
+    show_contexts = True

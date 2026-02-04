@@ -1,0 +1,131 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = [ "setuptools>=77.0.3" ]
+
+[project]
+name = "femethods"
+description = "Implementation of Finite Element Analysis"
+readme = "README.md"
+authors = [
+  { name = "Joseph Contreras", email = '26684136+JosephJContreras@users.noreply.github.com' },
+]
+
+requires-python = ">=3.11"
+
+classifiers = [
+  #    https://pypi.org/classifiers/
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+
+dynamic = [ "version" ]
+
+dependencies = [
+  "matplotlib",
+
+  "numpy",
+]
+
+optional-dependencies.dev = [
+  "black",
+  "coverage",
+  "coveralls",
+  "flake8",
+  "isort",
+  "mypy",
+  "pip-tools",
+  "pre-commit",
+  "pylint",
+  "pyproject-fmt",
+  "pytest",
+  "pytest-cov",
+  "twine",
+  "validate-pyproject[all]",
+]
+optional-dependencies.docs = [
+  "sphinx",
+]
+
+urls.Homepage = "https://femethods.readthedocs.io/en/latest/index.html"
+urls.Source = "https://github.com/JJCoding01/FEmethods"
+
+[tool.setuptools.dynamic]
+version = { attr = "femethods.__version__" }
+
+[tool.setuptools.packages.find]
+include = [ 'femethods' ]
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+force_alphabetical_sort_within_sections = true
+group_by_package = true
+lines_between_sections = 1
+lines_between_types = 1
+multi_line_output = 3
+profile = "black"
+src_paths = [ "femethods", "tests", "docs" ]
+known_first_party = [ "femethods" ]
+
+[tool.pytest.ini_options]
+
+# See https://docs.pytest.org/en/6.2.x/usage.html for more details
+addopts = [
+  #  "--maxfail=3",        # stop tests after this many fails
+  "-rfE",               # Short summary of failed tests in terminal
+  "-qq",                # quiet mode (displays less verbose output). Can also stack to -qqq
+  "--cov-context=test",
+]
+
+testpaths = [ "tests" ]
+
+[tool.mypy]
+
+plugins = [
+]
+
+# setup some defaults for incremental typing
+strict = true
+allow_subclassing_any = true
+follow_imports = "silent"    # options: "skip", "normal", "silent"
+no_implicit_reexport = false
+show_error_codes = true
+warn_return_any = true
+warn_unused_configs = true
+warn_unused_ignores = true
+
+# only check the areas of the project that have been typed so far
+files = [ # whitelist files as typing is added to the project
+  # white list typed modules here
+    "femethods/core",
+    "femethods/reactions",
+    "femethods/loads",
+    "femethods/elements",
+
+  # optionally, white list specific files here
+#    "femethods/elements/__base.py",
+    "femethods/elements/beam/__base.py",
+
+  # module level files
+    "femethods/validation.py",
+    "femethods/mesh.py",
+]
+
+exclude = [
+  # black list any non-typed files that are inside a white-listed module.
+  # these are regex patterns, so anchor the start to the begining of the
+  # package name
+    ".*distributed.*.py",
+    "^femethods/elements/beam/*",
+]
+
+disable_error_code = [
+  "attr-defined", # this allows imports without module being in __all__
+]

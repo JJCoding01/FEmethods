@@ -1,4 +1,11 @@
-# Change Log
+# Changelog
+
+## v0.1.8 (Jan 2026)
+ 
+- Rewrite entire project to have better structure, and improve organization
+- Update to use numpy structures more consistently throughout
+- BUGFIX: Issue with high moments at beam ends
+- Restructure tests folder and add many integration tests
 
 ## v0.1.7a2
 - Move common/private functionality into core module
