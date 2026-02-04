@@ -45,6 +45,7 @@ optional-dependencies.dev = [
   "pyproject-fmt",
   "pytest",
   "pytest-cov",
+  "twine",
   "validate-pyproject[all]",
 ]
 optional-dependencies.docs = [
