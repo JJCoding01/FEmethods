@@ -11,9 +11,11 @@ install:
 build:
 	python -m build
 
-upload:
-	twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
+upload-test:
+	twine upload --repository testpypi dist/*
 
+upload:
+	twine upload --repository pypi dist/*
 
 # ============= DOCS =============
 docs:
