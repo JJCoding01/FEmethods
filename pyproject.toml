@@ -58,6 +58,7 @@ dynamic.version = { attr = "femethods.__version__" }
 
 [tool.black]
 line-length = 88
+target-version = ["py311", "py312", "py313", "py314"]
 
 [tool.isort]
 profile = "black"
