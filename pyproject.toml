@@ -25,21 +25,26 @@ classifiers = [
 ]
 
 dynamic = [ "version" ]
-
 dependencies = [
   "matplotlib",
-
   "numpy",
+  "scipy",
 ]
+optional-dependencies.docs = [
+  "sphinx",
+]
+urls.Homepage = "https://femethods.readthedocs.io/en/latest/index.html"
+urls.Source = "https://github.com/JJCoding01/FEmethods"
 
-optional-dependencies.dev = [
+[dependency-groups]
+dev = [
   "black",
   "coverage",
   "coveralls",
+  "factory-boy",
   "flake8",
   "isort",
   "mypy",
-  "pip-tools",
   "pre-commit",
   "pylint",
   "pyproject-fmt",
@@ -48,12 +53,6 @@ optional-dependencies.dev = [
   "twine",
   "validate-pyproject[all]",
 ]
-optional-dependencies.docs = [
-  "sphinx",
-]
-
-urls.Homepage = "https://femethods.readthedocs.io/en/latest/index.html"
-urls.Source = "https://github.com/JJCoding01/FEmethods"
 
 [tool.setuptools]
 packages.find.where = [ "src" ]
