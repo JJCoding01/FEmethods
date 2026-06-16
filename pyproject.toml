@@ -55,11 +55,10 @@ optional-dependencies.docs = [
 urls.Homepage = "https://femethods.readthedocs.io/en/latest/index.html"
 urls.Source = "https://github.com/JJCoding01/FEmethods"
 
-[tool.setuptools.dynamic]
-version = { attr = "femethods.__version__" }
-
-[tool.setuptools.packages.find]
-include = [ 'femethods' ]
+[tool.setuptools]
+packages.find.where = [ "src" ]
+packages.find.include = [ "femethods*" ]
+dynamic.version = { attr = "femethods.__version__" }
 
 [tool.black]
 line-length = 88
@@ -73,18 +72,8 @@ multi_line_output = 3
 profile = "black"
 src_paths = [ "femethods", "tests", "docs" ]
 known_first_party = [ "femethods" ]
-
-[tool.pytest.ini_options]
-
-# See https://docs.pytest.org/en/6.2.x/usage.html for more details
-addopts = [
-  #  "--maxfail=3",        # stop tests after this many fails
-  "-rfE",               # Short summary of failed tests in terminal
-  "-qq",                # quiet mode (displays less verbose output). Can also stack to -qqq
-  "--cov-context=test",
-]
-
-testpaths = [ "tests" ]
+src_paths = [ "docs", "src", "tests" ]
+group_by_package = true
 
 [tool.mypy]
 
@@ -102,28 +91,27 @@ warn_unused_configs = true
 warn_unused_ignores = true
 
 # only check the areas of the project that have been typed so far
-files = [ # whitelist files as typing is added to the project
+files = [  # whitelist files as typing is added to the project
   # white list typed modules here
-    "femethods/core",
-    "femethods/reactions",
-    "femethods/loads",
-    "femethods/elements",
+  "src/femethods/core",
+  "src/femethods/elements",
 
   # optionally, white list specific files here
-#    "femethods/elements/__base.py",
-    "femethods/elements/beam/__base.py",
+  #    "src/femethods/elements/__base.py",
+  "src/femethods/elements/beam/__base.py",
+  "src/femethods/loads",
+  "src/femethods/mesh.py",
+  "src/femethods/reactions",
 
   # module level files
-    "femethods/validation.py",
-    "femethods/mesh.py",
+  "src/femethods/validation.py",
 ]
-
 exclude = [
   # black list any non-typed files that are inside a white-listed module.
   # these are regex patterns, so anchor the start to the begining of the
   # package name
-    ".*distributed.*.py",
-    "^femethods/elements/beam/*",
+  ".*distributed.*.py",
+  "^src/femethods/elements/beam/",
 ]
 
 disable_error_code = [

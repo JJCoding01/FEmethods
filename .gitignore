@@ -1,12 +1,13 @@
 # ignore python environment
 env/*
+.venv/
 
 scrap/*
 
 # ignore build related folders
 build/*
 dist/*
-femethods.egg-info/*
+*.egg-info/
 
 __pycache__/
 

@@ -1,4 +1,5 @@
-PACKAGE_NAME=femethods
+PACKAGE_NAME = femethods
+PACKAGE_PATH = src/$(PACKAGE_NAME)
 
 .PHONY: install docs lint-html tests
 
@@ -21,16 +22,16 @@ docs:
 
 # ============= FORMATTING AND LINTING =============
 format:
-	isort $(PACKAGE_NAME)
-	black $(PACKAGE_NAME)
+	isort $(PACKAGE_PATH)
+	black $(PACKAGE_PATH)
 
 format-tests:
 	isort tests
 	black tests
 
 format-all:
-	isort $(PACKAGE_NAME)
-	black $(PACKAGE_NAME)
+	isort $(PACKAGE_PATH)
+	black $(PACKAGE_PATH)
 	isort tests
 	black tests
 
@@ -40,18 +41,18 @@ pyproject:
 	pyproject-fmt pyproject.toml
 
 lint:
-	pylint $(PACKAGE_NAME) --disable=fixme
+	pylint $(PACKAGE_PATH) --disable=fixme
 
 lint-tests:
 	pylint tests
 
 lint-all:
-	pylint $(PACKAGE_NAME)
+	pylint $(PACKAGE_PATH)
 	pylint tests
 
 lint-ci:
-	flake8 $(PACKAGE_NAME) --count --select=E9,F63,F7,F82 --show-source --statistics
-	flake8 $(PACKAGE_NAME) --count --max-complexity=10 --max-line-length=127 --statistics
+	flake8 $(PACKAGE_PATH) --count --select=E9,F63,F7,F82 --show-source --statistics
+	flake8 $(PACKAGE_PATH) --count --max-complexity=10 --max-line-length=127 --statistics
 
 	flake8 tests --count --select=E9,F63,F7,F82 --show-source --statistics
 	flake8 tests --count --max-complexity=10 --max-line-length=127 --statistics
