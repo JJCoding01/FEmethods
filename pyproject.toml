@@ -7,13 +7,11 @@ name = "femethods"
 description = "Implementation of Finite Element Analysis"
 readme = "README.md"
 authors = [
-  { name = "Joseph Contreras", email = '26684136+JosephJContreras@users.noreply.github.com' },
+  { name = "Joseph Contreras", email = "26684136+JosephJContreras@users.noreply.github.com" },
 ]
-
 requires-python = ">=3.11"
-
 classifiers = [
-  #    https://pypi.org/classifiers/
+  # https://pypi.org/classifiers/
   "Development Status :: 2 - Pre-Alpha",
   "Intended Audience :: Developers",
   "Operating System :: OS Independent",
@@ -23,7 +21,6 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
 ]
-
 dynamic = [ "version" ]
 dependencies = [
   "matplotlib",
@@ -63,32 +60,16 @@ dynamic.version = { attr = "femethods.__version__" }
 line-length = 88
 
 [tool.isort]
+profile = "black"
+multi_line_output = 3
 force_alphabetical_sort_within_sections = true
-group_by_package = true
 lines_between_sections = 1
 lines_between_types = 1
-multi_line_output = 3
-profile = "black"
-src_paths = [ "femethods", "tests", "docs" ]
 known_first_party = [ "femethods" ]
 src_paths = [ "docs", "src", "tests" ]
 group_by_package = true
 
 [tool.mypy]
-
-plugins = [
-]
-
-# setup some defaults for incremental typing
-strict = true
-allow_subclassing_any = true
-follow_imports = "silent"    # options: "skip", "normal", "silent"
-no_implicit_reexport = false
-show_error_codes = true
-warn_return_any = true
-warn_unused_configs = true
-warn_unused_ignores = true
-
 # only check the areas of the project that have been typed so far
 files = [  # whitelist files as typing is added to the project
   # white list typed modules here
@@ -112,7 +93,26 @@ exclude = [
   ".*distributed.*.py",
   "^src/femethods/elements/beam/",
 ]
-
+follow_imports = "silent"  # options: "skip", "normal", "silent"
+warn_unused_ignores = true
+warn_return_any = true
 disable_error_code = [
   "attr-defined", # this allows imports without module being in __all__
+]
+# setup some defaults for incremental typing
+strict = true
+plugins = []
+warn_unused_configs = true
+allow_subclassing_any = true
+no_implicit_reexport = false
+show_error_codes = true
+
+[tool.pytest]
+ini_options.testpaths = [ "tests" ]
+# See https://docs.pytest.org/en/6.2.x/usage.html for more details
+ini_options.addopts = [
+  # "--maxfail=3",        # stop tests after this many fails
+  "-rfE",               # Short summary of failed tests in terminal
+  "-qq",                # quiet mode (displays less verbose output). Can also stack to -qqq
+  "--cov-context=test",
 ]
