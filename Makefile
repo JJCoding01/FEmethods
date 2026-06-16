@@ -5,84 +5,88 @@ PACKAGE_PATH = src/$(PACKAGE_NAME)
 
 
 install:
-	pip install -e .[dev, docs]
+	uv sync --extra docs
 
 # ============= BUILD AND UPLOAD COMMANDS =============
 .PHONY: build
 build:
-	python -m build
+	uv build
 
 upload:
-	twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
+	uv run twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
 
 
 # ============= DOCS =============
 docs:
-	cd docs && make html
+	cd docs && uv run make html
+
 
 # ============= FORMATTING AND LINTING =============
 format:
-	isort $(PACKAGE_PATH)
-	black $(PACKAGE_PATH)
+	uv run isort $(PACKAGE_PATH)
+	uv run black $(PACKAGE_PATH)
 
 format-tests:
-	isort tests
-	black tests
+	uv run isort tests
+	uv run black tests
 
 format-all:
-	isort $(PACKAGE_PATH)
-	black $(PACKAGE_PATH)
-	isort tests
-	black tests
+	uv run isort $(PACKAGE_PATH)
+	uv run black $(PACKAGE_PATH)
+	uv run isort tests
+	uv run black tests
 
-# ============= FORMATTING AND LINTING =============
+
+# ============= VALIDATION =============
 pyproject:
-	validate-pyproject pyproject.toml
-	pyproject-fmt pyproject.toml
+	uv run validate-pyproject pyproject.toml
+	uv run pyproject-fmt pyproject.toml
 
+
+# ============= LINTING =============
 lint:
-	pylint $(PACKAGE_PATH) --disable=fixme
+	uv run pylint $(PACKAGE_PATH) --disable=fixme
 
 lint-tests:
-	pylint tests
+	uv run pylint tests
 
 lint-all:
-	pylint $(PACKAGE_PATH)
-	pylint tests
+	uv run pylint $(PACKAGE_PATH)
+	uv run pylint tests
 
 lint-ci:
-	flake8 $(PACKAGE_PATH) --count --select=E9,F63,F7,F82 --show-source --statistics
-	flake8 $(PACKAGE_PATH) --count --max-complexity=10 --max-line-length=127 --statistics
+	uv run flake8 $(PACKAGE_PATH) --count --select=E9,F63,F7,F82 --show-source --statistics
+	uv run flake8 $(PACKAGE_PATH) --count --max-complexity=10 --max-line-length=127 --statistics
 
-	flake8 tests --count --select=E9,F63,F7,F82 --show-source --statistics
-	flake8 tests --count --max-complexity=10 --max-line-length=127 --statistics
+	uv run flake8 tests --count --select=E9,F63,F7,F82 --show-source --statistics
+	uv run flake8 tests --count --max-complexity=10 --max-line-length=127 --statistics
 
 
 # ============= RUNNING TESTS =============
 tests:
-	pytest tests
+	uv run pytest tests
 
 tests-cov:
-	pytest --cov-report html --cov=$(PACKAGE_NAME) tests
+	uv run pytest --cov-report html --cov=$(PACKAGE_NAME) tests
 
 tests-unit:
-	pytest tests/unit
+	uv run pytest tests/unit
 
 tests-unit-cov:
-	pytest --cov-report html --cov=$(PACKAGE_NAME) tests/unit
+	uv run pytest --cov-report html --cov=$(PACKAGE_NAME) tests/unit
 
 tests-int:
-	pytest tests/integration
+	uv run pytest tests/integration
 
 tests-int-cov:
-	pytest --cov-report html --cov=$(PACKAGE_NAME) tests/integration
+	uv run pytest --cov-report html --cov=$(PACKAGE_NAME) tests/integration
 
 tests-core:
-	pytest tests/$(PACKAGE_NAME)/core
+	uv run pytest tests/$(PACKAGE_NAME)/core
 
 tests-core-cov:
-	pytest --cov-report html --cov=$(PACKAGE_NAME) tests/$(PACKAGE_NAME)/core
+	uv run pytest --cov-report html --cov=$(PACKAGE_NAME) tests/$(PACKAGE_NAME)/core
 
 tests-ci-cov:
-	coverage run -m --source=actions pytest tests
-	coverage report --fail-under=100
+	uv run coverage run -m pytest tests
+	uv run coverage report --fail-under=100
